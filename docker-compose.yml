@@ -1,7 +1,8 @@
 services:
 
   application:
-    image: armhaina/symfony-build-hub:php-8.5-rc-fpm-trixie
+    build: build/php-8.3-fpm-bookworm/development
+    #image: armhaina/symfony-build-hub:php-8.5-rc-fpm-trixie
     env_file: .env
     working_dir: ${APP_PATH}
     environment:
