@@ -11,8 +11,6 @@ class ExceptionListener
 {
     public function onKernelException(ExceptionEvent $event): void
     {
-        return;
-
         $exception = $event->getThrowable();
 
         $data = [
