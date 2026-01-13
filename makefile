@@ -59,7 +59,7 @@ cache-clear:
 
 
 phpcs:
-	docker compose exec -it application php vendor/bin/php-cs-fixer fix --allow-risky=yes
+	docker compose exec -it application php vendor/bin/phpcbf
 
 phpstan:
 	docker compose exec -it application php vendor/bin/phpstan analyse src

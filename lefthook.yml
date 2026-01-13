@@ -1,0 +1,7 @@
+pre-commit:
+  commands:
+    phpcs:
+      run: make phpcs && git add {staged_files}
+
+    phpstan:
+      run: make phpstan
