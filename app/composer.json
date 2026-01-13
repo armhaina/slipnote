@@ -16,6 +16,7 @@
         "php-ds/php-ds": "^1.7",
         "phpdocumentor/reflection-docblock": "^6.0",
         "phpstan/phpdoc-parser": "^2.3.1",
+        "symfony/asset": "8.0.*",
         "symfony/browser-kit": "^7.4.3",
         "symfony/console": "8.0.*",
         "symfony/dotenv": "8.0.*",
@@ -29,6 +30,7 @@
         "symfony/scheduler": "8.0.*",
         "symfony/security-bundle": "8.0.*",
         "symfony/serializer": "8.0.*",
+        "symfony/twig-bundle": "8.0.*",
         "symfony/validator": "8.0.*",
         "symfony/yaml": "8.0.*"
     },
