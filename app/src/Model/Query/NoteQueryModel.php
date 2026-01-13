@@ -11,8 +11,11 @@ class NoteQueryModel implements EntityQueryModelInterface
     private int $limit = 20;
     private int $offset = 0;
     private ?int $ownUserId = null;
+    /** @var array<int> */
     private ?array $ids = null;
+    /** @var array<int> */
     private ?array $userIds = null;
+    /** @var array<string> */
     private array $orderBy = [];
     private ?\DateTimeImmutable $updatedAtLess = null;
 
@@ -40,11 +43,18 @@ class NoteQueryModel implements EntityQueryModelInterface
         return $this;
     }
 
+    /**
+     * @return array<int>|null
+     */
     public function getIds(): ?array
     {
         return $this->ids;
     }
 
+    /**
+     * @param array<int> $ids
+     * @return NoteQueryModel
+     */
     public function setIds(array $ids): self
     {
         $this->ids = $ids;
@@ -52,11 +62,18 @@ class NoteQueryModel implements EntityQueryModelInterface
         return $this;
     }
 
+    /**
+     * @return array<int>|null
+     */
     public function getUserIds(): ?array
     {
         return $this->userIds;
     }
 
+    /**
+     * @param array<int> $userIds
+     * @return NoteQueryModel
+     */
     public function setUserIds(array $userIds): self
     {
         $this->userIds = $userIds;
@@ -76,11 +93,18 @@ class NoteQueryModel implements EntityQueryModelInterface
         return $this;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getOrderBy(): array
     {
         return $this->orderBy;
     }
 
+    /**
+     * @param array<string> $orderBy
+     * @return NoteQueryModel
+     */
     public function setOrderBy(array $orderBy): self
     {
         $this->orderBy = $orderBy;
