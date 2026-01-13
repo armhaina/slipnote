@@ -62,7 +62,10 @@ class NotesDeleteCommand extends Command
     }
 
     /**
+     * @param int $offset
+     * @return Sequence
      * @throws EntityQueryModelInvalidObjectTypeException
+     * @throws \DateMalformedStringException
      */
     private function getNotes(int $offset): Sequence
     {
