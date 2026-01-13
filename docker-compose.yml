@@ -1,0 +1,27 @@
+services:
+
+  application:
+    build: armhaina/symfony-build-hub:php-8.5-rc-fpm-trixie
+    env_file: .env
+    working_dir: ${APP_PATH}
+    environment:
+      PHP_IDE_CONFIG: serverName=${SERVER_NAME}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:${APP_PATH}:cached
+    depends_on:
+      - ${DB_HOST}
+
+  database:
+    image: postgres:18.1-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - ./docker/database/db.sql:/docker-entrypoint-initdb.d/db.sql
+    ports:
+      - "5432:5432"
