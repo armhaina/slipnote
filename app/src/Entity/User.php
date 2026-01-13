@@ -22,6 +22,7 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['unsigned' => true])]
     #[Groups(groups: Group::PUBLIC->value)]
+    /** @phpstan-ignore property.unusedType */
     private ?int $id = null;
 
     /** @var array<string> */

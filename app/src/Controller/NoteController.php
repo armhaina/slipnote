@@ -48,7 +48,7 @@ class NoteController extends AbstractController
         if ($note->getIsPrivate() && $note->getUser() !== $user) {
             throw new \Exception();
         }
-        // sdf
+
         return $this->json(data: $note, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
@@ -60,11 +60,19 @@ class NoteController extends AbstractController
     )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('User not found or invalid user type');
+        }
+
+        $userId = $user->getId();
+
         if (
             empty($model->getUserIds())
-            || in_array(needle: $this->getUser()->getId(), haystack: $model->getUserIds())
+            || in_array(needle: $userId, haystack: $model->getUserIds())
         ) {
-            $model->setOwnUserId(ownUserId: $this->getUser()->getId());
+            $model->setOwnUserId(ownUserId: $userId);
         }
 
         $list = $this->noteService->list(queryModel: $model);
@@ -79,12 +87,17 @@ class NoteController extends AbstractController
     #[Route(methods: [Request::METHOD_POST])]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
-        $entity = (new Note())
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('User not found or invalid user type');
+        }
+
+        $entity = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
             ->setIsPrivate(isPrivate: $model->getIsPrivate())
-            ->setUser(user: $this->getUser())
-        ;
+            ->setUser(user: $user);
 
         $entity = $this->noteService->create(entity: $entity);
 
@@ -114,8 +127,7 @@ class NoteController extends AbstractController
         $note
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
-            ->setIsPrivate(isPrivate: $model->getIsPrivate())
-        ;
+            ->setIsPrivate(isPrivate: $model->getIsPrivate());
 
         $entity = $this->noteService->update(entity: $note);
 
