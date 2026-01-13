@@ -63,15 +63,15 @@ class NotesDeleteCommand extends Command
 
     /**
      * @param int $offset
-     * @return Sequence
+     * @return Sequence<Note>
      * @throws EntityQueryModelInvalidObjectTypeException
      * @throws \DateMalformedStringException
      */
     private function getNotes(int $offset): Sequence
     {
         return $this->noteService->list(
-            queryModel: (new NoteQueryModel())
-                ->setUpdatedAtLess(updatedAtLess: (new \DateTimeImmutable())->modify(modifier: '-30 days'))
+            queryModel: new NoteQueryModel()
+                ->setUpdatedAtLess(updatedAtLess: new \DateTimeImmutable()->modify(modifier: '-30 days'))
                 ->setOffset(offset: $offset)
                 ->setLimit(limit: self::LIMIT)
                 ->setOrderBy(orderBy: ['id' => 'ASC']),
