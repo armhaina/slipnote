@@ -24,6 +24,7 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     #[Groups(groups: Group::PUBLIC->value)]
     private ?int $id = null;
 
+    /** @var array<string> */
     #[ORM\Column(
         name: 'roles',
         type: Types::JSON,
@@ -66,6 +67,7 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     )]
     private \DateTimeImmutable $updatedAt;
 
+    /** @var Collection<int, Note> */
     #[ORM\OneToMany(
         targetEntity: Note::class,
         mappedBy: 'user',
@@ -91,12 +93,16 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
 
     /**
      * @see UserInterface
+     * @return array<string>
      */
     public function getRoles(): array
     {
         return $this->roles;
     }
 
+    /**
+     * @param array<string> $roles
+     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
