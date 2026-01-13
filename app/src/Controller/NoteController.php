@@ -23,8 +23,10 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/v1/notes')]
+#[OA\Tag(name: 'notes')]
 class NoteController extends AbstractController
 {
     public function __construct(
