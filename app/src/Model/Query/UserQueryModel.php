@@ -10,7 +10,9 @@ class UserQueryModel implements EntityQueryModelInterface
 {
     private int $limit = 20;
     private int $offset = 0;
+    /** @var array<int> */
     private ?array $ids = null;
+    /** @var array<int> */
     private ?array $excludeIds = null;
     private ?array $roles = null;
     private array $orderBy = [];
@@ -39,11 +41,18 @@ class UserQueryModel implements EntityQueryModelInterface
         return $this;
     }
 
+    /**
+     * @return array|null
+     */
     public function getIds(): ?array
     {
         return $this->ids;
     }
 
+    /**
+     * @param array<int> $ids
+     * @return UserQueryModel
+     */
     public function setIds(array $ids): self
     {
         $this->ids = $ids;
@@ -63,11 +72,18 @@ class UserQueryModel implements EntityQueryModelInterface
         return $this;
     }
 
+    /**
+     * @return array|null
+     */
     public function getExcludeIds(): ?array
     {
         return $this->excludeIds;
     }
 
+    /**
+     * @param array $excludeIds
+     * @return UserQueryModel
+     */
     public function setExcludeIds(array $excludeIds): self
     {
         $this->excludeIds = $excludeIds;
