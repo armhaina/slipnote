@@ -3,6 +3,7 @@
 namespace App\Contract;
 
 use Ds\Sequence;
+use Ds\Vector;
 
 interface ServiceInterface
 {
@@ -10,6 +11,9 @@ interface ServiceInterface
 
     public function one(EntityQueryModelInterface $queryModel): ?EntityInterface;
 
+    /**
+     * @return Sequence<EntityInterface>
+     */
     public function list(EntityQueryModelInterface $queryModel): Sequence;
 
     public function create(EntityInterface $entity): EntityInterface;

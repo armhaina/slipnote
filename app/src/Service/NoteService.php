@@ -69,7 +69,7 @@ readonly class NoteService extends AbstractService implements ServiceInterface
 
     /**
      * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Sequence<Note>
+     * @return Sequence<EntityInterface>
      */
     public function list(EntityQueryModelInterface $queryModel): Sequence
     {

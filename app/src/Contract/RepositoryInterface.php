@@ -16,6 +16,9 @@ interface RepositoryInterface
 
     public function one(EntityQueryModelInterface $queryModel): ?EntityInterface;
 
+    /**
+     * @return Vector<EntityInterface>
+     */
     public function list(EntityQueryModelInterface $queryModel): Vector;
 
     public function save(EntityInterface $entity): EntityInterface;

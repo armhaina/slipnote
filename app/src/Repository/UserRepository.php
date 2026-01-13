@@ -50,7 +50,7 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
 
     /**
      * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Vector<User>
+     * @return Vector<EntityInterface>
      */
     public function list(EntityQueryModelInterface $queryModel): Vector
     {

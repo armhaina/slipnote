@@ -51,7 +51,7 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
 
     /**
      * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Vector<Note>
+     * @return Vector<EntityInterface>
      */
     public function list(EntityQueryModelInterface $queryModel): Vector
     {
