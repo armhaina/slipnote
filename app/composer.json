@@ -82,7 +82,14 @@
         }
     },
     "require-dev": {
+        "codeception/codeception": "^5.3",
+        "codeception/module-asserts": "^3.3",
+        "codeception/module-cli": "^2.0",
+        "codeception/module-doctrine": "^3.3",
+        "codeception/module-rest": "^3.4",
+        "codeception/module-symfony": "^3.8",
         "doctrine/doctrine-fixtures-bundle": "^4.3",
+        "fakerphp/faker": "^1.24",
         "symfony/maker-bundle": "^1.65",
         "symfony/stopwatch": "8.0.*",
         "symfony/web-profiler-bundle": "8.0.*"
