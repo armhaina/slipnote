@@ -14,7 +14,9 @@ class UserQueryModel implements EntityQueryModelInterface
     private ?array $ids = null;
     /** @var array<int> */
     private ?array $excludeIds = null;
+    /** @var array<string> */
     private ?array $roles = null;
+    /** @var array<string> */
     private array $orderBy = [];
 
     public function getLimit(): int
@@ -42,7 +44,7 @@ class UserQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @return array|null
+     * @return array<int>|null
      */
     public function getIds(): ?array
     {
@@ -60,11 +62,18 @@ class UserQueryModel implements EntityQueryModelInterface
         return $this;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getOrderBy(): array
     {
         return $this->orderBy;
     }
 
+    /**
+     * @param array<string> $orderBy
+     * @return UserQueryModel
+     */
     public function setOrderBy(array $orderBy): self
     {
         $this->orderBy = $orderBy;
@@ -73,7 +82,7 @@ class UserQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @return array|null
+     * @return array<int>|null
      */
     public function getExcludeIds(): ?array
     {
@@ -81,7 +90,7 @@ class UserQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @param array $excludeIds
+     * @param array<int> $excludeIds
      * @return UserQueryModel
      */
     public function setExcludeIds(array $excludeIds): self
@@ -91,11 +100,18 @@ class UserQueryModel implements EntityQueryModelInterface
         return $this;
     }
 
+    /**
+     * @return array<string>|null
+     */
     public function getRoles(): ?array
     {
         return $this->roles;
     }
 
+    /**
+     * @param array<string> $roles
+     * @return UserQueryModel
+     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
