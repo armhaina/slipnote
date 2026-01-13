@@ -17,14 +17,14 @@ class NoteListFixtures extends Fixture implements FixtureGroupInterface
     {
         for ($i = 0; $i < 2; ++$i) {
             $user = (new User())
-                ->setEmail(email: 'test_'.$i.'@mail.ru')
+                ->setEmail(email: 'test_' . $i . '@mail.ru')
                 ->setPassword(password: md5((string) rand()))
                 ->setRoles(roles: [Role::ROLE_USER->value])
             ;
 
             $note = new Note();
-            $note->setName(name: 'Заметка_'.$i);
-            $note->setDescription(description: 'Описание заметки_'.$i);
+            $note->setName(name: 'Заметка_' . $i);
+            $note->setDescription(description: 'Описание заметки_' . $i);
             $note->setIsPrivate(isPrivate: false);
             $note->setUser(user: $user);
 

@@ -31,7 +31,8 @@ class NoteController extends AbstractController
 {
     public function __construct(
         private readonly NoteService $noteService,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws EntityNotFoundException
@@ -47,7 +48,7 @@ class NoteController extends AbstractController
         if ($note->getIsPrivate() && $note->getUser() !== $user) {
             throw new \Exception();
         }
-
+        // sdf
         return $this->json(data: $note, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
@@ -59,7 +60,8 @@ class NoteController extends AbstractController
     )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
-        if (empty($model->getUserIds())
+        if (
+            empty($model->getUserIds())
             || in_array(needle: $this->getUser()->getId(), haystack: $model->getUserIds())
         ) {
             $model->setOwnUserId(ownUserId: $this->getUser()->getId());

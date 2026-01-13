@@ -8,6 +8,7 @@ use App\Contract\EntityInterface;
 use App\Contract\EntityQueryModelInterface;
 use App\Contract\ServiceInterface;
 use App\Entity\Note;
+use App\Entity\User;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
@@ -68,6 +69,7 @@ readonly class NoteService extends AbstractService implements ServiceInterface
 
     /**
      * @throws EntityQueryModelInvalidObjectTypeException
+     * @return Sequence<Note>
      */
     public function list(EntityQueryModelInterface $queryModel): Sequence
     {

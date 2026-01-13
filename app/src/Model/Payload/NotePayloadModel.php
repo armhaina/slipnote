@@ -18,7 +18,8 @@ readonly class NotePayloadModel
         private string $description,
         #[Assert\Type(type: Types::BOOLEAN)]
         private bool $isPrivate,
-    ) {}
+    ) {
+    }
 
     public function getName(): string
     {

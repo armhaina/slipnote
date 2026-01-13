@@ -10,7 +10,8 @@ abstract readonly class AbstractService
 {
     public function __construct(
         private RepositoryInterface $repository,
-    ) {}
+    ) {
+    }
 
     public function transaction(callable $func): void
     {

@@ -28,7 +28,8 @@ class UserController extends AbstractController
     public function __construct(
         private readonly UserService $userService,
         private readonly UserPasswordHasherInterface $passwordHasher,
-    ) {}
+    ) {
+    }
 
     #[Route(
         path: '/{user}',

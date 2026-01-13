@@ -94,10 +94,10 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
     {
         $query = $this->createQueryBuilder(self::QUERY_ALIAS);
 
-        $query->andWhere(self::QUERY_ALIAS.'.isPrivate = false');
+        $query->andWhere(self::QUERY_ALIAS . '.isPrivate = false');
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
-            $query->addOrderBy(sort: self::QUERY_ALIAS.'.'.$column, order: $order);
+            $query->addOrderBy(sort: self::QUERY_ALIAS . '.' . $column, order: $order);
         }
 
         if (!empty($queryModel->getOffset())) {
@@ -111,28 +111,28 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
         if ($queryModel->getIds()) {
             $query
                 ->setParameter('ids', $queryModel->getIds())
-                ->andWhere(self::QUERY_ALIAS.'.id IN (:ids)')
+                ->andWhere(self::QUERY_ALIAS . '.id IN (:ids)')
             ;
         }
 
         if ($queryModel->getUserIds()) {
             $query
                 ->setParameter('userIds', $queryModel->getUserIds())
-                ->andWhere(self::QUERY_ALIAS.'.user IN (:userIds)')
+                ->andWhere(self::QUERY_ALIAS . '.user IN (:userIds)')
             ;
         }
 
         if ($queryModel->getOwnUserId()) {
             $query
                 ->setParameter('ownUserId', $queryModel->getOwnUserId())
-                ->orWhere(self::QUERY_ALIAS.'.user = :ownUserId')
+                ->orWhere(self::QUERY_ALIAS . '.user = :ownUserId')
             ;
         }
 
         if ($queryModel->getUpdatedAtLess()) {
             $query
                 ->setParameter('updatedAtLess', $queryModel->getUpdatedAtLess())
-                ->andWhere(self::QUERY_ALIAS.'.updatedAt < :updatedAtLess')
+                ->andWhere(self::QUERY_ALIAS . '.updatedAt < :updatedAtLess')
             ;
         }
 

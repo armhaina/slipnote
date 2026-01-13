@@ -50,6 +50,7 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
 
     /**
      * @throws EntityQueryModelInvalidObjectTypeException
+     * @return Vector<User>
      */
     public function list(EntityQueryModelInterface $queryModel): Vector
     {
@@ -95,7 +96,7 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
         $query = $this->createQueryBuilder(self::QUERY_ALIAS);
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
-            $query->addOrderBy(sort: self::QUERY_ALIAS.'.'.$column, order: $order);
+            $query->addOrderBy(sort: self::QUERY_ALIAS . '.' . $column, order: $order);
         }
 
         if (!empty($queryModel->getOffset())) {
@@ -109,14 +110,14 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
         if ($queryModel->getIds()) {
             $query
                 ->setParameter('ids', $queryModel->getIds())
-                ->andWhere(self::QUERY_ALIAS.'.id IN (:ids)')
+                ->andWhere(self::QUERY_ALIAS . '.id IN (:ids)')
             ;
         }
 
         if ($queryModel->getExcludeIds()) {
             $query
                 ->setParameter('excludeIds', $queryModel->getExcludeIds())
-                ->andWhere(self::QUERY_ALIAS.'.id NOT IN (:excludeIds)')
+                ->andWhere(self::QUERY_ALIAS . '.id NOT IN (:excludeIds)')
             ;
         }
 

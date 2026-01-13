@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-
 use App\Contract\EntityInterface;
 use App\Enum\Group;
 use App\Repository\UserRepository;

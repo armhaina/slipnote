@@ -68,6 +68,7 @@ readonly class UserService extends AbstractService implements ServiceInterface
 
     /**
      * @throws EntityQueryModelInvalidObjectTypeException
+     * @return Sequence<User>
      */
     public function list(EntityQueryModelInterface $queryModel): Sequence
     {

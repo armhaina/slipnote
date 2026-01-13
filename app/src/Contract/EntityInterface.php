@@ -2,4 +2,6 @@
 
 namespace App\Contract;
 
-interface EntityInterface {}
+interface EntityInterface
+{
+}
