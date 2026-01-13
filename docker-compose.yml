@@ -13,7 +13,7 @@ services:
     volumes:
       - ./app:${APP_PATH}:cached
     depends_on:
-      - ${DB_HOST}
+      - database
 
   database:
     image: postgres:18.1-alpine
