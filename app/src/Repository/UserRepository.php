@@ -18,7 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
 
 /**
- * @extends ServiceEntityRepository<User>
+ * @extends AbstractRepository<User>
  */
 class UserRepository extends AbstractRepository implements RepositoryInterface
 {

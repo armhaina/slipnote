@@ -8,6 +8,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @template T of object
+ * @extends ServiceEntityRepository<T>
+ */
 abstract class AbstractRepository extends ServiceEntityRepository
 {
     public function __construct(
