@@ -13,8 +13,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class AbstractCest
 {
-    public const USER_EMAIL = 'userAuthorized@mail.ru';
-    public const USER_PASSWORD = 'userAuthorizedPassword';
+    protected const string USER_EMAIL = 'userAuthorized@mail.ru';
+    protected const string USER_PASSWORD = 'userAuthorizedPassword';
 
     public function _before(FunctionalTester $I): void
     {
