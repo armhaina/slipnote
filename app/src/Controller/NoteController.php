@@ -64,13 +64,17 @@ class NoteController extends AbstractController
             new OA\Response(
                 response: 200,
                 description: 'Успешный ответ',
-                content: new OA\JsonContent(ref: new Model(type: NoteResponseModel::class, groups: [Group::PUBLIC->value]))
+                content: new OA\JsonContent(
+                    ref: new Model(
+                        type: NoteResponseModel::class,
+                        groups: [Group::PUBLIC->value]
+                    )
+                )
             ),
         ]
     )]
-    public function get(
-        Note $note
-    ): JsonResponse {
+    public function get(Note $note): JsonResponse
+    {
         if ($note->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
