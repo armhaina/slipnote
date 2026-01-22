@@ -14,7 +14,7 @@ class ExceptionListener
         $exception = $event->getThrowable();
 
         $data = [
-            'error' => true,
+            'success' => false,
             'message' => $exception->getMessage(),
             'code' => $exception->getCode(),
         ];

@@ -7,6 +7,7 @@ use App\Enum\Group;
 use App\Repository\NoteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 
@@ -59,7 +60,7 @@ class Note implements EntityInterface
         ]
     )]
     #[Groups(groups: Group::PUBLIC->value)]
-    private User $user;
+    private UserInterface $user;
 
     #[ORM\Column(
         name: 'created_at',
@@ -111,12 +112,12 @@ class Note implements EntityInterface
         return $this;
     }
 
-    public function getUser(): User
+    public function getUser(): UserInterface
     {
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(UserInterface $user): self
     {
         $this->user = $user;
 

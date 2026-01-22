@@ -99,16 +99,10 @@ class NoteController extends AbstractController
     #[Route(methods: [Request::METHOD_POST])]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
-        $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException('User not found or invalid user type');
-        }
-
         $entity = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
-            ->setUser(user: $user);
+            ->setUser(user: $this->getUser());
 
         $entity = $this->noteService->create(entity: $entity);
 

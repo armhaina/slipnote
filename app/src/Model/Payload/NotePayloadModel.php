@@ -12,9 +12,21 @@ readonly class NotePayloadModel
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
+        #[Assert\Length(
+            min: 2,
+            max: 100,
+            minMessage: 'Название должно содержать минимум {{ limit }} символа',
+            maxMessage: 'Название должно содержать максимум {{ limit }} символов'
+        )]
         private string $name,
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
+        #[Assert\Length(
+            min: 2,
+            max: 100,
+            minMessage: 'Описание должно содержать минимум {{ limit }} символа',
+            maxMessage: 'Описание должно содержать максимум {{ limit }} символов'
+        )]
         private string $description,
     ) {
     }
