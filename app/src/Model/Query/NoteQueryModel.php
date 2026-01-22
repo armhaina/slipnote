@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model\Query;
 
 use App\Contract\EntityQueryModelInterface;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 class NoteQueryModel implements EntityQueryModelInterface
 {
@@ -13,8 +14,10 @@ class NoteQueryModel implements EntityQueryModelInterface
     /** @var array<int> */
     private ?array $ids = null;
     /** @var array<int> */
+    #[SerializedName(serializedName: 'user_ids')]
     private ?array $userIds = null;
     /** @var array<string> */
+    #[SerializedName(serializedName: 'order_by')]
     private array $orderBy = [];
     private ?\DateTimeImmutable $updatedAtLess = null;
 

@@ -21,6 +21,7 @@ use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -33,7 +34,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(
     attribute: ROLE::ROLE_USER->value,
     message: 'Вы не авторизованы!',
-    statusCode: 403
+    statusCode: Response::HTTP_FORBIDDEN
 )]
 #[Security(name: 'Bearer')]
 class NoteController extends AbstractController
@@ -55,7 +56,7 @@ class NoteController extends AbstractController
     public function get(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('User not found or invalid user type');
+            throw $this->createAccessDeniedException();
         }
 
         return $this->json(data: $note, context: ['groups' => [Group::PUBLIC->value]]);
@@ -73,20 +74,48 @@ class NoteController extends AbstractController
         schema: new OA\Schema(
             type: 'array',
             items: new OA\Items(type: 'integer'),
-            default: [],
+            default: null,
             example: [1, 2, 3]
         ),
+    )]
+    #[OA\Parameter(
+        name: 'ids',
+        description: 'Массив ID заметок',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'array',
+            items: new OA\Items(type: 'integer'),
+            default: null,
+            example: [1, 2, 3]
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'order_by',
+        description: 'Сортировка',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            properties: [
+                new OA\Property(property: 'name', type: 'string', enum: ['asc', 'desc']),
+                new OA\Property(property: 'created_at', type: 'string', enum: ['asc', 'desc']),
+                new OA\Property(property: 'updated_at', type: 'string', enum: ['asc', 'desc']),
+                new OA\Property(property: 'id', type: 'string', enum: ['asc', 'desc']),
+            ],
+            type: 'object',
+            example: ['name' => 'asc', 'created_at' => 'desc'], // запрещаем другие поля
+            additionalProperties: false
+        )
     )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
         $user = $this->getUser();
 
         if (!$user instanceof User) {
-            throw $this->createAccessDeniedException('User not found or invalid user type');
+            throw $this->createAccessDeniedException();
         }
 
         $model->setUserIds(userIds: [$user->getId()]);
-
         $list = $this->noteService->list(queryModel: $model);
 
         return $this->json(data: $list, context: ['groups' => [Group::PUBLIC->value]]);
