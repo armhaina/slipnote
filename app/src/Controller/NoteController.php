@@ -56,6 +56,17 @@ class NoteController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
+//    #[OA\Get(
+//        description: 'Возвращает данные заметки по указанному идентификатору',
+//        summary: 'Получить заметку по ID',
+//        responses: [
+//            new OA\Response(
+//                response: 200,
+//                description: 'Успешный ответ',
+//                content: new OA\JsonContent(ref: '#/components/schemas/NoteResponse')
+//            ),
+//        ]
+//    )]
     public function get(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
