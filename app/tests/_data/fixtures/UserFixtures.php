@@ -17,8 +17,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures
 {
-    public const string USER_EMAIL = 'userAuthorized@mail.ru';
-    public const string USER_PASSWORD = 'userAuthorizedPassword';
+    public const string USER_AUTHORIZED_EMAIL = 'userAuthorized@mail.ru';
+    public const string USER_AUTHORIZED_PASSWORD = 'userAuthorizedPassword';
 
     public static function load(FunctionalTester $I, array $data = []): EntityInterface
     {
@@ -29,8 +29,8 @@ class UserFixtures
         $roles = $data['roles'] ?? [Role::ROLE_USER->value];
         $email = $data['email'] ?? $faker->email();
 
-        if ($email === self::USER_EMAIL) {
-            $password = self::USER_PASSWORD;
+        if ($email === self::USER_AUTHORIZED_EMAIL) {
+            $password = self::USER_AUTHORIZED_PASSWORD;
         } else {
             $password = $data['password'] ?? $faker->password();
         }

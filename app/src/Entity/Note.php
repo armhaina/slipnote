@@ -8,6 +8,7 @@ use App\Repository\NoteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
@@ -42,18 +43,6 @@ class Note implements EntityInterface
     )]
     #[Groups(groups: Group::PUBLIC->value)]
     private string $description;
-
-    #[ORM\Column(
-        name: 'is_private',
-        type: Types::BOOLEAN,
-        nullable: false,
-        options: [
-            'default' => true,
-            'comment' => 'Приватная заметка',
-        ],
-    )]
-    #[Groups(groups: Group::PUBLIC->value)]
-    private bool $isPrivate;
 
     #[ORM\ManyToOne(
         targetEntity: User::class,
@@ -130,18 +119,6 @@ class Note implements EntityInterface
     public function setUser(User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getIsPrivate(): bool
-    {
-        return $this->isPrivate;
-    }
-
-    public function setIsPrivate(bool $isPrivate): self
-    {
-        $this->isPrivate = $isPrivate;
 
         return $this;
     }

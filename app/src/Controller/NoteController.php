@@ -45,7 +45,7 @@ class NoteController extends AbstractController
     )]
     public function get(Note $note, #[CurrentUser] User $user): JsonResponse
     {
-        if ($note->getIsPrivate() && $note->getUser() !== $user) {
+        if ($note->getUser() !== $user) {
             throw new \Exception();
         }
 
@@ -68,10 +68,7 @@ class NoteController extends AbstractController
 
         $userId = $user->getId();
 
-        if (
-            empty($model->getUserIds())
-            || in_array(needle: $userId, haystack: $model->getUserIds())
-        ) {
+        if (empty($model->getUserIds()) || in_array(needle: $userId, haystack: $model->getUserIds())) {
             $model->setOwnUserId(ownUserId: $userId);
         }
 
@@ -96,7 +93,6 @@ class NoteController extends AbstractController
         $entity = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
-            ->setIsPrivate(isPrivate: $model->getIsPrivate())
             ->setUser(user: $user);
 
         $entity = $this->noteService->create(entity: $entity);
@@ -126,8 +122,7 @@ class NoteController extends AbstractController
 
         $note
             ->setName(name: $model->getName())
-            ->setDescription(description: $model->getDescription())
-            ->setIsPrivate(isPrivate: $model->getIsPrivate());
+            ->setDescription(description: $model->getDescription());
 
         $entity = $this->noteService->update(entity: $note);
 

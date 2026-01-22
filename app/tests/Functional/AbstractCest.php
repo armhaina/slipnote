@@ -53,19 +53,17 @@ abstract class AbstractCest
 
     protected function authorizedUpdate(FunctionalTester $I): EntityInterface
     {
-        $passwordHasher = $I->grabService(serviceId: UserPasswordHasherInterface::class);
-
         $user = UserFixtures::load(I: $I, data: [
-            'email' => UserFixtures::USER_EMAIL,
-            'password' => $passwordHasher->hashPassword(new User(), UserFixtures::USER_PASSWORD),
+            'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
+            'password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
             'roles' => [Role::ROLE_USER->value],
         ]);
 
         $I->sendPost(
             url: '/api/login_check',
             params: [
-                'username' => UserFixtures::USER_EMAIL,
-                'password' => UserFixtures::USER_PASSWORD,
+                'username' => UserFixtures::USER_AUTHORIZED_EMAIL,
+                'password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
             ]
         );
         $I->seeResponseCodeIs(code: 200);

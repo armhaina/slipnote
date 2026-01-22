@@ -42,28 +42,22 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'isPrivate' => false,
+                        'is_private' => false,
                         'user' => ['email' => 'test_0@mail.ru'],
                     ],
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'isPrivate' => false,
-                        'user' => ['email' => UserFixtures::USER_EMAIL],
+                        'is_private' => false,
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
                     [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'isPrivate' => false,
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'isPrivate' => false,
-                        'user' => ['email' => UserFixtures::USER_EMAIL],
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
             ],

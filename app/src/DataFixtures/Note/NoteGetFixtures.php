@@ -25,7 +25,6 @@ class NoteGetFixtures extends Fixture implements FixtureGroupInterface
             $note = new Note();
             $note->setName(name: 'Заметка_' . $i);
             $note->setDescription(description: 'Описание заметки_' . $i);
-            $note->setIsPrivate(isPrivate: false);
             $note->setUser(user: $user);
 
             $manager->persist($user);
