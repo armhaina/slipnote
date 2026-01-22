@@ -65,6 +65,17 @@ class NoteController extends AbstractController
      * @throws EntityQueryModelInvalidObjectTypeException
      */
     #[Route(methods: [Request::METHOD_GET])]
+    #[OA\Parameter(
+        name: 'userIds',
+        description: 'Массив ID пользователей',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'array',
+            items: new OA\Items(type: 'integer'),
+            default: []
+        ),
+    )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
         $user = $this->getUser();
