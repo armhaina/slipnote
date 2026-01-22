@@ -19,6 +19,7 @@ class NoteQueryModel implements EntityQueryModelInterface
     /** @var array<string> */
     #[SerializedName(serializedName: 'order_by')]
     private array $orderBy = [];
+    #[SerializedName(serializedName: 'updated_at_less')]
     private ?\DateTimeImmutable $updatedAtLess = null;
 
     public function getLimit(): int

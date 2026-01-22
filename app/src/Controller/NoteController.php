@@ -67,18 +67,6 @@ class NoteController extends AbstractController
      */
     #[Route(methods: [Request::METHOD_GET])]
     #[OA\Parameter(
-        name: 'user_ids',
-        description: 'Массив ID пользователей (в данный момент работает только с собственным ID)',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(
-            type: 'array',
-            items: new OA\Items(type: 'integer'),
-            default: null,
-            example: [1, 2, 3]
-        ),
-    )]
-    #[OA\Parameter(
         name: 'ids',
         description: 'Массив ID заметок',
         in: 'query',
@@ -91,21 +79,67 @@ class NoteController extends AbstractController
         ),
     )]
     #[OA\Parameter(
+        name: 'user_ids',
+        description: 'Массив ID пользователей (в данный момент работает только с собственным ID)',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'array',
+            items: new OA\Items(type: 'integer'),
+            default: null,
+            example: [1, 2, 3]
+        ),
+    )]
+    #[OA\Parameter(
         name: 'order_by',
-        description: 'Сортировка',
+        description: 'Сортировка по полям, пример: ?order_by[name]=asc&order_by[created_at]=desc',
         in: 'query',
         required: false,
         schema: new OA\Schema(
             properties: [
                 new OA\Property(property: 'name', type: 'string', enum: ['asc', 'desc']),
-                new OA\Property(property: 'created_at', type: 'string', enum: ['asc', 'desc']),
-                new OA\Property(property: 'updated_at', type: 'string', enum: ['asc', 'desc']),
-                new OA\Property(property: 'id', type: 'string', enum: ['asc', 'desc']),
             ],
             type: 'object',
-            example: ['name' => 'asc', 'created_at' => 'desc'], // запрещаем другие поля
-            additionalProperties: false
-        )
+            default: ['created_at' => 'desc'],
+            additionalProperties: false,
+        ),
+        style: 'deepObject',
+        explode: true,
+    )]
+    #[OA\Parameter(
+        name: 'limit',
+        description: 'Кол-во записей на странице',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'integer',
+            default: 20,
+            example: 10
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'offset',
+        description: 'Номер страницы',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'integer',
+            default: null,
+            example: 10
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'updated_at_less',
+        description: 'Дата изменения меньше указанной даты',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'integer',
+            format: 'date-time',
+            default: null,
+            example: '2024-01-22T10:30:00+03:00',
+            nullable: true
+        ),
     )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
