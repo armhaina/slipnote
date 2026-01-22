@@ -67,7 +67,7 @@ class NoteController extends AbstractController
     #[Route(methods: [Request::METHOD_GET])]
     #[OA\Parameter(
         name: 'user_ids',
-        description: 'Массив ID пользователей',
+        description: 'Массив ID пользователей (в данный момент работает только с собственным ID)',
         in: 'query',
         required: false,
         schema: new OA\Schema(
