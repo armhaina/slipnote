@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\DataFixtures\Note\NoteGetFixtures;
-use App\DataFixtures\Note\NoteListFixtures;
 use App\Entity\Note;
 use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
