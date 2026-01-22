@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Note;
 
 use App\DataFixtures\Note\NoteListFixtures;
+use App\Tests\_data\fixtures\NoteFixtures;
+use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
@@ -16,8 +18,11 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('successProvider')]
     public function tryToTest(FunctionalTester $I, Example $example): void
     {
-        $this->fixturesLoad(I: $I, groups: $example['groups']);
-        $this->authorized(I: $I);
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture);
+        }
+
+        $this->authorizedUpdate(I: $I);
 
         $I->sendGet(url: '/api/v1/notes');
         $I->seeResponseCodeIs(code: HttpCode::OK);
@@ -33,7 +38,20 @@ final class NoteListCest extends AbstractCest
     {
         return [
             [
-                'groups' => NoteListFixtures::GROUPS,
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'isPrivate' => false,
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'isPrivate' => false,
+                        'user' => ['email' => UserFixtures::USER_EMAIL],
+                    ],
+                ],
                 'response' => [
                     [
                         'name' => 'Заметка_0',
@@ -45,7 +63,7 @@ final class NoteListCest extends AbstractCest
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'isPrivate' => false,
-                        'user' => ['email' => 'test_1@mail.ru'],
+                        'user' => ['email' => UserFixtures::USER_EMAIL],
                     ],
                 ],
             ],

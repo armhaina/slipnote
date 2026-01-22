@@ -8,14 +8,12 @@ use App\Contract\EntityInterface;
 use App\DataFixtures\UserAuthorizedFixtures;
 use App\Entity\User;
 use App\Enum\Role;
+use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Support\FunctionalTester;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class AbstractCest
 {
-    protected const string USER_EMAIL = 'userAuthorized@mail.ru';
-    protected const string USER_PASSWORD = 'userAuthorizedPassword';
-
     public function _before(FunctionalTester $I): void
     {
         $I->haveHttpHeader(name: 'Content-Type', value: 'application/json');
@@ -57,17 +55,17 @@ abstract class AbstractCest
     {
         $passwordHasher = $I->grabService(serviceId: UserPasswordHasherInterface::class);
 
-        $user = $this->fixturesLoadUpdate(I: $I, entityClass: User::class, data: [
-            'email' => self::USER_EMAIL,
-            'password' => $passwordHasher->hashPassword(new User(), self::USER_PASSWORD),
+        $user = UserFixtures::load(I: $I, data: [
+            'email' => UserFixtures::USER_EMAIL,
+            'password' => $passwordHasher->hashPassword(new User(), UserFixtures::USER_PASSWORD),
             'roles' => [Role::ROLE_USER->value],
         ]);
 
         $I->sendPost(
             url: '/api/login_check',
             params: [
-                'username' => self::USER_EMAIL,
-                'password' => self::USER_PASSWORD,
+                'username' => UserFixtures::USER_EMAIL,
+                'password' => UserFixtures::USER_PASSWORD,
             ]
         );
         $I->seeResponseCodeIs(code: 200);
