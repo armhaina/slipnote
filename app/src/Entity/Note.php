@@ -19,7 +19,6 @@ class Note implements EntityInterface
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['unsigned' => true])]
-    #[Groups(groups: Group::PUBLIC->value)]
     /** @phpstan-ignore property.unusedType */
     private ?int $id = null;
 
@@ -31,7 +30,6 @@ class Note implements EntityInterface
             'comment' => 'Наименование',
         ],
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
     private string $name;
 
     #[ORM\Column(
@@ -42,7 +40,6 @@ class Note implements EntityInterface
             'comment' => 'Текст',
         ],
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
     private string $description;
 
     #[ORM\ManyToOne(
@@ -59,7 +56,6 @@ class Note implements EntityInterface
             'comment' => 'ID пользователя',
         ]
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
     private UserInterface $user;
 
     #[ORM\Column(

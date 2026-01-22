@@ -14,6 +14,7 @@ use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
 use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
+use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Service\NoteService;
@@ -42,6 +43,7 @@ class NoteController extends AbstractController
 {
     public function __construct(
         private readonly NoteService $noteService,
+        private readonly NoteResponseMapper $noteResponseMapper
     ) {
     }
 
@@ -60,7 +62,9 @@ class NoteController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        return $this->json(data: $note, context: ['groups' => [Group::PUBLIC->value]]);
+        $responseModel = $this->noteResponseMapper->one(note: $note);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
     /**
@@ -151,9 +155,11 @@ class NoteController extends AbstractController
         }
 
         $model->setUserIds(userIds: [$user->getId()]);
-        $list = $this->noteService->list(queryModel: $model);
+        $notes = $this->noteService->list(queryModel: $model);
 
-        return $this->json(data: $list, context: ['groups' => [Group::PUBLIC->value]]);
+        $responseModels = $this->noteResponseMapper->collection(notes: $notes->toArray());
+
+        return $this->json(data: $responseModels, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
     /**

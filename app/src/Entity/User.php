@@ -21,7 +21,6 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['unsigned' => true])]
-    #[Groups(groups: Group::PUBLIC->value)]
     /** @phpstan-ignore property.unusedType */
     private ?int $id = null;
 
@@ -41,7 +40,6 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
         unique: true,
         options: ['comment' => 'Электронная почта пользователя'],
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
     private string $email;
 
     #[ORM\Column(
