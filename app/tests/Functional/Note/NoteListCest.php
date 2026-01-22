@@ -18,7 +18,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('successProvider')]
     public function tryToTest(FunctionalTester $I, Example $example): void
     {
-        $this->authorizedUpdate(I: $I);
+        $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
             NoteFixtures::load(I: $I, data: $fixture);

@@ -18,7 +18,7 @@ final class NoteCreateCest extends AbstractCest
     #[DataProvider('successProvider')]
     public function tryToTest(FunctionalTester $I, Example $example): void
     {
-        $this->authorizedUpdate(I: $I);
+        $this->authorized(I: $I);
 
         $I->sendPost(url: '/api/v1/notes', params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::OK);

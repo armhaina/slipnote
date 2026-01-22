@@ -20,7 +20,7 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('successProvider')]
     public function tryToTest(FunctionalTester $I, Example $example): void
     {
-        $this->authorizedUpdate(I: $I);
+        $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
         $I->sendGet(url: '/api/v1/notes/' . $note->getId());

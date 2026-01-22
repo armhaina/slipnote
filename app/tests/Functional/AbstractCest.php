@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional;
 
 use App\Contract\EntityInterface;
-use App\DataFixtures\UserAuthorizedFixtures;
 use App\Entity\User;
 use App\Enum\Role;
 use App\Tests\_data\fixtures\UserFixtures;
@@ -19,39 +18,7 @@ abstract class AbstractCest
         $I->haveHttpHeader(name: 'Content-Type', value: 'application/json');
     }
 
-    protected function fixturesLoad(FunctionalTester $I, array $groups): void
-    {
-        $this->commandDoctrineFixturesLoad(I: $I, groups: $groups);
-    }
-
-    protected function authorized(FunctionalTester $I): void
-    {
-        $this->commandDoctrineFixturesLoad(I: $I, groups: UserAuthorizedFixtures::GROUPS);
-
-        $I->sendPost(
-            url: '/api/login_check',
-            params: [
-                'username' => UserAuthorizedFixtures::EMAIL,
-                'password' => UserAuthorizedFixtures::PASSWORD,
-            ]
-        );
-        $I->seeResponseCodeIs(code: 200);
-        $I->seeResponseIsJson();
-
-        $I->haveHttpHeader(
-            name: 'Authorization',
-            value: 'Bearer ' . json_decode($I->grabResponse(), true)['token']
-        );
-    }
-
-    protected function fixturesLoadUpdate(FunctionalTester $I, string $entityClass, array $data): EntityInterface|string
-    {
-        $id = $I->haveInRepository(classNameOrInstance: $entityClass, data: $data);
-
-        return $I->grabEntityFromRepository(entity: $entityClass, params: ['id' => $id]);
-    }
-
-    protected function authorizedUpdate(FunctionalTester $I): EntityInterface
+    protected function authorized(FunctionalTester $I): EntityInterface
     {
         $user = UserFixtures::load(I: $I, data: [
             'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
@@ -92,19 +59,5 @@ abstract class AbstractCest
         }
 
         return $data;
-    }
-
-    private function commandDoctrineFixturesLoad(FunctionalTester $I, array $groups = []): void
-    {
-        $I->runSymfonyConsoleCommand(
-            command: 'doctrine:fixtures:load',
-            parameters: [
-                '--no-interaction' => '--no-interaction',
-                '--purge-with-truncate' => true,
-                '--group' => $groups,
-                '--env' => 'test',
-                '--append' => null,
-            ]
-        );
     }
 }
