@@ -73,7 +73,8 @@ class NoteController extends AbstractController
         schema: new OA\Schema(
             type: 'array',
             items: new OA\Items(type: 'integer'),
-            default: []
+            default: [],
+            example: [1, 2, 3]
         ),
     )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
