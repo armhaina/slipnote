@@ -10,7 +10,6 @@ class NoteQueryModel implements EntityQueryModelInterface
 {
     private int $limit = 20;
     private int $offset = 0;
-    private ?int $ownUserId = null;
     /** @var array<int> */
     private ?array $ids = null;
     /** @var array<int> */
@@ -77,18 +76,6 @@ class NoteQueryModel implements EntityQueryModelInterface
     public function setUserIds(array $userIds): self
     {
         $this->userIds = $userIds;
-
-        return $this;
-    }
-
-    public function getOwnUserId(): ?int
-    {
-        return $this->ownUserId;
-    }
-
-    public function setOwnUserId(int $ownUserId): self
-    {
-        $this->ownUserId = $ownUserId;
 
         return $this;
     }

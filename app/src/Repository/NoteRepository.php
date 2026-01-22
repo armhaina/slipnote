@@ -122,13 +122,6 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
             ;
         }
 
-        if ($queryModel->getOwnUserId()) {
-            $query
-                ->setParameter('ownUserId', $queryModel->getOwnUserId())
-                ->orWhere(self::QUERY_ALIAS . '.user = :ownUserId')
-            ;
-        }
-
         if ($queryModel->getUpdatedAtLess()) {
             $query
                 ->setParameter('updatedAtLess', $queryModel->getUpdatedAtLess())

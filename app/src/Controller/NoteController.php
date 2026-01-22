@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Note;
 use App\Entity\User;
 use App\Enum\Group;
+use App\Enum\Role;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
@@ -16,6 +17,7 @@ use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Service\NoteService;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,9 +26,16 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/v1/notes')]
 #[OA\Tag(name: 'notes')]
+#[IsGranted(
+    attribute: ROLE::ROLE_USER->value,
+    message: 'Вы не авторизованы!',
+    statusCode: 403
+)]
+#[Security(name: 'Bearer')]
 class NoteController extends AbstractController
 {
     public function __construct(
@@ -35,18 +44,18 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @throws EntityNotFoundException
-     * @throws \Exception
+     * @param Note $note
+     * @return JsonResponse
      */
     #[Route(
         path: '/{note}',
         requirements: ['note' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
-    public function get(Note $note, #[CurrentUser] User $user): JsonResponse
+    public function get(Note $note): JsonResponse
     {
-        if ($note->getUser() !== $user) {
-            throw new \Exception();
+        if ($note->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('User not found or invalid user type');
         }
 
         return $this->json(data: $note, context: ['groups' => [Group::PUBLIC->value]]);
@@ -55,9 +64,7 @@ class NoteController extends AbstractController
     /**
      * @throws EntityQueryModelInvalidObjectTypeException
      */
-    #[Route(
-        methods: [Request::METHOD_GET]
-    )]
+    #[Route(methods: [Request::METHOD_GET])]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
         $user = $this->getUser();
@@ -66,11 +73,7 @@ class NoteController extends AbstractController
             throw $this->createAccessDeniedException('User not found or invalid user type');
         }
 
-        $userId = $user->getId();
-
-        if (empty($model->getUserIds()) || in_array(needle: $userId, haystack: $model->getUserIds())) {
-            $model->setOwnUserId(ownUserId: $userId);
-        }
+        $model->setUserIds(userIds: [$user->getId()]);
 
         $list = $this->noteService->list(queryModel: $model);
 
@@ -117,7 +120,7 @@ class NoteController extends AbstractController
         NotePayloadModel $model,
     ): JsonResponse {
         if ($note->getUser() !== $this->getUser()) {
-            throw new \Exception();
+            throw $this->createAccessDeniedException('User not found or invalid user type');
         }
 
         $note
@@ -143,7 +146,7 @@ class NoteController extends AbstractController
     public function delete(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
-            throw new \Exception();
+            throw $this->createAccessDeniedException('User not found or invalid user type');
         }
 
         $this->noteService->delete(entity: $note);

@@ -16,8 +16,6 @@ readonly class NotePayloadModel
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
         private string $description,
-        #[Assert\Type(type: Types::BOOLEAN)]
-        private bool $isPrivate,
     ) {
     }
 
@@ -29,10 +27,5 @@ readonly class NotePayloadModel
     public function getDescription(): string
     {
         return $this->description;
-    }
-
-    public function getIsPrivate(): bool
-    {
-        return $this->isPrivate;
     }
 }
