@@ -6,6 +6,7 @@ namespace App\Model\Payload;
 
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Attributes as OA;
 
 readonly class NotePayloadModel
 {
@@ -18,6 +19,7 @@ readonly class NotePayloadModel
             minMessage: 'Название должно содержать минимум {{ limit }} символа',
             maxMessage: 'Название должно содержать максимум {{ limit }} символов'
         )]
+        #[OA\Property(description: 'Наименование')]
         private string $name,
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
@@ -27,6 +29,7 @@ readonly class NotePayloadModel
             minMessage: 'Описание должно содержать минимум {{ limit }} символа',
             maxMessage: 'Описание должно содержать максимум {{ limit }} символов'
         )]
+        #[OA\Property(description: 'Описание')]
         private string $description,
     ) {
     }

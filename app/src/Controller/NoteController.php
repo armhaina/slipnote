@@ -17,6 +17,7 @@ use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Service\NoteService;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -160,6 +161,17 @@ class NoteController extends AbstractController
      * @throws EntityModelInvalidObjectTypeException
      */
     #[Route(methods: [Request::METHOD_POST])]
+    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\Response(
+        response: 201,
+        description: 'Заметки созданы',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'total', type: 'integer', example: 2),
+            ],
+            type: 'object'
+        )
+    )]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
         $entity = new Note()
