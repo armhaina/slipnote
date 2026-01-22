@@ -7,6 +7,9 @@ namespace App\EventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ExceptionListener
 {
@@ -25,28 +28,32 @@ class ExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
+        $previous = $exception->getPrevious();
+
+        $status = method_exists(
+            object_or_class: $exception,
+            method: 'getStatusCode'
+        ) ? $exception->getStatusCode() : Response::HTTP_BAD_REQUEST;
 
         $data = [
             'success' => false,
-            'message' => self::HTTP_STATUS_MESSAGE[method_exists(
-                object_or_class: $exception,
-                method: 'getStatusCode'
-            ) ? $exception->getStatusCode() : Response::HTTP_BAD_REQUEST],
+            'message' => self::HTTP_STATUS_MESSAGE[$status],
             'code' => $exception->getCode(),
         ];
 
-        if (!empty($exception->getPrevious())) {
-            $data['previous'] = [
-                'message' => $exception->getPrevious()->getMessage(),
-            ];
+        if ($previous instanceof ValidationFailedException) {
+            foreach ($previous->getViolations() as $violation) {
+                $data['errors'][] = [
+                    'property' => $violation->getPropertyPath(),
+                    'message' => $violation->getMessage(),
+                    'code' => $violation->getCode(),
+                ];
+            }
         }
 
         $response = new JsonResponse(
             data: $data,
-            status: method_exists(
-                object_or_class: $exception,
-                method: 'getStatusCode'
-            ) ? $exception->getStatusCode() : 400
+            status: $status
         );
 
         $event->setResponse(response: $response);
