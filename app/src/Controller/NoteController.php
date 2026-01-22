@@ -67,8 +67,9 @@ class NoteController extends AbstractController
 //            ),
 //        ]
 //    )]
-    public function get(Note $note): JsonResponse
-    {
+    public function get(
+        Note $note
+    ): JsonResponse {
         if ($note->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
@@ -82,6 +83,10 @@ class NoteController extends AbstractController
      * @throws EntityQueryModelInvalidObjectTypeException
      */
     #[Route(methods: [Request::METHOD_GET])]
+    #[OA\Get(
+        description: 'Получить список заметок текущего пользователя',
+        summary: 'Получить список заметок текущего пользователя',
+    )]
     #[OA\Parameter(
         name: 'ids',
         description: 'Массив ID заметок',
