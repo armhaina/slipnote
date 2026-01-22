@@ -18,11 +18,11 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('successProvider')]
     public function tryToTest(FunctionalTester $I, Example $example): void
     {
+        $this->authorizedUpdate(I: $I);
+
         foreach ($example['fixtures'] as $fixture) {
             NoteFixtures::load(I: $I, data: $fixture);
         }
-
-        $this->authorizedUpdate(I: $I);
 
         $I->sendGet(url: '/api/v1/notes');
         $I->seeResponseCodeIs(code: HttpCode::OK);

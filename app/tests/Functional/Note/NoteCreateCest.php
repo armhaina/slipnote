@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Note;
 
 use App\DataFixtures\Note\NoteListFixtures;
 use App\DataFixtures\UserAuthorizedFixtures;
+use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
@@ -17,7 +18,7 @@ final class NoteCreateCest extends AbstractCest
     #[DataProvider('successProvider')]
     public function tryToTest(FunctionalTester $I, Example $example): void
     {
-        $this->authorized(I: $I);
+        $this->authorizedUpdate(I: $I);
 
         $I->sendPost(url: '/api/v1/notes', params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
@@ -33,17 +34,14 @@ final class NoteCreateCest extends AbstractCest
     {
         return [
             [
-                'groups' => NoteListFixtures::GROUPS,
                 'request' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
-                    'isPrivate' => true,
                 ],
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
-                    'isPrivate' => true,
-                    'user' => ['email' => UserAuthorizedFixtures::EMAIL],
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
             ],
         ];
