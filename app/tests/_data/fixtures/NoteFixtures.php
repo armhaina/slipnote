@@ -21,13 +21,11 @@ class NoteFixtures
 
         $name = $data['name'] ?? $faker->name;
         $description = $data['description'] ?? $faker->text();
-        $isPrivate = $data['is_private'] ?? $faker->boolean();
         $user = UserFixtures::load(I: $I, data: $data['user'] ?? []);
 
         $id = $I->haveInRepository(classNameOrInstance: Note::class, data: [
             'name' => $name,
             'description' => $description,
-            'isPrivate' => $isPrivate,
             'user' => $user,
         ]);
 
