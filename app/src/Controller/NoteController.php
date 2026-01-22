@@ -17,6 +17,7 @@ use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
+use App\Model\Response\NoteResponseModel;
 use App\Service\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -56,17 +57,17 @@ class NoteController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
-//    #[OA\Get(
-//        description: 'Возвращает данные заметки по указанному идентификатору',
-//        summary: 'Получить заметку по ID',
-//        responses: [
-//            new OA\Response(
-//                response: 200,
-//                description: 'Успешный ответ',
-//                content: new OA\JsonContent(ref: '#/components/schemas/NoteResponse')
-//            ),
-//        ]
-//    )]
+    #[OA\Get(
+        description: 'Возвращает данные заметки по указанному идентификатору',
+        summary: 'Получить заметку по ID',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Успешный ответ',
+                content: new OA\JsonContent(ref: new Model(type: NoteResponseModel::class, groups: [Group::PUBLIC->value]))
+            ),
+        ]
+    )]
     public function get(
         Note $note
     ): JsonResponse {
