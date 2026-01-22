@@ -48,8 +48,8 @@ class NoteController extends AbstractController
      * @return JsonResponse
      */
     #[Route(
-        path: '/{note}',
-        requirements: ['note' => '\d+'],
+        path: '/{id}',
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
     public function get(Note $note): JsonResponse
@@ -110,8 +110,8 @@ class NoteController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        path: '/{note}',
-        requirements: ['note' => '\d+'],
+        path: '/{id}',
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
     public function update(
@@ -139,8 +139,8 @@ class NoteController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        path: '/{note}',
-        requirements: ['note' => '\d+'],
+        path: '/{id}',
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_DELETE]
     )]
     public function delete(Note $note): JsonResponse
