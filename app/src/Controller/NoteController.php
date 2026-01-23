@@ -9,7 +9,6 @@ use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
-use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
@@ -17,10 +16,12 @@ use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
-use App\Model\Response\NoteResponseModel;
+use App\Model\Response\Entity\NoteResponseModel;
+use App\Model\Response\Method\DeleteResponseModel;
 use App\Service\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,8 +29,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/v1/notes')]
@@ -238,7 +237,7 @@ class NoteController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
-    #[OA\Put(summary: 'Изменить заметку')]
+    #[OA\Put(summary: 'Изменить заметку по ID')]
     #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -271,15 +270,21 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @throws EntityNotFoundWhenDeleteException
-     * @throws EntityModelInvalidObjectTypeException
-     * @throws EntityInvalidObjectTypeException
-     * @throws \Exception
+     * @param Note $note
+     * @return JsonResponse
      */
     #[Route(
         path: '/{id}',
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_DELETE]
+    )]
+    #[OA\Delete(summary: 'Удалить заметку по ID')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Успех',
+        content: new OA\JsonContent(
+            ref: new Model(type: DeleteResponseModel::class)
+        )
     )]
     public function delete(Note $note): JsonResponse
     {
@@ -287,8 +292,6 @@ class NoteController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $this->noteService->delete(entity: $note);
-
-        return $this->json(data: ['success' => true, 'message' => 'Запись успешно удалена']);
+        return $this->json(data: new DeleteResponseModel());
     }
 }

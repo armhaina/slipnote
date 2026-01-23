@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Model\Response;
+namespace App\Model\Response\Entity;
 
 use App\Enum\Group;
-use Doctrine\DBAL\Types\Types;
-use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class NoteResponseModel
 {

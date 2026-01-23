@@ -7,14 +7,8 @@ namespace App\Mapper\Response;
 use App\Contract\EntityInterface;
 use App\Entity\Note;
 use App\Entity\User;
-use App\Enum\Group;
-use App\Model\Response\NoteResponseModel;
-use App\Model\Response\UserResponseModel;
-use Doctrine\DBAL\Types\Types;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
-use OpenApi\Attributes as OA;
+use App\Model\Response\Entity\NoteResponseModel;
+use App\Model\Response\Entity\UserResponseModel;
 
 readonly class NoteResponseMapper
 {
