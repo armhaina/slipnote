@@ -17,7 +17,6 @@ use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
-use App\Model\Response\ExpiredJWTTokenResponseModel;
 use App\Model\Response\NoteResponseModel;
 use App\Service\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -202,27 +201,30 @@ class NoteController extends AbstractController
      * @throws EntityModelInvalidObjectTypeException
      */
     #[Route(methods: [Request::METHOD_POST])]
+    #[OA\Post(summary: 'Создать заметку')]
     #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
     #[OA\Response(
-        response: 201,
-        description: 'Заметки созданы',
+        response: Response::HTTP_OK,
+        description: 'Успех',
         content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'total', type: 'integer', example: 2),
-            ],
-            type: 'object'
+            ref: new Model(
+                type: NoteResponseModel::class,
+                groups: [Group::PUBLIC->value]
+            )
         )
     )]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
-        $entity = new Note()
+        $note = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
             ->setUser(user: $this->getUser());
 
-        $entity = $this->noteService->create(entity: $entity);
+        $note = $this->noteService->create(entity: $note);
 
-        return $this->json(data: $entity, context: ['groups' => [Group::PUBLIC->value]]);
+        $responseModel = $this->noteResponseMapper->one(note: $note);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
     /**
@@ -235,6 +237,18 @@ class NoteController extends AbstractController
         path: '/{id}',
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
+    )]
+    #[OA\Put(summary: 'Изменить заметку')]
+    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Успех',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: NoteResponseModel::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
     )]
     public function update(
         Note $note,
@@ -249,9 +263,11 @@ class NoteController extends AbstractController
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription());
 
-        $entity = $this->noteService->update(entity: $note);
+        $note = $this->noteService->update(entity: $note);
 
-        return $this->json(data: $entity, context: ['groups' => [Group::PUBLIC->value]]);
+        $responseModel = $this->noteResponseMapper->one(note: $note);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
     /**
@@ -268,7 +284,7 @@ class NoteController extends AbstractController
     public function delete(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('User not found or invalid user type');
+            throw $this->createAccessDeniedException();
         }
 
         $this->noteService->delete(entity: $note);
