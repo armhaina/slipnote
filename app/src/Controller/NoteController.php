@@ -16,6 +16,7 @@ use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
+use App\Model\Response\Access\ForbiddenResponseModel;
 use App\Model\Response\Entity\NoteResponseModel;
 use App\Model\Response\Action\DeleteResponseModel;
 use App\Service\NoteService;
@@ -70,6 +71,15 @@ class NoteController extends AbstractController
                 )
             ),
         ]
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: 'Доступ запрещен',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModel::class,
+            )
+        )
     )]
     public function get(Note $note): JsonResponse
     {

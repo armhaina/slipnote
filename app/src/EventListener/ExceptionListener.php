@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Model\Response\Access\ForbiddenResponseModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -49,6 +51,10 @@ class ExceptionListener
                     'code' => $violation->getCode(),
                 ];
             }
+        }
+
+        if ($previous instanceof AccessDeniedException) {
+            $data = new ForbiddenResponseModel();
         }
 
         $response = new JsonResponse(
