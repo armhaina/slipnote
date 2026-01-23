@@ -10,11 +10,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Attributes as OA;
 
-//#[OA\Schema(
-//    schema: 'NoteResponse',
-//    description: 'Модель ответа с данными заметки',
-//    required: ['id', 'name', 'description', 'is_private', 'created_at', 'user']
-//)]
 readonly class NoteResponseModel
 {
     public function __construct(

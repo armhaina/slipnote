@@ -58,7 +58,6 @@ class NoteController extends AbstractController
         methods: [Request::METHOD_GET]
     )]
     #[OA\Get(
-        description: 'Возвращает данные заметки по указанному ID',
         summary: 'Получить заметку по ID',
         responses: [
             new OA\Response(
@@ -89,8 +88,22 @@ class NoteController extends AbstractController
      */
     #[Route(methods: [Request::METHOD_GET])]
     #[OA\Get(
-        description: 'Получить список заметок текущего пользователя',
-        summary: 'Получить список заметок текущего пользователя',
+        summary: 'Получить список заметок',
+        responses: [
+            new OA\Response(
+                response: Response::HTTP_OK,
+                description: 'Успех',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(
+                            type: NoteResponseModel::class,
+                            groups: [Group::PUBLIC->value]
+                        )
+                    )
+                )
+            ),
+        ]
     )]
     #[OA\Parameter(
         name: 'ids',
@@ -228,7 +241,7 @@ class NoteController extends AbstractController
         NotePayloadModel $model,
     ): JsonResponse {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('User not found or invalid user type');
+            throw $this->createAccessDeniedException();
         }
 
         $note
