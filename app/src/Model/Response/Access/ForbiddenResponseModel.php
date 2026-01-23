@@ -12,18 +12,21 @@ use Symfony\Component\Serializer\Attribute\Groups;
 readonly class ForbiddenResponseModel
 {
     public function __construct(
+        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
         #[OA\Property(
             description: 'Подтверждение',
             type: 'boolean',
             example: false
         )]
         private bool $success = false,
+        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
             example: 'Доступ запрещен'
         )]
         private string $message = 'Доступ запрещен',
+        #[Groups([Group::ADMIN->value])]
         #[OA\Property(
             description: 'Код ошибки',
             type: 'integer',
@@ -46,5 +49,17 @@ readonly class ForbiddenResponseModel
     public function getCode(): int
     {
         return $this->code;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'success' => $this->success,
+            'message' => $this->message,
+            'code' => $this->code,
+        ];
     }
 }

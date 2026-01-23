@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Enum\Group;
+use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Response\Access\ForbiddenResponseModel;
+use App\Service\NoteService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -27,6 +32,14 @@ class ExceptionListener
         Response::HTTP_SERVICE_UNAVAILABLE => 'Сервис временно недоступен',
     ];
 
+    public function __construct(
+        private readonly SerializerInterface $serializer
+    ) {
+    }
+
+    /**
+     * @throws ExceptionInterface
+     */
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
@@ -57,11 +70,16 @@ class ExceptionListener
             $data = new ForbiddenResponseModel();
         }
 
-        $response = new JsonResponse(
-            data: $data,
-            status: $status
-        );
+        $data = $this->serializer->serialize(data: $data, format: 'json', context: array_merge([
+            'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
+        ], ['groups' => [Group::PUBLIC->value]]));
 
-        $event->setResponse(response: $response);
+        $event->setResponse(
+            response: new JsonResponse(
+                data: $data,
+                status: $status,
+                json: true
+            )
+        );
     }
 }
