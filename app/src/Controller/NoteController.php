@@ -17,6 +17,7 @@ use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
+use App\Model\Response\ExpiredJWTTokenResponseModel;
 use App\Model\Response\NoteResponseModel;
 use App\Service\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
