@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model\Response\Method;
+namespace App\Model\Response\Action;
 
 use App\Enum\Group;
 use App\Model\Response\Entity\UserResponseModel;

@@ -17,7 +17,7 @@ use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Entity\NoteResponseModel;
-use App\Model\Response\Method\DeleteResponseModel;
+use App\Model\Response\Action\DeleteResponseModel;
 use App\Service\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
