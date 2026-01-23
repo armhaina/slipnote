@@ -57,20 +57,16 @@ class NoteController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
-    #[OA\Get(
-        summary: 'Получить заметку по ID',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Успех',
-                content: new OA\JsonContent(
-                    ref: new Model(
-                        type: NoteResponseModel::class,
-                        groups: [Group::PUBLIC->value]
-                    )
-                )
-            ),
-        ]
+    #[OA\Get(operationId: 'getNote', summary: 'Получить заметку по ID')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Успех',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: NoteResponseModel::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
@@ -78,6 +74,7 @@ class NoteController extends AbstractController
         content: new OA\JsonContent(
             ref: new Model(
                 type: ForbiddenResponseModel::class,
+                groups: [Group::PUBLIC->value]
             )
         )
     )]
