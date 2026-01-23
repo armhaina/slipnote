@@ -278,7 +278,7 @@ class NoteController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_DELETE]
     )]
-    #[OA\Delete(summary: 'Удалить заметку по ID')]
+    #[OA\Delete(operationId: 'deleteNote', summary: 'Удалить заметку по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Успех',
