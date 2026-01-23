@@ -58,12 +58,12 @@ class NoteController extends AbstractController
         methods: [Request::METHOD_GET]
     )]
     #[OA\Get(
-        description: 'Возвращает данные заметки по указанному идентификатору',
+        description: 'Возвращает данные заметки по указанному ID',
         summary: 'Получить заметку по ID',
         responses: [
             new OA\Response(
-                response: 200,
-                description: 'Успешный ответ',
+                response: Response::HTTP_OK,
+                description: 'Успех',
                 content: new OA\JsonContent(
                     ref: new Model(
                         type: NoteResponseModel::class,
