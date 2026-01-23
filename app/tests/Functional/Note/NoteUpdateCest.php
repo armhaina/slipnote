@@ -33,7 +33,7 @@ final class NoteUpdateCest extends AbstractCest
     protected function successProvider(): array
     {
         return [
-            [
+            'main' => [
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',

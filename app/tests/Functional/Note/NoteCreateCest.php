@@ -31,7 +31,7 @@ final class NoteCreateCest extends AbstractCest
     protected function successProvider(): array
     {
         return [
-            [
+            'main' => [
                 'request' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
