@@ -225,6 +225,15 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNPROCESSABLE_ENTITY,
+        description: 'Ошибка валидации',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ValidationResponseModelException::class
+            )
+        )
+    )]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
         $note = new Note()
@@ -259,6 +268,24 @@ class NoteController extends AbstractController
             ref: new Model(
                 type: NoteResponseModelEntity::class,
                 groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNPROCESSABLE_ENTITY,
+        description: 'Ошибка валидации',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ValidationResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: 'Доступ запрещен',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
             )
         )
     )]
@@ -297,6 +324,15 @@ class NoteController extends AbstractController
         description: 'Успех',
         content: new OA\JsonContent(
             ref: new Model(type: DeleteResponseModelAction::class)
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: 'Доступ запрещен',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
         )
     )]
     public function delete(Note $note): JsonResponse
