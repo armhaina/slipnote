@@ -32,7 +32,7 @@ class UserController extends AbstractController
     }
 
     #[Route(
-        path: '/{user}',
+        path: '/{id}',
         requirements: ['user' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
@@ -69,7 +69,7 @@ class UserController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        path: '/{user}',
+        path: '/{id}',
         requirements: ['user' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
@@ -101,7 +101,7 @@ class UserController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        path: '/{user}',
+        path: '/{id}',
         requirements: ['user' => '\d+'],
         methods: [Request::METHOD_DELETE]
     )]
