@@ -140,7 +140,7 @@ class NoteController extends AbstractController
         )
     )]
     #[OA\Parameter(
-        name: 'ids',
+        name: 'ids[]',
         description: 'Массив ID заметок',
         in: 'query',
         required: false,
@@ -150,9 +150,11 @@ class NoteController extends AbstractController
             default: null,
             example: [1, 2, 3]
         ),
+        style: 'form',
+        explode: true
     )]
     #[OA\Parameter(
-        name: 'user_ids',
+        name: 'user_ids[]',
         description: 'Массив ID пользователей (в данный момент работает только с собственным ID)',
         in: 'query',
         required: false,
@@ -162,6 +164,8 @@ class NoteController extends AbstractController
             default: null,
             example: [1, 2, 3]
         ),
+        style: 'form',
+        explode: true
     )]
     #[OA\Parameter(
         name: 'limit',
@@ -191,7 +195,7 @@ class NoteController extends AbstractController
         in: 'query',
         required: false,
         schema: new OA\Schema(
-            type: 'integer',
+            type: 'string',
             format: 'date-time',
             default: null,
             example: '2030-01-01',

@@ -16,8 +16,10 @@ class NoteQueryModel implements EntityQueryModelInterface
     private int $limit = 20;
     private int $offset = 0;
     /** @var array<int> */
+    #[Ignore]
     private ?array $ids = null;
     /** @var array<int> */
+    #[Ignore]
     #[SerializedName(serializedName: 'user_ids')]
     private ?array $userIds = null;
     /** @var array<string> */

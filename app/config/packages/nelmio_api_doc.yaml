@@ -8,6 +8,7 @@ nelmio_api_doc:
           operationId: getJWT
           summary: Получить JWT токен
           description: Выполнить запрос для получения JWT токена
+          security: []
           requestBody:
             content:
               application/json:
@@ -51,6 +52,9 @@ nelmio_api_doc:
           bearerFormat: JWT
     security:
       - Bearer: [ ]
+  html_config:
+    swagger_ui_config:
+      defaultModelsExpandDepth: 0 # свернуть схемы
   areas: # to filter documented areas
     path_patterns:
       - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
