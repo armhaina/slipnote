@@ -28,7 +28,6 @@ readonly class ForbiddenResponseModelException implements ExceptionResponseInter
         #[OA\Property(
             description: 'Код ошибки (' . Group::ADMIN->value . ')',
             type: 'integer',
-            default: null,
         )]
         private int $code
     ) {

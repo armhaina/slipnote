@@ -32,7 +32,6 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
         #[OA\Property(
             description: 'Код ошибки (' . Group::ADMIN->value . ')',
             type: 'integer',
-            default: null,
         )]
         private int $code,
         #[Groups([Group::PUBLIC->value])]
