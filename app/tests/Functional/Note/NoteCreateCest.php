@@ -17,7 +17,7 @@ final class NoteCreateCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Создать заметку');
+        $I->wantTo('POST: Создать заметку');
 
         $this->authorized(I: $I);
 
@@ -34,7 +34,7 @@ final class NoteCreateCest extends AbstractCest
     #[DataProvider('failedValidationProvider')]
     public function failedValidation(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Ошибка валидации');
+        $I->wantTo('POST: Ошибка валидации');
 
         $this->authorized(I: $I);
 
@@ -51,7 +51,7 @@ final class NoteCreateCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Ошибка авторизации');
+        $I->wantTo('POST: Ошибка авторизации');
 
         $I->sendPost(url: '/api/v1/notes', params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);

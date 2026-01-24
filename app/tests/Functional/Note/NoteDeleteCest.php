@@ -17,7 +17,7 @@ final class NoteDeleteCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Удалить заметку');
+        $I->wantTo('DELETE: Удалить заметку');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
@@ -35,7 +35,7 @@ final class NoteDeleteCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Доступ запрещен');
+        $I->wantTo('DELETE: Доступ запрещен');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
@@ -53,7 +53,7 @@ final class NoteDeleteCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Ошибка авторизации');
+        $I->wantTo('DELETE: Ошибка авторизации');
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 

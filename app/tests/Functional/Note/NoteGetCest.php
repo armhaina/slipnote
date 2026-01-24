@@ -15,9 +15,11 @@ use Codeception\Util\HttpCode;
 
 final class NoteGetCest extends AbstractCest
 {
-    #[DataProvider('successProvider')]
-    public function tryToTest(FunctionalTester $I, Example $example): void
+    #[DataProvider('mainProvider')]
+    public function main(FunctionalTester $I, Example $example): void
     {
+        $I->wantTo('GET: Получить заметку');
+
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
@@ -31,10 +33,28 @@ final class NoteGetCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    protected function successProvider(): array
+    #[DataProvider('forbiddenProvider')]
+    public function forbidden(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Доступ запрещен');
+
+        $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendGet(url: '/api/v1/notes/' . $note->getId());
+        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    protected function mainProvider(): array
     {
         return [
-            'main' => [
+            [
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
@@ -44,6 +64,23 @@ final class NoteGetCest extends AbstractCest
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+            ],
+        ];
+    }
+
+    protected function forbiddenProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => 'test_0@mail.ru'],
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Доступ запрещен',
                 ],
             ],
         ];

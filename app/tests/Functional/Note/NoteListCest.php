@@ -18,7 +18,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET запрос без параметров');
+        $I->wantTo('GET: Получить список заметок');
 
         $this->authorized(I: $I);
 
@@ -39,7 +39,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('idsProvider')]
     public function paramIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET запрос с параметрами: ids');
+        $I->wantTo('GET: Получить список заметок с параметром [ids]');
 
         $this->authorized(I: $I);
 
@@ -62,7 +62,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('userIdsProvider')]
     public function paramUserIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET запрос с параметрами: user_ids');
+        $I->wantTo('GET: Получить список заметок с параметром [user_ids]');
 
         $this->authorized(I: $I);
 
