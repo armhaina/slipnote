@@ -104,6 +104,7 @@ class NoteController extends AbstractController
      */
     #[Route(methods: [Request::METHOD_GET])]
     #[OA\Get(
+        operationId: 'getListNote',
         summary: 'Получить список заметок',
     )]
     #[OA\Response(
@@ -241,7 +242,7 @@ class NoteController extends AbstractController
      * @throws EntityModelInvalidObjectTypeException
      */
     #[Route(methods: [Request::METHOD_POST])]
-    #[OA\Post(summary: 'Создать заметку')]
+    #[OA\Post(operationId: 'createNote', summary: 'Создать заметку')]
     #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -296,7 +297,7 @@ class NoteController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
-    #[OA\Put(summary: 'Изменить заметку по ID')]
+    #[OA\Put(operationId: 'updateNote', summary: 'Изменить заметку по ID')]
     #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
