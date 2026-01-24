@@ -32,7 +32,7 @@ readonly class DefaultResponseModelException implements ExceptionResponseInterfa
             ),
             description: 'Контекст (' . Group::ADMIN->value . ')',
             type: 'object',
-            default: null
+            nullable: true
         )]
         private ContextResponseModelException $context,
     ) {
