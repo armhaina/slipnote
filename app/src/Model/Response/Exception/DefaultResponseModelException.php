@@ -6,6 +6,7 @@ namespace App\Model\Response\Exception;
 
 use App\Contract\Exception\ExceptionResponseInterface;
 use App\Enum\Group;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -26,6 +27,16 @@ readonly class DefaultResponseModelException implements ExceptionResponseInterfa
             example: 'Ошибка'
         )]
         private string $message,
+        #[Groups([Group::ADMIN->value])]
+        #[OA\Property(
+            ref: new Model(
+                type: ContextResponseModelException::class,
+            ),
+            description: 'Контекст (' . Group::ADMIN->value . ')',
+            type: 'object',
+            default: null
+        )]
+        private ContextResponseModelException $context,
     ) {
     }
 
@@ -37,5 +48,10 @@ readonly class DefaultResponseModelException implements ExceptionResponseInterfa
     public function getMessage(): string
     {
         return $this->message;
+    }
+
+    public function getContext(): ContextResponseModelException
+    {
+        return $this->context;
     }
 }

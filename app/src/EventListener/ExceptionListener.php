@@ -7,6 +7,7 @@ namespace App\EventListener;
 use App\Contract\Exception\ExceptionResponseInterface;
 use App\Enum\Group;
 use App\Enum\Role;
+use App\Model\Response\Exception\ContextResponseModelException;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
@@ -79,7 +80,15 @@ class ExceptionListener
             return $this->validationExceptionHandler(exception: $exception, status: $status);
         }
 
-        return new DefaultResponseModelException(success: false, message: self::HTTP_STATUS_MESSAGE[$status]);
+        return new DefaultResponseModelException(
+            success: false,
+            message: self::HTTP_STATUS_MESSAGE[$status],
+            context: new ContextResponseModelException(
+                file: $exception->getFile(),
+                line: $exception->getLine(),
+                message: $exception->getMessage(),
+            )
+        );
     }
 
     private function forbiddenExceptionHandler(\Throwable $exception, int $status): ExceptionResponseInterface
