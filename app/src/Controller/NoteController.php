@@ -194,7 +194,7 @@ class NoteController extends AbstractController
             type: 'integer',
             format: 'date-time',
             default: null,
-            example: '2024-01-22T10:30:00+03:00',
+            example: '2030-01-01',
             nullable: true
         ),
     )]
