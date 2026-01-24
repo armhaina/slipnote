@@ -15,21 +15,18 @@ readonly class NoteResponseModelEntity
         #[OA\Property(
             description: 'Уникальный идентификатор заметки',
             type: 'integer',
-            example: 1
         )]
         private int $id,
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
         #[OA\Property(
             description: 'Наименование',
             type: 'string',
-            example: 'Первая заметка'
         )]
         private string $name,
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
         #[OA\Property(
             description: 'Описание',
             type: 'string',
-            example: 'Первая описание заметки'
         )]
         private string $description,
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]

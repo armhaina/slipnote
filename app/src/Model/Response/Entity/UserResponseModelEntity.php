@@ -15,14 +15,12 @@ readonly class UserResponseModelEntity
         #[OA\Property(
             description: 'Уникальный идентификатор пользователя',
             type: 'integer',
-            example: 1
         )]
         private int $id,
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
         #[OA\Property(
             description: 'Email пользователя',
             type: 'string',
-            example: 'example@mail.ru'
         )]
         private string $email,
     ) {

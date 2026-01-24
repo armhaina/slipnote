@@ -15,13 +15,11 @@ readonly class DeleteResponseModelAction
         #[OA\Property(
             description: 'Статус',
             type: 'boolean',
-            example: true
         )]
         private bool $success = true,
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
-            example: 'Запись успешно удалена'
         )]
         private string $message = 'Запись успешно удалена'
     ) {
