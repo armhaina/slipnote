@@ -13,9 +13,11 @@ use Codeception\Util\HttpCode;
 
 final class NoteCreateCest extends AbstractCest
 {
-    #[DataProvider('successProvider')]
-    public function tryToTest(FunctionalTester $I, Example $example): void
+    #[DataProvider('mainProvider')]
+    public function main(FunctionalTester $I, Example $example): void
     {
+        $I->wantTo('Создать заметку');
+
         $this->authorized(I: $I);
 
         $I->sendPost(url: '/api/v1/notes', params: $example['request']);
@@ -28,10 +30,10 @@ final class NoteCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    protected function successProvider(): array
+    protected function mainProvider(): array
     {
         return [
-            'main' => [
+            [
                 'request' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
