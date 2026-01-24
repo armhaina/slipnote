@@ -33,7 +33,6 @@ final class NoteGetCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {

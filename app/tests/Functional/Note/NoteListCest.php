@@ -36,6 +36,28 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+
+
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Ошибка авторизации');
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture);
+        }
+
+        $I->sendGet(url: '/api/v1/notes');
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+
     #[DataProvider('idsProvider')]
     public function paramIds(FunctionalTester $I, Example $example): void
     {
@@ -105,6 +127,30 @@ final class NoteListCest extends AbstractCest
                         'description' => 'Описание заметки_1',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
+                ],
+            ]
+        ];
+    }
+
+    protected function failedAuthorizationProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    'code' => 401,
+                    'message' => 'JWT Token not found',
                 ],
             ]
         ];
