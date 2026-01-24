@@ -105,12 +105,12 @@ class Note implements EntityInterface
         return $this;
     }
 
-    public function getUser(): UserInterface
+    public function getUser(): User|UserInterface
     {
         return $this->user;
     }
 
-    public function setUser(UserInterface $user): self
+    public function setUser(User|UserInterface $user): self
     {
         $this->user = $user;
 

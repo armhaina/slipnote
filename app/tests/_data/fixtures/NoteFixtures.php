@@ -9,7 +9,7 @@ use Faker\Factory;
 
 class NoteFixtures
 {
-    public static function load(FunctionalTester $I, array $data = []): EntityInterface
+    public static function load(FunctionalTester $I, array $data = []): Note
     {
         $faker = Factory::create();
 
