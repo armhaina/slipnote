@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
+use App\Entity\Note;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
