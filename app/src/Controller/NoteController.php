@@ -9,16 +9,15 @@ use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
-use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
 use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
-use App\Model\Response\Access\ForbiddenResponseModel;
-use App\Model\Response\Entity\NoteResponseModel;
-use App\Model\Response\Action\DeleteResponseModel;
+use App\Model\Response\Action\DeleteResponseModelAction;
+use App\Model\Response\Entity\NoteResponseModelEntity;
+use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Service\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -63,7 +62,7 @@ class NoteController extends AbstractController
         description: 'Успех',
         content: new OA\JsonContent(
             ref: new Model(
-                type: NoteResponseModel::class,
+                type: NoteResponseModelEntity::class,
                 groups: [Group::PUBLIC->value]
             )
         )
@@ -73,8 +72,7 @@ class NoteController extends AbstractController
         description: 'Доступ запрещен',
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModel::class,
-                groups: [Group::PUBLIC->value]
+                type: ForbiddenResponseModelException::class
             )
         )
     )]
@@ -103,7 +101,7 @@ class NoteController extends AbstractController
                     type: 'array',
                     items: new OA\Items(
                         ref: new Model(
-                            type: NoteResponseModel::class,
+                            type: NoteResponseModelEntity::class,
                             groups: [Group::PUBLIC->value]
                         )
                     )
@@ -214,7 +212,7 @@ class NoteController extends AbstractController
         description: 'Успех',
         content: new OA\JsonContent(
             ref: new Model(
-                type: NoteResponseModel::class,
+                type: NoteResponseModelEntity::class,
                 groups: [Group::PUBLIC->value]
             )
         )
@@ -251,7 +249,7 @@ class NoteController extends AbstractController
         description: 'Успех',
         content: new OA\JsonContent(
             ref: new Model(
-                type: NoteResponseModel::class,
+                type: NoteResponseModelEntity::class,
                 groups: [Group::PUBLIC->value]
             )
         )
@@ -290,7 +288,7 @@ class NoteController extends AbstractController
         response: Response::HTTP_OK,
         description: 'Успех',
         content: new OA\JsonContent(
-            ref: new Model(type: DeleteResponseModel::class)
+            ref: new Model(type: DeleteResponseModelAction::class)
         )
     )]
     public function delete(Note $note): JsonResponse
@@ -299,6 +297,6 @@ class NoteController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        return $this->json(data: new DeleteResponseModel());
+        return $this->json(data: new DeleteResponseModelAction());
     }
 }

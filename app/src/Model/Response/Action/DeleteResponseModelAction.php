@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Model\Response\Action;
 
 use App\Enum\Group;
-use App\Model\Response\Entity\UserResponseModel;
+use App\Model\Response\Entity\UserResponseModelEntity;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class DeleteResponseModel
+readonly class DeleteResponseModelAction
 {
     public function __construct(
         #[OA\Property(

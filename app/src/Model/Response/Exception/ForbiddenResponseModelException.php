@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Model\Response\Access;
+namespace App\Model\Response\Exception;
 
+use App\Contract\ExceptionResponseInterface;
 use App\Enum\Group;
-use App\Model\Response\Entity\UserResponseModel;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class ForbiddenResponseModel
+readonly class ForbiddenResponseModelException implements ExceptionResponseInterface
 {
     public function __construct(
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
@@ -28,7 +28,7 @@ readonly class ForbiddenResponseModel
         private string $message = 'Доступ запрещен',
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
-            description: 'Код ошибки',
+            description: 'Код ошибки (только администраторы)',
             type: 'integer',
             example: 0
         )]
@@ -49,17 +49,5 @@ readonly class ForbiddenResponseModel
     public function getCode(): int
     {
         return $this->code;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
-    {
-        return [
-            'success' => $this->success,
-            'message' => $this->message,
-            'code' => $this->code,
-        ];
     }
 }

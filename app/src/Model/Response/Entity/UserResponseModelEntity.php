@@ -8,7 +8,7 @@ use App\Enum\Group;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class UserResponseModel
+readonly class UserResponseModelEntity
 {
     public function __construct(
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]

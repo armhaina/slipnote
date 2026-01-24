@@ -8,7 +8,7 @@ use App\Enum\Group;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class NoteResponseModel
+readonly class NoteResponseModelEntity
 {
     public function __construct(
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
@@ -36,7 +36,7 @@ readonly class NoteResponseModel
         #[OA\Property(
             description: 'Пользователь (владелец заметки)',
         )]
-        private UserResponseModel $user,
+        private UserResponseModelEntity $user,
     ) {
     }
 
@@ -55,7 +55,7 @@ readonly class NoteResponseModel
         return $this->description;
     }
 
-    public function getUser(): UserResponseModel
+    public function getUser(): UserResponseModelEntity
     {
         return $this->user;
     }
