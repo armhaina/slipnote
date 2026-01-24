@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\EntityModel;
 
-use App\Contract\ExceptionInterface;
+use App\Contract\Exception\ExceptionInterface;
 
 class EntityModelInvalidObjectTypeException extends \Exception implements ExceptionInterface
 {

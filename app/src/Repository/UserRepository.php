@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\EntityInterface;
-use App\Contract\EntityQueryModelInterface;
+use App\Contract\Entity\EntityInterface;
+use App\Contract\Entity\EntityQueryModelInterface;
 use App\Contract\RepositoryInterface;
 use App\Entity\User;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\UserQueryModel;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;

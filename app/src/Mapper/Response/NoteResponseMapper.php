@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mapper\Response;
 
-use App\Contract\EntityInterface;
+use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
 use App\Entity\User;
 use App\Model\Response\Entity\NoteResponseModelEntity;

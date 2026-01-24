@@ -2,6 +2,8 @@
 
 namespace App\Contract;
 
+use App\Contract\Entity\EntityInterface;
+use App\Contract\Entity\EntityQueryModelInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;

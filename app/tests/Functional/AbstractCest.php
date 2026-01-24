@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional;
 
-use App\Contract\EntityInterface;
-use App\Entity\User;
+use App\Contract\Entity\EntityInterface;
 use App\Enum\Role;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Support\FunctionalTester;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class AbstractCest
 {

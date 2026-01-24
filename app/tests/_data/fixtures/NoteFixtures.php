@@ -2,15 +2,9 @@
 
 namespace App\Tests\_data\fixtures;
 
-use App\Contract\EntityInterface;
+use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
-use App\Entity\User;
-use App\Enum\Role;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Example;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
 class NoteFixtures

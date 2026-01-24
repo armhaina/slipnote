@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Contract\EntityInterface;
-use App\Contract\EntityQueryModelInterface;
+use App\Contract\Entity\EntityInterface;
+use App\Contract\Entity\EntityQueryModelInterface;
 use App\Contract\ServiceInterface;
 use App\Entity\User;
 use App\Exception\Entity\EntityInvalidObjectTypeException;

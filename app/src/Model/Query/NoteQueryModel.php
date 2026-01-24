@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
-use App\Contract\EntityQueryModelInterface;
+use App\Contract\Entity\EntityQueryModelInterface;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 
 class NoteQueryModel implements EntityQueryModelInterface
