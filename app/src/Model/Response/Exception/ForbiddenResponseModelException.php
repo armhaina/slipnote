@@ -16,14 +16,12 @@ readonly class ForbiddenResponseModelException implements ExceptionResponseInter
         #[OA\Property(
             description: 'Статус',
             type: 'boolean',
-            example: false
         )]
         private bool $success,
         #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
-            example: 'Доступ запрещен'
         )]
         private string $message,
         #[Groups([Group::ADMIN->value])]
@@ -31,7 +29,6 @@ readonly class ForbiddenResponseModelException implements ExceptionResponseInter
             description: 'Код ошибки (' . Group::ADMIN->value . ')',
             type: 'integer',
             default: null,
-            example: 0
         )]
         private int $code
     ) {

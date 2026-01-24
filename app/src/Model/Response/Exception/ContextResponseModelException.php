@@ -16,21 +16,18 @@ readonly class ContextResponseModelException implements ExceptionResponseInterfa
         #[OA\Property(
             description: 'Файл',
             type: 'string',
-            example: '/pub/www/app/src/Controller/NoteController.php'
         )]
         private string $file,
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
             description: 'Строка',
             type: 'integer',
-            example: 210
         )]
         private int $line,
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
-            example: 'Ошибка'
         )]
         private string $message,
     ) {

@@ -20,14 +20,12 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
         #[OA\Property(
             description: 'Статус',
             type: 'boolean',
-            example: false
         )]
         private bool $success,
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
-            example: 'Ошибка валидации'
         )]
         private string $message,
         #[Groups([Group::ADMIN->value])]
@@ -35,7 +33,6 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
             description: 'Код ошибки (' . Group::ADMIN->value . ')',
             type: 'integer',
             default: null,
-            example: 0
         )]
         private int $code,
         #[Groups([Group::PUBLIC->value])]
