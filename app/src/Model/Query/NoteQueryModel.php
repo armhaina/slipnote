@@ -23,7 +23,7 @@ class NoteQueryModel implements EntityQueryModelInterface
     /** @var array<string> */
     #[Ignore]
     #[SerializedName(serializedName: 'order_by')]
-    #[OrderBy(fields: ['name', 'created_at'])]
+    #[OrderBy(fields: ['name', 'created_at', 'updated_at'])]
     private array $orderBy = [];
     #[SerializedName(serializedName: 'updated_at_less')]
     private ?\DateTimeImmutable $updatedAtLess = null;

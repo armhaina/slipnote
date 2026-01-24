@@ -209,6 +209,48 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('orderByUpdatedAtAscProvider')]
+    public function paramOrderByUpdatedAtAsc(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Получить список заметок с параметром [order_by[updated_at]=asc]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: '/api/v1/notes', params: ['order_by[updated_at]' => 'asc']);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('orderByUpdatedAtDescProvider')]
+    public function paramOrderByUpdatedAtDesc(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Получить список заметок с параметром [order_by[updated_at]=desc]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: '/api/v1/notes', params: ['order_by[updated_at]' => 'desc']);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     protected function mainProvider(): array
     {
         return [
@@ -456,6 +498,74 @@ final class NoteListCest extends AbstractCest
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    protected function orderByUpdatedAtAscProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'updated_at' => new DateTimeImmutable('01.01.2025')
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'updated_at' => new DateTimeImmutable('01.01.2030')
+                    ],
+                ],
+                'response' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    protected function orderByUpdatedAtDescProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'updated_at' => new DateTimeImmutable('01.01.2030')
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'updated_at' => new DateTimeImmutable('01.01.2025')
                     ],
                 ],
                 'response' => [
