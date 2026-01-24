@@ -103,8 +103,6 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-
-
     #[DataProvider('orderByNameAscProvider')]
     public function paramOrderByNameAsc(FunctionalTester $I, Example $example): void
     {
@@ -138,6 +136,48 @@ final class NoteListCest extends AbstractCest
         }
 
         $I->sendGet(url: '/api/v1/notes', params: ['order_by[name]' => 'desc']);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('orderByCreatedAtAscProvider')]
+    public function paramOrderByCreatedAtAsc(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Получить список заметок с параметром [order_by[created_at]=asc]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: '/api/v1/notes', params: ['order_by[created_at]' => 'asc']);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('orderByCreatedAtDescProvider')]
+    public function paramOrderByCreatedAtDesc(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Получить список заметок с параметром [order_by[created_at]=desc]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: '/api/v1/notes', params: ['order_by[created_at]' => 'desc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -297,6 +337,70 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    protected function orderByCreatedAtAscProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    protected function orderByCreatedAtDescProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],

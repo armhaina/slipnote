@@ -95,6 +95,7 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
         $query = $this->createQueryBuilder(self::QUERY_ALIAS);
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
+            $column = $this->convertSnakeCaseToCamelCase(value: $column);
             $query->addOrderBy(sort: self::QUERY_ALIAS . '.' . $column, order: $order);
         }
 
