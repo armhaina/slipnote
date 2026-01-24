@@ -13,6 +13,7 @@ use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
 use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Entity\NoteMapper;
+use App\Message\HttpStatusMessage;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
@@ -61,7 +62,7 @@ class NoteController extends AbstractController
     #[OA\Get(operationId: 'getNote', summary: 'Получить заметку по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Успех',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,

@@ -7,6 +7,7 @@ namespace App\EventListener;
 use App\Contract\Exception\ExceptionResponseInterface;
 use App\Enum\Group;
 use App\Enum\Role;
+use App\Message\HttpStatusMessage;
 use App\Model\Response\Exception\ContextResponseModelException;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
@@ -22,20 +23,8 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-class ExceptionListener
+readonly class ExceptionListener
 {
-    private const array HTTP_STATUS_MESSAGE = [
-        Response::HTTP_BAD_REQUEST => 'Некорректный запрос',
-        Response::HTTP_UNAUTHORIZED => 'Требуется авторизация',
-        Response::HTTP_FORBIDDEN => 'Доступ запрещен',
-        Response::HTTP_NOT_FOUND => 'Ресурс не найден',
-        Response::HTTP_METHOD_NOT_ALLOWED => 'Метод не разрешен',
-        Response::HTTP_UNPROCESSABLE_ENTITY => 'Ошибка валидации',
-        Response::HTTP_TOO_MANY_REQUESTS => 'Слишком много запросов',
-        Response::HTTP_INTERNAL_SERVER_ERROR => 'Внутренняя ошибка сервера',
-        Response::HTTP_SERVICE_UNAVAILABLE => 'Сервис временно недоступен',
-    ];
-
     public function __construct(
         private readonly SerializerInterface $serializer,
         private readonly Security $security
@@ -82,7 +71,7 @@ class ExceptionListener
 
         return new DefaultResponseModelException(
             success: false,
-            message: self::HTTP_STATUS_MESSAGE[$status],
+            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
             context: new ContextResponseModelException(
                 file: $exception->getFile(),
                 line: $exception->getLine(),
@@ -95,7 +84,7 @@ class ExceptionListener
     {
         return new ForbiddenResponseModelException(
             success: false,
-            message: self::HTTP_STATUS_MESSAGE[$status],
+            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
             code: $exception->getCode(),
         );
     }
@@ -118,7 +107,7 @@ class ExceptionListener
 
         return new ValidationResponseModelException(
             success: false,
-            message: self::HTTP_STATUS_MESSAGE[$status],
+            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
             code: $exception->getCode(),
             errors: $errors,
         );

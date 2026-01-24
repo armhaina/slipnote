@@ -31,8 +31,8 @@ final class NoteCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('errorValidationProvider')]
-    public function errorValidation(FunctionalTester $I, Example $example): void
+    #[DataProvider('failedValidationProvider')]
+    public function failedValidation(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('Ошибка валидации');
 
@@ -65,7 +65,7 @@ final class NoteCreateCest extends AbstractCest
         ];
     }
 
-    protected function errorValidationProvider(): array
+    protected function failedValidationProvider(): array
     {
         $faker = Factory::create();
 
