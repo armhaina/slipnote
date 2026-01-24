@@ -73,7 +73,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: 'Доступ запрещен',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
         content: new OA\JsonContent(
             ref: new Model(
                 type: ForbiddenResponseModelException::class
@@ -82,7 +82,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: 'Внутренняя ошибка сервера',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -110,7 +110,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Успех',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
         content: new OA\JsonContent(
             type: 'array',
             items: new OA\Items(
@@ -123,7 +123,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: 'Ошибка валидации',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
         content: new OA\JsonContent(
             ref: new Model(
                 type: ValidationResponseModelException::class
@@ -132,7 +132,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: 'Внутренняя ошибка сервера',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -247,7 +247,7 @@ class NoteController extends AbstractController
     #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Успех',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,
@@ -257,7 +257,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: 'Ошибка валидации',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
         content: new OA\JsonContent(
             ref: new Model(
                 type: ValidationResponseModelException::class
@@ -266,7 +266,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: 'Внутренняя ошибка сервера',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -306,7 +306,7 @@ class NoteController extends AbstractController
     #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Успех',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,
@@ -316,7 +316,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: 'Ошибка валидации',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
         content: new OA\JsonContent(
             ref: new Model(
                 type: ValidationResponseModelException::class
@@ -325,7 +325,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: 'Доступ запрещен',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
         content: new OA\JsonContent(
             ref: new Model(
                 type: ForbiddenResponseModelException::class
@@ -334,7 +334,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: 'Внутренняя ошибка сервера',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -373,14 +373,14 @@ class NoteController extends AbstractController
     #[OA\Delete(operationId: 'deleteNote', summary: 'Удалить заметку по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Успех',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
         content: new OA\JsonContent(
             ref: new Model(type: DeleteResponseModelAction::class)
         )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: 'Доступ запрещен',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
         content: new OA\JsonContent(
             ref: new Model(
                 type: ForbiddenResponseModelException::class
@@ -389,7 +389,7 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: 'Внутренняя ошибка сервера',
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
