@@ -12,7 +12,7 @@ use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
 use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
-use App\Mapper\Response\NoteResponseMapper;
+use App\Mapper\Entity\NoteMapper;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
@@ -44,7 +44,7 @@ class NoteController extends AbstractController
 {
     public function __construct(
         private readonly NoteService $noteService,
-        private readonly NoteResponseMapper $noteResponseMapper
+        private readonly NoteMapper $noteResponseMapper
     ) {
     }
 

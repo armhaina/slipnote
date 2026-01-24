@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Mapper\Response;
+namespace App\Mapper\Entity;
 
 use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
@@ -10,7 +10,7 @@ use App\Entity\User;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Entity\UserResponseModelEntity;
 
-readonly class NoteResponseMapper
+readonly class NoteMapper
 {
     /**
      * @param array<string, mixed> $context
