@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Model\Query;
 
 use App\Contract\Entity\EntityQueryModelInterface;
+use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
+use OpenApi\Attributes as OA;
 
 class NoteQueryModel implements EntityQueryModelInterface
 {
@@ -17,6 +19,7 @@ class NoteQueryModel implements EntityQueryModelInterface
     #[SerializedName(serializedName: 'user_ids')]
     private ?array $userIds = null;
     /** @var array<string> */
+    #[Ignore]
     #[SerializedName(serializedName: 'order_by')]
     private array $orderBy = [];
     #[SerializedName(serializedName: 'updated_at_less')]

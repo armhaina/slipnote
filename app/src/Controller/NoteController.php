@@ -161,22 +161,6 @@ class NoteController extends AbstractController
         ),
     )]
     #[OA\Parameter(
-        name: 'order_by',
-        description: 'Сортировка по полям, пример: ?order_by[name]=asc&order_by[created_at]=desc',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(
-            properties: [
-                new OA\Property(property: 'name', type: 'string', enum: ['asc', 'desc']),
-            ],
-            type: 'object',
-            default: ['created_at' => 'desc'],
-            additionalProperties: false,
-        ),
-        style: 'deepObject',
-        explode: true,
-    )]
-    #[OA\Parameter(
         name: 'limit',
         description: 'Кол-во записей на странице',
         in: 'query',
@@ -210,6 +194,30 @@ class NoteController extends AbstractController
             example: '2024-01-22T10:30:00+03:00',
             nullable: true
         ),
+    )]
+    #[OA\Parameter(
+        name: 'order_by[name]',
+        description: 'Сортировка по имени',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', enum: ['asc', 'desc']),
+        example: 'asc',
+    )]
+    #[OA\Parameter(
+        name: 'order_by[created_at]',
+        description: 'Сортировка по дате создания',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', enum: ['asc', 'desc']),
+        example: 'desc',
+    )]
+    #[OA\Parameter(
+        name: 'order_by[updated_at]',
+        description: 'Сортировка по дате обновления',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', enum: ['asc', 'desc']),
+        example: 'desc',
     )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
