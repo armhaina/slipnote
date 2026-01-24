@@ -14,9 +14,11 @@ use Codeception\Util\HttpCode;
 
 final class NoteDeleteCest extends AbstractCest
 {
-    #[DataProvider('successProvider')]
-    public function tryToTest(FunctionalTester $I, Example $example): void
+    #[DataProvider('mainProvider')]
+    public function main(FunctionalTester $I, Example $example): void
     {
+        $I->wantTo('Удалить заметку');
+
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
@@ -30,10 +32,45 @@ final class NoteDeleteCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    protected function successProvider(): array
+    #[DataProvider('forbiddenProvider')]
+    public function forbidden(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('Доступ запрещен');
+
+        $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendDelete(url: '/api/v1/notes/' . $note->getId());
+        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('Ошибка авторизации');
+
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendDelete(url: '/api/v1/notes/' . $note->getId());
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    protected function mainProvider(): array
     {
         return [
-            'main' => [
+            [
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
@@ -42,6 +79,40 @@ final class NoteDeleteCest extends AbstractCest
                 'response' => [
                     'success' => true,
                     'message' => 'Запись успешно удалена',
+                ],
+            ],
+        ];
+    }
+
+    protected function forbiddenProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание заметки_0',
+                    'user' => ['email' => 'test_0@mail.ru'],
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Доступ запрещен',
+                ],
+            ],
+        ];
+    }
+
+    protected function failedAuthorizationProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание заметки_0',
+                    'user' => ['email' => 'test_0@mail.ru'],
+                ],
+                'response' => [
+                    'code' => 401,
+                    'message' => 'JWT Token not found',
                 ],
             ],
         ];

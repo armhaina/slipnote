@@ -110,8 +110,6 @@ final class NoteCreateCest extends AbstractCest
 
     protected function failedAuthorizationProvider(): array
     {
-        $faker = Factory::create();
-
         return [
             [
                 'request' => [
