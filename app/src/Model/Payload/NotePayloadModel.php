@@ -25,7 +25,7 @@ readonly class NotePayloadModel
         #[Assert\Type(type: Types::STRING)]
         #[Assert\Length(
             min: 2,
-            max: 100,
+            max: 10000,
             minMessage: 'Описание должно содержать минимум {{ limit }} символа',
             maxMessage: 'Описание должно содержать максимум {{ limit }} символов'
         )]

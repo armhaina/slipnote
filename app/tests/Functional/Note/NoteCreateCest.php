@@ -10,6 +10,7 @@ use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
+use Faker\Factory;
 
 final class NoteCreateCest extends AbstractCest
 {
@@ -30,6 +31,23 @@ final class NoteCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('errorValidationProvider')]
+    public function errorValidation(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('Ошибка валидации');
+
+        $this->authorized(I: $I);
+
+        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     protected function mainProvider(): array
     {
         return [
@@ -42,6 +60,34 @@ final class NoteCreateCest extends AbstractCest
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+            ],
+        ];
+    }
+
+    protected function errorValidationProvider(): array
+    {
+        $faker = Factory::create();
+
+        return [
+            [
+                'request' => [
+                    'name' => $faker->regexify('[A-Za-z0-9]{' . mt_rand(101, 101) . '}'),
+                    'description' => $faker->regexify('[A-Za-z0-9]{' . mt_rand(10001, 10001) . '}')
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Ошибка валидации',
+                    'errors' => [
+                        [
+                            'property' => 'name',
+                            'message' => 'Название должно содержать максимум 100 символов'
+                        ],
+                        [
+                            'property' => 'description',
+                            'message' => 'Описание должно содержать максимум 10000 символов'
+                        ]
+                    ],
                 ],
             ],
         ];
