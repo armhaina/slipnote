@@ -178,7 +178,7 @@ class NoteController extends AbstractController
         required: false,
         schema: new OA\Schema(
             type: 'integer',
-            default: null,
+            default: 0,
             example: 10
         ),
     )]
