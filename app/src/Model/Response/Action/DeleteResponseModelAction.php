@@ -13,7 +13,7 @@ readonly class DeleteResponseModelAction
 {
     public function __construct(
         #[OA\Property(
-            description: 'Подтверждение',
+            description: 'Статус',
             type: 'boolean',
             example: true
         )]
