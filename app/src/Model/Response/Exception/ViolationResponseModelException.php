@@ -28,6 +28,7 @@ readonly class ViolationResponseModelException implements ExceptionResponseInter
         #[OA\Property(
             description: 'Код ошибки',
             type: 'string',
+            default: null
         )]
         private ?string $code,
     ) {

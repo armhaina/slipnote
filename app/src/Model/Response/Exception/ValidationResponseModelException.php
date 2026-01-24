@@ -19,7 +19,7 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
     public function __construct(
         #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
         #[OA\Property(
-            description: 'Подтверждение',
+            description: 'Статус',
             type: 'boolean',
             example: false
         )]
@@ -35,10 +35,11 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
         #[OA\Property(
             description: 'Код ошибки (только администраторы)',
             type: 'integer',
+            default: null,
             example: 0
         )]
         private int $code,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Ошибки',
             type: 'array',

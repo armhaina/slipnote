@@ -14,7 +14,7 @@ readonly class ForbiddenResponseModelException implements ExceptionResponseInter
     public function __construct(
         #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
-            description: 'Подтверждение',
+            description: 'Статус',
             type: 'boolean',
             example: false
         )]
@@ -28,8 +28,9 @@ readonly class ForbiddenResponseModelException implements ExceptionResponseInter
         private string $message,
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
-            description: 'Код ошибки (только администраторы)',
+            description: 'Код ошибки (' . Group::ADMIN->value . ')',
             type: 'integer',
+            default: null,
             example: 0
         )]
         private int $code

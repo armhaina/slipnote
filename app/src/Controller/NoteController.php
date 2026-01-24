@@ -94,21 +94,19 @@ class NoteController extends AbstractController
     #[Route(methods: [Request::METHOD_GET])]
     #[OA\Get(
         summary: 'Получить список заметок',
-        responses: [
-            new OA\Response(
-                response: Response::HTTP_OK,
-                description: 'Успех',
-                content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(
-                            type: NoteResponseModelEntity::class,
-                            groups: [Group::PUBLIC->value]
-                        )
-                    )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Успех',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(
+                ref: new Model(
+                    type: NoteResponseModelEntity::class,
+                    groups: [Group::PUBLIC->value]
                 )
-            ),
-        ]
+            )
+        )
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,

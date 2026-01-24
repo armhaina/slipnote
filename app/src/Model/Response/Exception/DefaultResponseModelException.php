@@ -14,7 +14,7 @@ readonly class DefaultResponseModelException implements ExceptionResponseInterfa
     public function __construct(
         #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
-            description: 'Подтверждение',
+            description: 'Статус',
             type: 'boolean',
             example: false
         )]
