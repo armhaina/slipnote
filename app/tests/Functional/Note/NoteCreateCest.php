@@ -48,6 +48,21 @@ final class NoteCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('Ошибка авторизации');
+
+        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     protected function mainProvider(): array
     {
         return [
@@ -88,6 +103,24 @@ final class NoteCreateCest extends AbstractCest
                             'message' => 'Описание должно содержать максимум 10000 символов'
                         ]
                     ],
+                ],
+            ],
+        ];
+    }
+
+    protected function failedAuthorizationProvider(): array
+    {
+        $faker = Factory::create();
+
+        return [
+            [
+                'request' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание заметки_0',
+                ],
+                'response' => [
+                    'code' => 401,
+                    'message' => 'JWT Token not found',
                 ],
             ],
         ];
