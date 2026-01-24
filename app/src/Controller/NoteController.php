@@ -17,6 +17,7 @@ use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NoteResponseModelEntity;
+use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\NoteService;
@@ -77,6 +78,15 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: 'Внутренняя ошибка сервера',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
     public function get(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
@@ -114,6 +124,15 @@ class NoteController extends AbstractController
         content: new OA\JsonContent(
             ref: new Model(
                 type: ValidationResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: 'Внутренняя ошибка сервера',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -234,6 +253,15 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: 'Внутренняя ошибка сервера',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
         $note = new Note()
@@ -289,6 +317,15 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: 'Внутренняя ошибка сервера',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
     public function update(
         Note $note,
         #[MapRequestPayload]
@@ -332,6 +369,15 @@ class NoteController extends AbstractController
         content: new OA\JsonContent(
             ref: new Model(
                 type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: 'Внутренняя ошибка сервера',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
             )
         )
     )]

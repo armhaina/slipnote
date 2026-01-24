@@ -33,6 +33,11 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    private function getQueryParams()
+    {
+        $test = 1;
+    }
+
     protected function successProvider(): array
     {
         return [
@@ -57,6 +62,30 @@ final class NoteListCest extends AbstractCest
                     ],
                 ],
             ],
+            'user_ids' => [
+                'query' => [
+                    'user_ids' => true
+                ],
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+            ]
         ];
     }
 }

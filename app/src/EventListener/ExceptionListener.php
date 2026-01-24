@@ -51,7 +51,7 @@ class ExceptionListener
         $status = method_exists(
             object_or_class: $exception,
             method: 'getStatusCode'
-        ) ? $exception->getStatusCode() : Response::HTTP_BAD_REQUEST;
+        ) ? $exception->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
 
         $data = $this->exceptionFactory(exception: $exception, status: $status);
         $groups = $this->getGroupsByUserRoles();
