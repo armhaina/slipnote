@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Model\Query;
 
 use App\Contract\Entity\EntityQueryModelInterface;
+use App\Validator\OrderBy;
+use App\Validator\OrderByValidator;
 use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use OpenApi\Attributes as OA;
@@ -21,6 +23,7 @@ class NoteQueryModel implements EntityQueryModelInterface
     /** @var array<string> */
     #[Ignore]
     #[SerializedName(serializedName: 'order_by')]
+    #[OrderBy(fields: ['name', 'created_at', 'updated_at'])]
     private array $orderBy = [];
     #[SerializedName(serializedName: 'updated_at_less')]
     private ?\DateTimeImmutable $updatedAtLess = null;

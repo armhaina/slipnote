@@ -26,8 +26,8 @@ use Symfony\Component\Validator\Exception\ValidationFailedException;
 readonly class ExceptionListener
 {
     public function __construct(
-        private readonly SerializerInterface $serializer,
-        private readonly Security $security
+        private SerializerInterface $serializer,
+        private Security $security
     ) {
     }
 
@@ -61,11 +61,14 @@ readonly class ExceptionListener
 
     private function exceptionFactory(\Throwable $exception, int $status): ExceptionResponseInterface
     {
+        $previous = $exception->getPrevious();
+
+        // TODO: переделать на $previous
         if ($exception instanceof AccessDeniedHttpException) {
             return $this->forbiddenExceptionHandler(exception: $exception, status: $status);
         }
 
-        if ($exception instanceof UnprocessableEntityHttpException) {
+        if ($previous instanceof ValidationFailedException) {
             return $this->validationExceptionHandler(exception: $exception, status: $status);
         }
 
