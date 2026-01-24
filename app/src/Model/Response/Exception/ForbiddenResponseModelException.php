@@ -12,27 +12,27 @@ use Symfony\Component\Serializer\Attribute\Groups;
 readonly class ForbiddenResponseModelException implements ExceptionResponseInterface
 {
     public function __construct(
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Подтверждение',
             type: 'boolean',
             example: false
         )]
-        private bool $success = false,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        private bool $success,
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
             example: 'Доступ запрещен'
         )]
-        private string $message = 'Доступ запрещен',
+        private string $message,
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
             description: 'Код ошибки (только администраторы)',
             type: 'integer',
             example: 0
         )]
-        private int $code = 0
+        private int $code
     ) {
     }
 

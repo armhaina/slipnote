@@ -12,20 +12,20 @@ use Symfony\Component\Serializer\Attribute\Groups;
 readonly class DefaultResponseModelException implements ExceptionResponseInterface
 {
     public function __construct(
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Подтверждение',
             type: 'boolean',
             example: false
         )]
-        private bool $success = false,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        private bool $success,
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
-            example: 'Доступ запрещен'
+            example: 'Ошибка'
         )]
-        private string $message = 'Доступ запрещен',
+        private string $message,
     ) {
     }
 

@@ -18,6 +18,7 @@ use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
+use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -108,6 +109,15 @@ class NoteController extends AbstractController
                 )
             ),
         ]
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNPROCESSABLE_ENTITY,
+        description: 'Ошибка валидации',
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ValidationResponseModelException::class
+            )
+        )
     )]
     #[OA\Parameter(
         name: 'ids',

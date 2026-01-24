@@ -6,10 +6,12 @@ namespace App\EventListener;
 
 use App\Contract\ExceptionResponseInterface;
 use App\Enum\Group;
+use App\Enum\Role;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Model\Response\Exception\ViolationResponseModelException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -36,6 +38,7 @@ class ExceptionListener
 
     public function __construct(
         private readonly SerializerInterface $serializer,
+        private readonly Security $security
     ) {
     }
 
@@ -51,15 +54,16 @@ class ExceptionListener
             method: 'getStatusCode'
         ) ? $exception->getStatusCode() : Response::HTTP_BAD_REQUEST;
 
-        $response = $this->exceptionFactory(exception: $exception, status: $status);
+        $data = $this->exceptionFactory(exception: $exception, status: $status);
+        $groups = $this->getGroupsByUserRoles();
 
-        $response = $this->serializer->serialize(data: $response, format: 'json', context: array_merge([
+        $data = $this->serializer->serialize(data: $data, format: 'json', context: array_merge([
             'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
-        ], ['groups' => [Group::PUBLIC->value]]));
+        ], ['groups' => $groups]));
 
         $event->setResponse(
             response: new JsonResponse(
-                data: $response,
+                data: $data,
                 status: $status,
                 json: true
             )
@@ -76,7 +80,7 @@ class ExceptionListener
             return $this->validationExceptionHandler(exception: $exception, status: $status);
         }
 
-        return new DefaultResponseModelException();
+        return new DefaultResponseModelException(success: false, message: self::HTTP_STATUS_MESSAGE[$status]);
     }
 
     private function forbiddenExceptionHandler(\Throwable $exception, int $status): ExceptionResponseInterface
@@ -107,8 +111,28 @@ class ExceptionListener
         return new ValidationResponseModelException(
             success: false,
             message: self::HTTP_STATUS_MESSAGE[$status],
-            errors: $errors,
             code: $exception->getCode(),
+            errors: $errors,
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getGroupsByUserRoles(): array
+    {
+        $user = $this->security->getUser() ?? null;
+
+        $groups = [Group::PUBLIC->value];
+
+        if (!$user) {
+            return $groups;
+        }
+
+        if (in_array(needle: Role::ROLE_ADMIN->value, haystack: $user->getRoles())) {
+            $groups[] = Group::ADMIN->value;
+        }
+
+        return $groups;
     }
 }

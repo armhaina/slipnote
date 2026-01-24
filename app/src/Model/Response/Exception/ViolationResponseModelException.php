@@ -12,19 +12,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
 readonly class ViolationResponseModelException implements ExceptionResponseInterface
 {
     public function __construct(
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Свойство',
             type: 'string',
         )]
         private string $property,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
         )]
         private string $message,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::ADMIN->value])]
         #[OA\Property(
             description: 'Код ошибки',
             type: 'string',

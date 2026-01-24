@@ -6,6 +6,8 @@ namespace App\Model\Response\Exception;
 
 use App\Contract\ExceptionResponseInterface;
 use App\Enum\Group;
+use App\Model\Response\Entity\NoteResponseModelEntity;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -29,19 +31,24 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
             example: 'Ошибка валидации'
         )]
         private string $message,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
-        #[OA\Property(
-            description: 'Ошибки',
-            type: 'array',
-        )]
-        private array $errors,
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
             description: 'Код ошибки (только администраторы)',
             type: 'integer',
             example: 0
         )]
-        private int $code = 0
+        private int $code,
+        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[OA\Property(
+            description: 'Ошибки',
+            type: 'array',
+            items: new OA\Items(
+                ref: new Model(
+                    type: ViolationResponseModelException::class,
+                )
+            )
+        )]
+        private array $errors,
     ) {
     }
 
