@@ -18,6 +18,8 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
+        $I->wantTo('Авторизация без логина/пароля');
+
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
@@ -35,8 +37,10 @@ final class NoteListCest extends AbstractCest
     }
 
     #[DataProvider('userIdsProvider')]
-    public function userIds(FunctionalTester $I, Example $example): void
+    public function paramUserIds(FunctionalTester $I, Example $example): void
     {
+        $I->wantTo('Авторизация без логина/пароля');
+
         $this->authorized(I: $I);
 
         $users = [];
@@ -86,7 +90,7 @@ final class NoteListCest extends AbstractCest
     protected function userIdsProvider(): array
     {
         return [
-            [
+           [
                 'fixtures' => [
                     [
                         'name' => 'Заметка_0',
