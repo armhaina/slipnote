@@ -91,6 +91,7 @@ class NoteController extends AbstractController
     )]
     public function get(Note $note): JsonResponse
     {
+        //
         if ($note->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
