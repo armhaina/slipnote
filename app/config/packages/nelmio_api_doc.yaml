@@ -1,5 +1,44 @@
 nelmio_api_doc:
   documentation:
+    paths:
+      /api/login_check:
+        post:
+          tags:
+            - authorization
+          operationId: getJWT
+          summary: Получить JWT токен
+          description: Выполнить запрос для получения JWT токена
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required: [username, password]
+                  properties:
+                    username:
+                      type: string
+                      format: email
+                      example: 'user@example.com'
+                      description: 'Email пользователя'
+                    password:
+                      type: string
+                      format: password
+                      minLength: 6
+                      example: 'password123'
+                      description: 'Пароль пользователя'
+          responses:
+            '200':
+              description: Успех
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    required: [token]
+                    properties:
+                      token:
+                        type: string
+                        example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NjkyODk3NDEsImV4cCI6MTc2OTI5MzM0MSwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoidGVzdEBtYWlsLnJ1In0.LUkyfjl04qVQd1KLJonrtHnHx6Z6JwTpysYokH6TnWjToTxTXANXwqi9ukPSXRIqZYmGTCPie6lSs_Snc1nsN17uorK8mkatNdqdHd40Zzy9vTG5xkzcrreA8Z5hYoRDiCkuqs29M_pNW3I7nXXVCn3R8Fwug0ODG5RYdbgo-JkULOWJC6q6LwotqLTukU3w8kM8H0q2cdIJt5EhtfqOn1MjPrbe77ebfLxr2518XOj68g6h-G1_1R8MI25i_rNSUmZ9shImUyzDfv_KFY-xv5UWTzPuwsfOMm_AXWala7nB4qFRxP3QJAv08YckFU-4E5znW39m86PmIHISgTGaEQ'
+                        description: 'Токен'
     info:
       title: Slipnote
       description: Сервис быстрых заметок!
