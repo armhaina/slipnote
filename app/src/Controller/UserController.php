@@ -33,7 +33,7 @@ class UserController extends AbstractController
 
     #[Route(
         path: '/{id}',
-        requirements: ['user' => '\d+'],
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
     public function get(User $user): JsonResponse
@@ -70,7 +70,7 @@ class UserController extends AbstractController
      */
     #[Route(
         path: '/{id}',
-        requirements: ['user' => '\d+'],
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
     public function update(
@@ -102,7 +102,7 @@ class UserController extends AbstractController
      */
     #[Route(
         path: '/{id}',
-        requirements: ['user' => '\d+'],
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_DELETE]
     )]
     public function delete(User $user): JsonResponse
