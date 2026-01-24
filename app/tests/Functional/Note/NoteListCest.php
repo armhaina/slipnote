@@ -18,7 +18,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Авторизация без логина/пароля');
+        $I->wantTo('GET запрос без параметров');
 
         $this->authorized(I: $I);
 
@@ -39,7 +39,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('userIdsProvider')]
     public function paramUserIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Авторизация без логина/пароля');
+        $I->wantTo('GET запрос с параметром: user_ids');
 
         $this->authorized(I: $I);
 
