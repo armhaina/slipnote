@@ -36,10 +36,33 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('idsProvider')]
+    public function paramIds(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET запрос с параметрами: ids');
+
+        $this->authorized(I: $I);
+
+        $noteIds = [];
+
+        foreach ($example['fixtures'] as $fixture) {
+            $noteIds[] = NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: '/api/v1/notes', params: ['ids' => $noteIds]);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     #[DataProvider('userIdsProvider')]
     public function paramUserIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET запрос с параметром: user_ids');
+        $I->wantTo('GET запрос с параметрами: user_ids');
 
         $this->authorized(I: $I);
 
@@ -90,7 +113,34 @@ final class NoteListCest extends AbstractCest
     protected function userIdsProvider(): array
     {
         return [
-           [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    protected function idsProvider(): array
+    {
+        return [
+            [
                 'fixtures' => [
                     [
                         'name' => 'Заметка_0',
