@@ -33,6 +33,24 @@ final class NoteGetCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Ошибка авторизации');
+
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendGet(url: '/api/v1/notes/' . $note->getId());
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
@@ -64,6 +82,23 @@ final class NoteGetCest extends AbstractCest
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+            ],
+        ];
+    }
+
+    protected function failedAuthorizationProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+                'response' => [
+                    'code' => 401,
+                    'message' => 'JWT Token not found',
                 ],
             ],
         ];
