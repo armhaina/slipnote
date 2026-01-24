@@ -8,6 +8,7 @@ use App\Enum\Group;
 use App\Mapper\Response\NoteResponseMapper;
 use App\Model\Response\Access\ForbiddenResponseModel;
 use App\Service\NoteService;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -33,7 +34,7 @@ class ExceptionListener
     ];
 
     public function __construct(
-        private readonly SerializerInterface $serializer
+        private readonly SerializerInterface $serializer,
     ) {
     }
 
