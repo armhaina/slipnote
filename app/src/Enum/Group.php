@@ -7,4 +7,5 @@ namespace App\Enum;
 enum Group: string
 {
     case PUBLIC = 'public';
+    case ADMIN = 'admin';
 }

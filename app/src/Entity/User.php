@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use App\Contract\EntityInterface;
-use App\Enum\Group;
+use App\Contract\Entity\EntityInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,7 +10,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`users`')]
@@ -21,7 +19,6 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['unsigned' => true])]
-    #[Groups(groups: Group::PUBLIC->value)]
     /** @phpstan-ignore property.unusedType */
     private ?int $id = null;
 
@@ -41,7 +38,6 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
         unique: true,
         options: ['comment' => 'Электронная почта пользователя'],
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
     private string $email;
 
     #[ORM\Column(

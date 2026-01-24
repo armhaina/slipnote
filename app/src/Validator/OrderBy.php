@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Validator;
+
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
+
+#[\Attribute]
+class OrderBy extends Constraint
+{
+    /**
+     * @var array<string>
+     */
+    public array $allowedFields;
+    /**
+     * @var array<string>
+     */
+    public array $allowedDirections = ['asc', 'desc'];
+    public string $invalidFieldMessage = 'Поле "{{ field }}" не разрешено для сортировки. Разрешены: {{ allowed }}';
+    public string $invalidDirectionMessage = 'Направление "{{ direction }}" недопустимо. Используйте: asc или desc';
+
+    /**
+     * @param string[] $fields
+     */
+    #[HasNamedArguments]
+    public function __construct(array $fields)
+    {
+        $this->allowedFields = $fields;
+
+        parent::__construct();
+    }
+}

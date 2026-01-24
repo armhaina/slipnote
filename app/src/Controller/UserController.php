@@ -7,22 +7,32 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
+use App\Entity\Note;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
 use App\Model\Payload\UserPayloadModel;
 use App\Service\UserService;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/v1/users')]
 #[OA\Tag(name: 'users')]
+#[IsGranted(
+    attribute: ROLE::ROLE_USER->value,
+    message: 'Вы не авторизованы!',
+    statusCode: Response::HTTP_FORBIDDEN
+)]
+#[Security(name: 'Bearer')]
 class UserController extends AbstractController
 {
     public function __construct(
@@ -32,8 +42,8 @@ class UserController extends AbstractController
     }
 
     #[Route(
-        path: '/{user}',
-        requirements: ['user' => '\d+'],
+        path: '/{id}',
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
     public function get(User $user): JsonResponse
@@ -69,8 +79,8 @@ class UserController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        path: '/{user}',
-        requirements: ['user' => '\d+'],
+        path: '/{id}',
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
     public function update(
@@ -101,8 +111,8 @@ class UserController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        path: '/{user}',
-        requirements: ['user' => '\d+'],
+        path: '/{id}',
+        requirements: ['id' => '\d+'],
         methods: [Request::METHOD_DELETE]
     )]
     public function delete(User $user): JsonResponse

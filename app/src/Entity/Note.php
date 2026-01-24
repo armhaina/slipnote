@@ -2,22 +2,20 @@
 
 namespace App\Entity;
 
-use App\Contract\EntityInterface;
-use App\Enum\Group;
+use App\Contract\Entity\EntityInterface;
 use App\Repository\NoteRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
-#[ORM\HasLifecycleCallbacks]
 class Note implements EntityInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: Types::INTEGER, nullable: false, options: ['unsigned' => true])]
-    #[Groups(groups: Group::PUBLIC->value)]
     /** @phpstan-ignore property.unusedType */
     private ?int $id = null;
 
@@ -29,7 +27,6 @@ class Note implements EntityInterface
             'comment' => 'Наименование',
         ],
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
     private string $name;
 
     #[ORM\Column(
@@ -40,20 +37,7 @@ class Note implements EntityInterface
             'comment' => 'Текст',
         ],
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
     private string $description;
-
-    #[ORM\Column(
-        name: 'is_private',
-        type: Types::BOOLEAN,
-        nullable: false,
-        options: [
-            'default' => true,
-            'comment' => 'Приватная заметка',
-        ],
-    )]
-    #[Groups(groups: Group::PUBLIC->value)]
-    private bool $isPrivate;
 
     #[ORM\ManyToOne(
         targetEntity: User::class,
@@ -69,8 +53,7 @@ class Note implements EntityInterface
             'comment' => 'ID пользователя',
         ]
     )]
-    #[Groups(groups: Group::PUBLIC->value)]
-    private User $user;
+    private UserInterface $user;
 
     #[ORM\Column(
         name: 'created_at',
@@ -78,7 +61,7 @@ class Note implements EntityInterface
         nullable: false,
         options: ['comment' => 'Дата создания'],
     )]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(
         name: 'updated_at',
@@ -86,7 +69,7 @@ class Note implements EntityInterface
         nullable: false,
         options: ['comment' => 'Дата изменения'],
     )]
-    private \DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $updatedAt;
 
     public function __toString()
     {
@@ -122,53 +105,38 @@ class Note implements EntityInterface
         return $this;
     }
 
-    public function getUser(): User
+    public function getUser(): User|UserInterface
     {
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(User|UserInterface $user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getIsPrivate(): bool
-    {
-        return $this->isPrivate;
-    }
-
-    public function setIsPrivate(bool $isPrivate): self
-    {
-        $this->isPrivate = $isPrivate;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
-    public function setCreatedAt(): self
+    public function setCreatedAt(DateTimeImmutable $dateTimeImmutable): self
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = $dateTimeImmutable;
 
         return $this;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function setUpdatedAt(): self
+    public function setUpdatedAt(DateTimeImmutable $dateTimeImmutable): self
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = $dateTimeImmutable;
 
         return $this;
     }

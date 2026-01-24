@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Contract\EntityInterface;
+use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
 use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\NoteQueryModel;

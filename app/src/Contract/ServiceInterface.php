@@ -2,8 +2,9 @@
 
 namespace App\Contract;
 
+use App\Contract\Entity\EntityInterface;
+use App\Contract\Entity\EntityQueryModelInterface;
 use Ds\Sequence;
-use Ds\Vector;
 
 interface ServiceInterface
 {

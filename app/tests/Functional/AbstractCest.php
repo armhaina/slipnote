@@ -4,70 +4,31 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional;
 
-use App\Contract\EntityInterface;
-use App\DataFixtures\UserAuthorizedFixtures;
-use App\Entity\User;
+use App\Contract\Entity\EntityInterface;
 use App\Enum\Role;
+use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Support\FunctionalTester;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class AbstractCest
 {
-    protected const string USER_EMAIL = 'userAuthorized@mail.ru';
-    protected const string USER_PASSWORD = 'userAuthorizedPassword';
-
     public function _before(FunctionalTester $I): void
     {
         $I->haveHttpHeader(name: 'Content-Type', value: 'application/json');
     }
 
-    protected function fixturesLoad(FunctionalTester $I, array $groups): void
+    protected function authorized(FunctionalTester $I): EntityInterface
     {
-        $this->commandDoctrineFixturesLoad(I: $I, groups: $groups);
-    }
-
-    protected function authorized(FunctionalTester $I): void
-    {
-        $this->commandDoctrineFixturesLoad(I: $I, groups: UserAuthorizedFixtures::GROUPS);
-
-        $I->sendPost(
-            url: '/api/login_check',
-            params: [
-                'username' => UserAuthorizedFixtures::EMAIL,
-                'password' => UserAuthorizedFixtures::PASSWORD,
-            ]
-        );
-        $I->seeResponseCodeIs(code: 200);
-        $I->seeResponseIsJson();
-
-        $I->haveHttpHeader(
-            name: 'Authorization',
-            value: 'Bearer ' . json_decode($I->grabResponse(), true)['token']
-        );
-    }
-
-    protected function fixturesLoadUpdate(FunctionalTester $I, string $entityClass, array $data): EntityInterface|string
-    {
-        $id = $I->haveInRepository(classNameOrInstance: $entityClass, data: $data);
-
-        return $I->grabEntityFromRepository(entity: $entityClass, params: ['id' => $id]);
-    }
-
-    protected function authorizedUpdate(FunctionalTester $I): EntityInterface
-    {
-        $passwordHasher = $I->grabService(serviceId: UserPasswordHasherInterface::class);
-
-        $user = $this->fixturesLoadUpdate(I: $I, entityClass: User::class, data: [
-            'email' => self::USER_EMAIL,
-            'password' => $passwordHasher->hashPassword(new User(), self::USER_PASSWORD),
+        $user = UserFixtures::load(I: $I, data: [
+            'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
+            'password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
             'roles' => [Role::ROLE_USER->value],
         ]);
 
         $I->sendPost(
             url: '/api/login_check',
             params: [
-                'username' => self::USER_EMAIL,
-                'password' => self::USER_PASSWORD,
+                'username' => UserFixtures::USER_AUTHORIZED_EMAIL,
+                'password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
             ]
         );
         $I->seeResponseCodeIs(code: 200);
@@ -96,19 +57,5 @@ abstract class AbstractCest
         }
 
         return $data;
-    }
-
-    private function commandDoctrineFixturesLoad(FunctionalTester $I, array $groups = []): void
-    {
-        $I->runSymfonyConsoleCommand(
-            command: 'doctrine:fixtures:load',
-            parameters: [
-                '--no-interaction' => '--no-interaction',
-                '--purge-with-truncate' => true,
-                '--group' => $groups,
-                '--env' => 'test',
-                '--append' => null,
-            ]
-        );
     }
 }

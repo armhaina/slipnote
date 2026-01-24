@@ -26,4 +26,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
     {
         $this->em->wrapInTransaction(func: $func);
     }
+
+    protected function convertSnakeCaseToCamelCase(string $value): string
+    {
+        return lcfirst(str_replace('_', '', ucwords($value, '_')));
+    }
 }

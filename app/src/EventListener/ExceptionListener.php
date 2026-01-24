@@ -4,35 +4,135 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Contract\Exception\ExceptionResponseInterface;
+use App\Enum\Group;
+use App\Enum\Role;
+use App\Message\HttpStatusMessage;
+use App\Model\Response\Exception\ContextResponseModelException;
+use App\Model\Response\Exception\DefaultResponseModelException;
+use App\Model\Response\Exception\ForbiddenResponseModelException;
+use App\Model\Response\Exception\ValidationResponseModelException;
+use App\Model\Response\Exception\ViolationResponseModelException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-class ExceptionListener
+readonly class ExceptionListener
 {
+    public function __construct(
+        private SerializerInterface $serializer,
+        private Security $security
+    ) {
+    }
+
+    /**
+     * @throws ExceptionInterface
+     */
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
 
-        $data = [
-            'error' => true,
-            'message' => $exception->getMessage(),
-            'code' => $exception->getCode(),
-        ];
+        $status = method_exists(
+            object_or_class: $exception,
+            method: 'getStatusCode'
+        ) ? $exception->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
 
-        if (!empty($exception->getPrevious())) {
-            $data['previous'] = [
-                'message' => $exception->getPrevious()->getMessage(),
-            ];
+        $data = $this->exceptionFactory(exception: $exception, status: $status);
+        $groups = $this->getGroupsByUserRoles();
+
+        $data = $this->serializer->serialize(data: $data, format: 'json', context: array_merge([
+            'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
+        ], ['groups' => $groups]));
+
+        $event->setResponse(
+            response: new JsonResponse(
+                data: $data,
+                status: $status,
+                json: true
+            )
+        );
+    }
+
+    private function exceptionFactory(\Throwable $exception, int $status): ExceptionResponseInterface
+    {
+        $previous = $exception->getPrevious();
+
+        // TODO: переделать на $previous
+        if ($exception instanceof AccessDeniedHttpException) {
+            return $this->forbiddenExceptionHandler(exception: $exception, status: $status);
         }
 
-        $response = new JsonResponse(
-            data: $data,
-            status: method_exists(
-                object_or_class: $exception,
-                method: 'getStatusCode'
-            ) ? $exception->getStatusCode() : 400
-        );
+        if ($previous instanceof ValidationFailedException) {
+            return $this->validationExceptionHandler(exception: $exception, status: $status);
+        }
 
-        $event->setResponse(response: $response);
+        return new DefaultResponseModelException(
+            success: false,
+            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
+            context: new ContextResponseModelException(
+                file: $exception->getFile(),
+                line: $exception->getLine(),
+                message: $exception->getMessage(),
+            )
+        );
+    }
+
+    private function forbiddenExceptionHandler(\Throwable $exception, int $status): ExceptionResponseInterface
+    {
+        return new ForbiddenResponseModelException(
+            success: false,
+            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
+            code: $exception->getCode(),
+        );
+    }
+
+    private function validationExceptionHandler(\Throwable $exception, int $status): ExceptionResponseInterface
+    {
+        $errors = [];
+
+        $previous = $exception->getPrevious() ?? null;
+
+        if ($previous instanceof ValidationFailedException) {
+            foreach ($previous->getViolations() as $violation) {
+                $errors[] = new ViolationResponseModelException(
+                    property: $violation->getPropertyPath(),
+                    message: $violation->getMessage(),
+                    code: $violation->getCode()
+                );
+            }
+        }
+
+        return new ValidationResponseModelException(
+            success: false,
+            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
+            code: $exception->getCode(),
+            errors: $errors,
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getGroupsByUserRoles(): array
+    {
+        $user = $this->security->getUser() ?? null;
+
+        $groups = [Group::PUBLIC->value];
+
+        if (!$user) {
+            return $groups;
+        }
+
+        if (in_array(needle: Role::ROLE_ADMIN->value, haystack: $user->getRoles())) {
+            $groups[] = Group::ADMIN->value;
+        }
+
+        return $groups;
     }
 }

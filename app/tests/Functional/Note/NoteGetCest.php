@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\DataFixtures\Note\NoteGetFixtures;
-use App\DataFixtures\Note\NoteListFixtures;
 use App\Entity\Note;
+use App\Tests\_data\fixtures\NoteFixtures;
+use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
@@ -15,16 +15,13 @@ use Codeception\Util\HttpCode;
 
 final class NoteGetCest extends AbstractCest
 {
-    #[DataProvider('successProvider')]
-    public function tryToTest(FunctionalTester $I, Example $example): void
+    #[DataProvider('mainProvider')]
+    public function main(FunctionalTester $I, Example $example): void
     {
-        $user = $this->authorizedUpdate(I: $I);
+        $I->wantTo('GET: Получить заметку');
 
-        $note = $this->fixturesLoadUpdate(
-            I: $I,
-            entityClass: Note::class,
-            data: array_merge($example['fixtures'], ['user' => $user])
-        );
+        $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
         $I->sendGet(url: '/api/v1/notes/' . $note->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
@@ -36,21 +33,88 @@ final class NoteGetCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    protected function successProvider(): array
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Ошибка авторизации');
+
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendGet(url: '/api/v1/notes/' . $note->getId());
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('forbiddenProvider')]
+    public function forbidden(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Доступ запрещен');
+
+        $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendGet(url: '/api/v1/notes/' . $note->getId());
+        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    protected function mainProvider(): array
     {
         return [
             [
-                'groups' => NoteGetFixtures::GROUPS,
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'isPrivate' => true,
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'isPrivate' => true,
-                    'user' => ['email' => self::USER_EMAIL],
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+            ],
+        ];
+    }
+
+    protected function failedAuthorizationProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+                'response' => [
+                    'code' => 401,
+                    'message' => 'JWT Token not found',
+                ],
+            ],
+        ];
+    }
+
+    protected function forbiddenProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => 'test_0@mail.ru'],
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Доступ запрещен',
                 ],
             ],
         ];

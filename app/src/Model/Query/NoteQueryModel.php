@@ -4,19 +4,30 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
-use App\Contract\EntityQueryModelInterface;
+use App\Contract\Entity\EntityQueryModelInterface;
+use App\Validator\OrderBy;
+use App\Validator\OrderByValidator;
+use Nelmio\ApiDocBundle\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use OpenApi\Attributes as OA;
 
 class NoteQueryModel implements EntityQueryModelInterface
 {
     private int $limit = 20;
     private int $offset = 0;
-    private ?int $ownUserId = null;
     /** @var array<int> */
+    #[Ignore]
     private ?array $ids = null;
     /** @var array<int> */
+    #[Ignore]
+    #[SerializedName(serializedName: 'user_ids')]
     private ?array $userIds = null;
     /** @var array<string> */
+    #[Ignore]
+    #[SerializedName(serializedName: 'order_by')]
+    #[OrderBy(fields: ['name', 'created_at', 'updated_at'])]
     private array $orderBy = [];
+    #[SerializedName(serializedName: 'updated_at_less')]
     private ?\DateTimeImmutable $updatedAtLess = null;
 
     public function getLimit(): int
@@ -77,18 +88,6 @@ class NoteQueryModel implements EntityQueryModelInterface
     public function setUserIds(array $userIds): self
     {
         $this->userIds = $userIds;
-
-        return $this;
-    }
-
-    public function getOwnUserId(): ?int
-    {
-        return $this->ownUserId;
-    }
-
-    public function setOwnUserId(int $ownUserId): self
-    {
-        $this->ownUserId = $ownUserId;
 
         return $this;
     }
