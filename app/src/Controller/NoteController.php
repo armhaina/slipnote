@@ -22,6 +22,7 @@ use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\NoteService;
+use DateTimeImmutable;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use OpenApi\Attributes as OA;
@@ -274,10 +275,14 @@ class NoteController extends AbstractController
     )]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
+        $dateTimeImmutable = new DateTimeImmutable();
+
         $note = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
-            ->setUser(user: $this->getUser());
+            ->setUser(user: $this->getUser())
+            ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
+            ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable);
 
         $note = $this->noteService->create(entity: $note);
 

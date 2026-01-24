@@ -4,13 +4,13 @@ namespace App\Entity;
 
 use App\Contract\Entity\EntityInterface;
 use App\Repository\NoteRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
-#[ORM\HasLifecycleCallbacks]
 class Note implements EntityInterface
 {
     #[ORM\Id]
@@ -61,7 +61,7 @@ class Note implements EntityInterface
         nullable: false,
         options: ['comment' => 'Дата создания'],
     )]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\Column(
         name: 'updated_at',
@@ -69,7 +69,7 @@ class Note implements EntityInterface
         nullable: false,
         options: ['comment' => 'Дата изменения'],
     )]
-    private \DateTimeImmutable $updatedAt;
+    private DateTimeImmutable $updatedAt;
 
     public function __toString()
     {
@@ -117,29 +117,26 @@ class Note implements EntityInterface
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
-    public function setCreatedAt(): self
+    public function setCreatedAt(DateTimeImmutable $dateTimeImmutable): self
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = $dateTimeImmutable;
 
         return $this;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function setUpdatedAt(): self
+    public function setUpdatedAt(DateTimeImmutable $dateTimeImmutable): self
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = $dateTimeImmutable;
 
         return $this;
     }

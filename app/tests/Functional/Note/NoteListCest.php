@@ -12,6 +12,7 @@ use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
+use DateTimeImmutable;
 
 final class NoteListCest extends AbstractCest
 {
@@ -94,6 +95,27 @@ final class NoteListCest extends AbstractCest
         }
 
         $I->sendGet(url: '/api/v1/notes', params: ['user_ids' => $users]);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('updatedAtLessProvider')]
+    public function paramUpdatedAtLess(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET: Получить список заметок с параметром [updated_at_less]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture);
+        }
+
+        $I->sendGet(url: '/api/v1/notes', params: ['updated_at_less' => $example['query']['updated_at_less']]);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -252,6 +274,38 @@ final class NoteListCest extends AbstractCest
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+            ]
+        ];
+    }
+
+    protected function updatedAtLessProvider(): array
+    {
+        return [
+            [
+                'query' => [
+                    'updated_at_less' => new DateTimeImmutable('01.02.2025')->format(format: DATE_ATOM)
+                ],
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'updated_at' => new DateTimeImmutable('01.03.2025'),
+                    ],
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'updated_at' => new DateTimeImmutable('01.01.2025'),
                     ],
                 ],
                 'response' => [

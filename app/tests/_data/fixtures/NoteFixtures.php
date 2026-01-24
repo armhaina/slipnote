@@ -13,14 +13,20 @@ class NoteFixtures
     {
         $faker = Factory::create();
 
+        $dateTimeImmutable = new \DateTimeImmutable();
+
         $name = $data['name'] ?? $faker->name;
         $description = $data['description'] ?? $faker->text();
         $user = UserFixtures::load(I: $I, data: $data['user'] ?? []);
+        $createdAt = $data['created_at'] ?? $dateTimeImmutable;
+        $updatedAt = $data['updated_at'] ?? $dateTimeImmutable;
 
         $id = $I->haveInRepository(classNameOrInstance: Note::class, data: [
             'name' => $name,
             'description' => $description,
             'user' => $user,
+            'createdAt' => $createdAt,
+            'updatedAt' => $updatedAt,
         ]);
 
         return $I->grabEntityFromRepository(entity: Note::class, params: ['id' => $id]);
