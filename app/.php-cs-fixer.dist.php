@@ -27,6 +27,9 @@ $rules = [
     'phpdoc_inline_tag_normalizer' => true, // Нормализует inline-теги
 
     'phpdoc_order' => true, // Правильный порядок аннотаций
+    'phpdoc_to_comment' => true, // Преобразует неправильные док-блоки в комментарии
+    'phpdoc_trim' => true, // Обрезает лишние пробелы
+    'phpdoc_trim_consecutive_blank_line_separation' => true, // Удаляет лишние пустые строки
 ];
 
 $finder = new PhpCsFixer\Finder()
