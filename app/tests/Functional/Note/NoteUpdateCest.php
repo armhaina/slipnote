@@ -23,7 +23,7 @@ final class NoteUpdateCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: '/api/v1/notes/' . $note->getId(), params: $example['request']);
+        $I->sendPut(url: '/api/v1/notes/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -41,7 +41,7 @@ final class NoteUpdateCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: '/api/v1/notes/' . $note->getId(), params: $example['request']);
+        $I->sendPut(url: '/api/v1/notes/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
@@ -58,7 +58,7 @@ final class NoteUpdateCest extends AbstractCest
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: '/api/v1/notes/' . $note->getId(), params: $example['request']);
+        $I->sendPut(url: '/api/v1/notes/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -76,7 +76,7 @@ final class NoteUpdateCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: '/api/v1/notes/' . $note->getId(), params: $example['request']);
+        $I->sendPut(url: '/api/v1/notes/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -120,8 +120,8 @@ final class NoteUpdateCest extends AbstractCest
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
                 'request' => [
-                    'name' => $faker->regexify('[A-Za-z0-9]{' . mt_rand(101, 101) . '}'),
-                    'description' => $faker->regexify('[A-Za-z0-9]{' . mt_rand(10001, 10001) . '}')
+                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
+                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
                 ],
                 'response' => [
                     'success' => false,
@@ -129,12 +129,12 @@ final class NoteUpdateCest extends AbstractCest
                     'errors' => [
                         [
                             'property' => 'name',
-                            'message' => 'Название должно содержать максимум 100 символов'
+                            'message' => 'Название должно содержать максимум 100 символов',
                         ],
                         [
                             'property' => 'description',
-                            'message' => 'Описание должно содержать максимум 10000 символов'
-                        ]
+                            'message' => 'Описание должно содержать максимум 10000 символов',
+                        ],
                     ],
                 ],
             ],

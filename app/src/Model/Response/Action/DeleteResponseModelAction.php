@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Action;
 
-use App\Enum\Group;
-use App\Model\Response\Entity\UserResponseModelEntity;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class DeleteResponseModelAction
 {
@@ -24,8 +21,7 @@ readonly class DeleteResponseModelAction
             default: 'Запись успешно удалена'
         )]
         private string $message = 'Запись успешно удалена'
-    ) {
-    }
+    ) {}
 
     public function getSuccess(): bool
     {

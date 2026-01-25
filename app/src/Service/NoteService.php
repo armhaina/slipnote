@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Contract\Entity\EntityInterface;
-use App\Contract\Entity\EntityQueryModelInterface;
-use App\Contract\ServiceInterface;
 use App\Entity\Note;
-use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
-use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
-use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\NoteQueryModel;
 use App\Repository\NoteRepository;
 use Ds\Sequence;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
-readonly class NoteService extends AbstractService implements ServiceInterface
+readonly class NoteService extends AbstractService
 {
     public function __construct(
         private NoteRepository $noteRepository,
@@ -26,15 +21,8 @@ readonly class NoteService extends AbstractService implements ServiceInterface
         parent::__construct(repository: $noteRepository);
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
-    public function count(EntityQueryModelInterface $queryModel): int
+    public function count(NoteQueryModel $queryModel): int
     {
-        if (!$queryModel instanceof NoteQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $criteria = [];
 
         return $this->noteRepository->count(criteria: $criteria);
@@ -54,55 +42,37 @@ readonly class NoteService extends AbstractService implements ServiceInterface
         return $entity;
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
-    public function one(EntityQueryModelInterface $queryModel): ?Note
+    public function one(NoteQueryModel $queryModel): ?Note
     {
-        if (!$queryModel instanceof NoteQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         return $this->noteRepository->one(queryModel: $queryModel);
     }
 
     /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Sequence<EntityInterface>
+     * @return PaginationInterface<int, Note>
      */
-    public function list(EntityQueryModelInterface $queryModel): Sequence
+    public function pagination(NoteQueryModel $queryModel): PaginationInterface
     {
-        if (!$queryModel instanceof NoteQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
-        return $this->noteRepository->list(queryModel: $queryModel);
+        return $this->noteRepository->pagination(queryModel: $queryModel);
     }
 
     /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
+     * @return Sequence<Note>
      */
-    public function create(EntityInterface $entity): Note
+    public function list(NoteQueryModel $queryModel): Sequence
     {
-        if (!$entity instanceof Note) {
-            throw new EntityModelInvalidObjectTypeException();
-        }
+        return $this->noteRepository->list(queryModel: $queryModel);
+    }
 
+    public function create(Note $entity): Note
+    {
         return $this->noteRepository->save(entity: $entity);
     }
 
     /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
      * @throws EntityNotFoundWhenUpdateException
      */
-    public function update(EntityInterface $entity): Note
+    public function update(Note $entity): Note
     {
-        if (!$entity instanceof Note) {
-            throw new EntityModelInvalidObjectTypeException();
-        }
-
         if (!$entity->getId()) {
             throw new EntityNotFoundWhenUpdateException(entity: $entity::class);
         }
@@ -111,16 +81,10 @@ readonly class NoteService extends AbstractService implements ServiceInterface
     }
 
     /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
      * @throws EntityNotFoundWhenDeleteException
      */
-    public function delete(EntityInterface $entity): void
+    public function delete(Note $entity): void
     {
-        if (!$entity instanceof Note) {
-            throw new EntityModelInvalidObjectTypeException();
-        }
-
         if (!$entity->getId()) {
             throw new EntityNotFoundWhenDeleteException(entity: $entity::class);
         }

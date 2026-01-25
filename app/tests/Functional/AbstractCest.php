@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional;
 
-use App\Contract\Entity\EntityInterface;
+use App\Entity\User;
 use App\Enum\Role;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Support\FunctionalTester;
@@ -16,7 +16,7 @@ abstract class AbstractCest
         $I->haveHttpHeader(name: 'Content-Type', value: 'application/json');
     }
 
-    protected function authorized(FunctionalTester $I): EntityInterface
+    protected function authorized(FunctionalTester $I): User
     {
         $user = UserFixtures::load(I: $I, data: [
             'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
@@ -36,7 +36,7 @@ abstract class AbstractCest
 
         $I->haveHttpHeader(
             name: 'Authorization',
-            value: 'Bearer ' . json_decode($I->grabResponse(), true)['token']
+            value: 'Bearer '.json_decode($I->grabResponse(), true)['token']
         );
 
         return $user;

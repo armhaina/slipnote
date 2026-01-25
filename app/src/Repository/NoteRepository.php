@@ -4,28 +4,24 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\Entity\EntityInterface;
-use App\Contract\Entity\EntityQueryModelInterface;
 use App\Contract\RepositoryInterface;
 use App\Entity\Note;
-use App\Exception\Entity\EntityInvalidObjectTypeException;
-use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\NoteQueryModel;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 
-/**
- * @extends AbstractRepository<Note>
- */
 class NoteRepository extends AbstractRepository implements RepositoryInterface
 {
-    public const QUERY_ALIAS = 'NoteEntity';
-
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
-    {
-        parent::__construct(entityClass: Note::class, registry: $registry, em: $em);
+    public function __construct(
+        ManagerRegistry $registry,
+        EntityManagerInterface $em,
+        PaginatorInterface $paginator
+    ) {
+        parent::__construct(entityClass: Note::class, registry: $registry, em: $em, paginator: $paginator);
     }
 
     public function get(int $id): ?Note
@@ -33,70 +29,58 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
         return $this->find($id);
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
-    public function one(EntityQueryModelInterface $queryModel): ?Note
+    public function one(NoteQueryModel $queryModel): ?Note
     {
-        if (!$queryModel instanceof NoteQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $queryBuilder = $this->queryBuilder(queryModel: $queryModel)->setMaxResults(maxResults: 1);
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
     /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Vector<EntityInterface>
+     * @return Vector<Note>
      */
-    public function list(EntityQueryModelInterface $queryModel): Vector
+    public function list(NoteQueryModel $queryModel): Vector
     {
-        if (!$queryModel instanceof NoteQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $queryBuilder = $this->queryBuilder(queryModel: $queryModel);
 
         return new Vector($queryBuilder->getQuery()->getResult());
     }
 
     /**
-     * @throws EntityInvalidObjectTypeException
+     * @return PaginationInterface<int, Note>
      */
-    public function save(EntityInterface $entity): Note
+    public function pagination(NoteQueryModel $queryModel): PaginationInterface
     {
-        if (!$entity instanceof Note) {
-            throw new EntityInvalidObjectTypeException();
-        }
+        $queryBuilder = $this->queryBuilder(queryModel: $queryModel);
 
+        return $this->paginator->paginate(
+            target: $queryBuilder->getQuery(),
+            page: $queryModel->getOffset(),
+            limit: $queryModel->getLimit()
+        );
+    }
+
+    public function save(Note $entity): Note
+    {
         $this->em->persist(object: $entity);
         $this->em->flush();
 
         return $entity;
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     */
-    public function delete(EntityInterface $entity): void
+    public function delete(Note $entity): void
     {
-        if (!$entity instanceof Note) {
-            throw new EntityInvalidObjectTypeException();
-        }
-
         $this->em->remove(object: $entity);
         $this->em->flush();
     }
 
     private function queryBuilder(NoteQueryModel $queryModel): QueryBuilder
     {
-        $query = $this->createQueryBuilder(self::QUERY_ALIAS);
+        $query = $this->createQueryBuilder(Note::shortName());
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
-            $query->addOrderBy(sort: self::QUERY_ALIAS . '.' . $column, order: $order);
+            $query->addOrderBy(sort: Note::shortName().'.'.$column, order: $order);
         }
 
         if (!empty($queryModel->getOffset())) {
@@ -110,21 +94,21 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
         if ($queryModel->getIds()) {
             $query
                 ->setParameter('ids', $queryModel->getIds())
-                ->andWhere(self::QUERY_ALIAS . '.id IN (:ids)')
+                ->andWhere(Note::shortName().'.id IN (:ids)')
             ;
         }
 
         if ($queryModel->getUserIds()) {
             $query
                 ->setParameter('userIds', $queryModel->getUserIds())
-                ->andWhere(self::QUERY_ALIAS . '.user IN (:userIds)')
+                ->andWhere(Note::shortName().'.user IN (:userIds)')
             ;
         }
 
         if ($queryModel->getUpdatedAtLess()) {
             $query
                 ->setParameter('updatedAtLess', $queryModel->getUpdatedAtLess())
-                ->andWhere(self::QUERY_ALIAS . '.updatedAt < :updatedAtLess')
+                ->andWhere(Note::shortName().'.updatedAt < :updatedAtLess')
             ;
         }
 

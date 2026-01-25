@@ -2,9 +2,8 @@
 
 namespace App\Validator;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Attribute\HasNamedArguments;
+use Symfony\Component\Validator\Constraint;
 
 #[\Attribute]
 class OrderBy extends Constraint

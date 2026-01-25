@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Contract\Entity\EntityInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`users`')]
 #[ORM\HasLifecycleCallbacks]
-class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
@@ -90,6 +89,7 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
 
     /**
      * @see UserInterface
+     *
      * @return array<string>
      */
     public function getRoles(): array
@@ -186,5 +186,10 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     public function getNotes(): Collection
     {
         return $this->notes;
+    }
+
+    public static function shortName(): string
+    {
+        return new \ReflectionClass(objectOrClass: self::class)->getShortName();
     }
 }

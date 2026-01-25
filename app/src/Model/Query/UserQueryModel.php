@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
-use App\Contract\Entity\EntityQueryModelInterface;
-
-class UserQueryModel implements EntityQueryModelInterface
+class UserQueryModel
 {
     private int $limit = 20;
-    private int $offset = 0;
+    private int $offset = 1;
     /** @var array<int> */
     private ?array $ids = null;
     /** @var array<int> */
@@ -44,7 +42,7 @@ class UserQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @return array<int>|null
+     * @return null|array<int>
      */
     public function getIds(): ?array
     {
@@ -53,7 +51,6 @@ class UserQueryModel implements EntityQueryModelInterface
 
     /**
      * @param array<int> $ids
-     * @return UserQueryModel
      */
     public function setIds(array $ids): self
     {
@@ -72,7 +69,6 @@ class UserQueryModel implements EntityQueryModelInterface
 
     /**
      * @param array<string> $orderBy
-     * @return UserQueryModel
      */
     public function setOrderBy(array $orderBy): self
     {
@@ -82,7 +78,7 @@ class UserQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @return array<int>|null
+     * @return null|array<int>
      */
     public function getExcludeIds(): ?array
     {
@@ -91,7 +87,6 @@ class UserQueryModel implements EntityQueryModelInterface
 
     /**
      * @param array<int> $excludeIds
-     * @return UserQueryModel
      */
     public function setExcludeIds(array $excludeIds): self
     {
@@ -101,7 +96,7 @@ class UserQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @return array<string>|null
+     * @return null|array<string>
      */
     public function getRoles(): ?array
     {
@@ -110,7 +105,6 @@ class UserQueryModel implements EntityQueryModelInterface
 
     /**
      * @param array<string> $roles
-     * @return UserQueryModel
      */
     public function setRoles(array $roles): self
     {

@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\Entity\EntityInterface;
-use App\Contract\Entity\EntityQueryModelInterface;
 use App\Contract\RepositoryInterface;
 use App\Entity\User;
-use App\Exception\Entity\EntityInvalidObjectTypeException;
-use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\UserQueryModel;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
+use Knp\Component\Pager\PaginatorInterface;
 
-/**
- * @extends AbstractRepository<User>
- */
 class UserRepository extends AbstractRepository implements RepositoryInterface
 {
-    public const QUERY_ALIAS = 'UserEntity';
-
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
-    {
-        parent::__construct(entityClass: User::class, registry: $registry, em: $em);
+    public function __construct(
+        ManagerRegistry $registry,
+        EntityManagerInterface $em,
+        PaginatorInterface $paginator
+    ) {
+        parent::__construct(entityClass: User::class, registry: $registry, em: $em, paginator: $paginator);
     }
 
     public function get(int $id): ?User
@@ -33,70 +28,44 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
         return $this->find($id);
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
-    public function one(EntityQueryModelInterface $queryModel): ?User
+    public function one(UserQueryModel $queryModel): ?User
     {
-        if (!$queryModel instanceof UserQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $queryBuilder = $this->queryBuilder(queryModel: $queryModel)->setMaxResults(maxResults: 1);
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
     /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Vector<EntityInterface>
+     * @return Vector<User>
      */
-    public function list(EntityQueryModelInterface $queryModel): Vector
+    public function list(UserQueryModel $queryModel): Vector
     {
-        if (!$queryModel instanceof UserQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $queryBuilder = $this->queryBuilder(queryModel: $queryModel);
 
         return new Vector($queryBuilder->getQuery()->getResult());
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     */
-    public function save(EntityInterface $entity): User
+    public function save(User $entity): User
     {
-        if (!$entity instanceof User) {
-            throw new EntityInvalidObjectTypeException();
-        }
-
         $this->em->persist(object: $entity);
         $this->em->flush();
 
         return $entity;
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     */
-    public function delete(EntityInterface $entity): void
+    public function delete(User $entity): void
     {
-        if (!$entity instanceof User) {
-            throw new EntityInvalidObjectTypeException();
-        }
-
         $this->em->remove(object: $entity);
         $this->em->flush();
     }
 
     private function queryBuilder(UserQueryModel $queryModel): QueryBuilder
     {
-        $query = $this->createQueryBuilder(self::QUERY_ALIAS);
+        $query = $this->createQueryBuilder(User::shortName());
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
-            $query->addOrderBy(sort: self::QUERY_ALIAS . '.' . $column, order: $order);
+            $query->addOrderBy(sort: User::shortName().'.'.$column, order: $order);
         }
 
         if (!empty($queryModel->getOffset())) {
@@ -110,14 +79,14 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
         if ($queryModel->getIds()) {
             $query
                 ->setParameter('ids', $queryModel->getIds())
-                ->andWhere(self::QUERY_ALIAS . '.id IN (:ids)')
+                ->andWhere(User::shortName().'.id IN (:ids)')
             ;
         }
 
         if ($queryModel->getExcludeIds()) {
             $query
                 ->setParameter('excludeIds', $queryModel->getExcludeIds())
-                ->andWhere(self::QUERY_ALIAS . '.id NOT IN (:excludeIds)')
+                ->andWhere(User::shortName().'.id NOT IN (:excludeIds)')
             ;
         }
 

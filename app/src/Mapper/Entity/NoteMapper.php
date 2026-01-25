@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Mapper\Entity;
 
-use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
 use App\Entity\User;
+use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Entity\UserResponseModelEntity;
+use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
 readonly class NoteMapper
 {
@@ -19,6 +21,7 @@ readonly class NoteMapper
     {
         $user = $note->getUser();
 
+        // TODO: переделать
         if (!$user instanceof User) {
             throw new \RuntimeException('Note user must be instance of App\Entity\User');
         }
@@ -33,15 +36,36 @@ readonly class NoteMapper
 
     /**
      * @param array<string, mixed> $context
-     * @param EntityInterface[] $notes
+     * @param Note[]               $notes
+     *
      * @return NoteResponseModelEntity[]
      */
     public function collection(array $notes, array $context = []): array
     {
-        /** @var Note[] $notes */
         return array_map(
-            fn(Note $note) => $this->one(note: $note, context: $context),
+            fn (Note $note): NoteResponseModelEntity => $this->one(note: $note, context: $context),
             $notes
+        );
+    }
+
+    /**
+     * @param array<string, mixed>           $context
+     * @param PaginationInterface<int, Note> $pagination
+     */
+    public function pagination(PaginationInterface $pagination, array $context = []): NotePaginationResponseModelEntity
+    {
+        if ($pagination instanceof SlidingPagination) {
+            $pages = $pagination->getPageCount();
+        } else {
+            $pages = (int) ceil($pagination->getTotalItemCount() / $pagination->getItemNumberPerPage());
+        }
+
+        return new NotePaginationResponseModelEntity(
+            count: $pagination->count(),
+            page: $pagination->getCurrentPageNumber(),
+            total: $pagination->getTotalItemCount(),
+            pages: $pages,
+            items: $this->collection(notes: $pagination->getItems())
         );
     }
 

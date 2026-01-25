@@ -15,6 +15,21 @@ $rules = [
     ],
     'strict_comparison' => true,
     'line_ending' => true,
+
+    // Правила для док-блоков
+    'align_multiline_comment' => true, // Выравнивает многострочные комментарии
+    'general_phpdoc_tag_rename' => true, // Исправляет теги (например, @inheritDoc -> @inheritdoc)
+    'multiline_comment_opening_closing' => true, // Форматирование многострочных комментариев
+    'phpdoc_add_missing_param_annotation' => ['only_untyped' => true], // Добавляет недостающие @param
+    'phpdoc_align' => true, // Выравнивает док-блоки
+    'phpdoc_annotation_without_dot' => true, // Убирает точки в конце аннотаций
+    'phpdoc_indent' => true, // Правильные отступы в док-блоках
+    'phpdoc_inline_tag_normalizer' => true, // Нормализует inline-теги
+
+    'phpdoc_order' => true, // Правильный порядок аннотаций
+    'phpdoc_to_comment' => true, // Преобразует неправильные док-блоки в комментарии
+    'phpdoc_trim' => true, // Обрезает лишние пробелы
+    'phpdoc_trim_consecutive_blank_line_separation' => true, // Удаляет лишние пустые строки
 ];
 
 $finder = new PhpCsFixer\Finder()
