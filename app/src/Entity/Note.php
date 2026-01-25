@@ -141,6 +141,6 @@ class Note
 
     public static function shortName(): string
     {
-        return new \ReflectionClass(self::class)->getShortName();
+        return new \ReflectionClass(objectOrClass: self::class)->getShortName();
     }
 }
