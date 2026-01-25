@@ -25,6 +25,8 @@ $rules = [
     'phpdoc_annotation_without_dot' => true, // Убирает точки в конце аннотаций
     'phpdoc_indent' => true, // Правильные отступы в док-блоках
     'phpdoc_inline_tag_normalizer' => true, // Нормализует inline-теги
+
+    'phpdoc_order' => true, // Правильный порядок аннотаций
 ];
 
 $finder = new PhpCsFixer\Finder()
