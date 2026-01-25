@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Contract\ServiceInterface;
 use App\Entity\User;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
@@ -13,7 +12,7 @@ use App\Model\Query\UserQueryModel;
 use App\Repository\UserRepository;
 use Ds\Sequence;
 
-readonly class UserService extends AbstractService implements ServiceInterface
+readonly class UserService extends AbstractService
 {
     public function __construct(
         private UserRepository $userRepository,
