@@ -23,6 +23,8 @@ $rules = [
     'phpdoc_add_missing_param_annotation' => ['only_untyped' => true], // Добавляет недостающие @param
     'phpdoc_align' => true, // Выравнивает док-блоки
     'phpdoc_annotation_without_dot' => true, // Убирает точки в конце аннотаций
+    'phpdoc_indent' => true, // Правильные отступы в док-блоках
+    'phpdoc_inline_tag_normalizer' => true, // Нормализует inline-теги
 ];
 
 $finder = new PhpCsFixer\Finder()
