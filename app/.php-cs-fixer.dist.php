@@ -20,6 +20,7 @@ $rules = [
     'align_multiline_comment' => true, // Выравнивает многострочные комментарии
     'general_phpdoc_tag_rename' => true, // Исправляет теги (например, @inheritDoc -> @inheritdoc)
     'multiline_comment_opening_closing' => true, // Форматирование многострочных комментариев
+    'phpdoc_add_missing_param_annotation' => ['only_untyped' => true], // Добавляет недостающие @param
 ];
 
 $finder = new PhpCsFixer\Finder()
