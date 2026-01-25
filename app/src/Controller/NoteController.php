@@ -8,9 +8,7 @@ use App\Entity\Note;
 use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
-use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
-use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
 use App\Mapper\Entity\NoteMapper;
 use App\Message\HttpStatusMessage;
 use App\Model\Payload\NotePayloadModel;
@@ -233,10 +231,6 @@ class NoteController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
-     */
     #[Route(methods: [Request::METHOD_POST])]
     #[OA\Post(operationId: 'createNote', summary: 'Создать заметку')]
     #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
@@ -288,10 +282,7 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @throws EntityModelInvalidObjectTypeException
      * @throws EntityNotFoundWhenUpdateException
-     * @throws EntityInvalidObjectTypeException
-     * @throws \Exception
      */
     #[Route(
         path: '/{id}',
