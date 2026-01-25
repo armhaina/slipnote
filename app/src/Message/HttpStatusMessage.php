@@ -15,6 +15,7 @@ readonly class HttpStatusMessage
         Response::HTTP_FORBIDDEN => 'Доступ запрещен',
         Response::HTTP_NOT_FOUND => 'Ресурс не найден',
         Response::HTTP_METHOD_NOT_ALLOWED => 'Метод не разрешен',
+        Response::HTTP_CONFLICT => 'Конфликт данных',
         Response::HTTP_UNPROCESSABLE_ENTITY => 'Ошибка валидации',
         Response::HTTP_TOO_MANY_REQUESTS => 'Слишком много запросов',
         Response::HTTP_INTERNAL_SERVER_ERROR => 'Внутренняя ошибка сервера',

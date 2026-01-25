@@ -81,6 +81,15 @@ class UserController extends AbstractController
         )
     )]
     #[OA\Response(
+        response: Response::HTTP_CONFLICT,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_CONFLICT],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
         content: new OA\JsonContent(
