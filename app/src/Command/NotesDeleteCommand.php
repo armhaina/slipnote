@@ -60,9 +60,9 @@ class NotesDeleteCommand extends Command
     }
 
     /**
-     * @return Sequence<Note>
-     *
      * @throws \DateMalformedStringException
+     *
+     * @return Sequence<Note>
      */
     private function getNotes(int $offset): Sequence
     {
