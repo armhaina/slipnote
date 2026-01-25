@@ -11,6 +11,7 @@ use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Model\Query\NoteQueryModel;
 use App\Repository\NoteRepository;
 use Ds\Sequence;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
 readonly class NoteService extends AbstractService
 {
@@ -44,6 +45,14 @@ readonly class NoteService extends AbstractService
     public function one(NoteQueryModel $queryModel): ?Note
     {
         return $this->noteRepository->one(queryModel: $queryModel);
+    }
+
+    /**
+     * @return PaginationInterface<int, Note>
+     */
+    public function pagination(NoteQueryModel $queryModel): PaginationInterface
+    {
+        return $this->noteRepository->pagination(queryModel: $queryModel);
     }
 
     /**

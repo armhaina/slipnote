@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
 class NoteRepository extends AbstractRepository implements RepositoryInterface
@@ -42,13 +43,21 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
     {
         $queryBuilder = $this->queryBuilder(queryModel: $queryModel);
 
-        $pagination = $this->paginator->paginate(
+        return new Vector($queryBuilder->getQuery()->getResult());
+    }
+
+    /**
+     * @return PaginationInterface<int, Note>
+     */
+    public function pagination(NoteQueryModel $queryModel): PaginationInterface
+    {
+        $queryBuilder = $this->queryBuilder(queryModel: $queryModel);
+
+        return $this->paginator->paginate(
             target: $queryBuilder->getQuery(),
             page: $queryModel->getOffset(),
             limit: $queryModel->getLimit()
         );
-
-        return new Vector($pagination->getItems());
     }
 
     public function save(Note $entity): Note

@@ -10,7 +10,7 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
 
 class NoteQueryModel
 {
-    private int $limit = 20;
+    private int $limit = 1;
     private int $offset = 1;
     /** @var array<int> */
     #[Ignore]

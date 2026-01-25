@@ -6,8 +6,11 @@ namespace App\Mapper\Entity;
 
 use App\Entity\Note;
 use App\Entity\User;
+use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Entity\UserResponseModelEntity;
+use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 
 readonly class NoteMapper
 {
@@ -42,6 +45,27 @@ readonly class NoteMapper
         return array_map(
             fn (Note $note): NoteResponseModelEntity => $this->one(note: $note, context: $context),
             $notes
+        );
+    }
+
+    /**
+     * @param array<string, mixed>           $context
+     * @param PaginationInterface<int, Note> $pagination
+     */
+    public function pagination(PaginationInterface $pagination, array $context = []): NotePaginationResponseModelEntity
+    {
+        if ($pagination instanceof SlidingPagination) {
+            $pages = $pagination->getPageCount();
+        } else {
+            $pages = (int) ceil($pagination->getTotalItemCount() / $pagination->getItemNumberPerPage());
+        }
+
+        return new NotePaginationResponseModelEntity(
+            count: $pagination->getItemNumberPerPage(),
+            page: $pagination->getCurrentPageNumber(),
+            total: $pagination->getTotalItemCount(),
+            pages: $pages,
+            items: $this->collection(notes: $pagination->getItems())
         );
     }
 

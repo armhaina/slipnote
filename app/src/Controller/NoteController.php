@@ -229,9 +229,9 @@ class NoteController extends AbstractController
         }
 
         $model->setUserIds(userIds: [$user->getId()]);
-        $notes = $this->noteService->list(queryModel: $model);
+        $pagination = $this->noteService->pagination(queryModel: $model);
 
-        $responseModels = $this->noteResponseMapper->collection(notes: $notes->toArray());
+        $responseModels = $this->noteResponseMapper->pagination(pagination: $pagination);
 
         return $this->json(data: $responseModels, context: ['groups' => [Group::PUBLIC->value]]);
     }

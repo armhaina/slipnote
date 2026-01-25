@@ -1,0 +1,82 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Model\Response\Entity;
+
+use App\Enum\Group;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+readonly class NotePaginationResponseModelEntity
+{
+    /**
+     * @param array<int, NoteResponseModelEntity> $items
+     */
+    public function __construct(
+        #[Groups([Group::PUBLIC->value])]
+        #[OA\Property(
+            description: 'Количество записей на странице',
+            type: 'integer',
+        )]
+        private int $count,
+        #[Groups([Group::PUBLIC->value])]
+        #[OA\Property(
+            description: 'Номер страницы',
+            type: 'integer',
+        )]
+        private int $page,
+        #[Groups([Group::PUBLIC->value])]
+        #[OA\Property(
+            description: 'Количество записей',
+            type: 'integer',
+        )]
+        private int $total,
+        #[Groups([Group::PUBLIC->value])]
+        #[OA\Property(
+            description: 'Количество страниц',
+            type: 'integer',
+        )]
+        private int $pages,
+        #[Groups([Group::PUBLIC->value])]
+        #[OA\Property(
+            description: 'Пользователь (владелец заметки)',
+            type: 'array',
+            items: new OA\Items(
+                ref: new Model(
+                    type: NoteResponseModelEntity::class,
+                )
+            )
+        )]
+        private array $items,
+    ) {}
+
+    public function getCount(): int
+    {
+        return $this->count;
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
+
+    public function getPages(): int
+    {
+        return $this->pages;
+    }
+
+    /**
+     * @return array<NoteResponseModelEntity>
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+}

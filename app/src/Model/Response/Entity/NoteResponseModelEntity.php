@@ -11,25 +11,25 @@ use Symfony\Component\Serializer\Attribute\Groups;
 readonly class NoteResponseModelEntity
 {
     public function __construct(
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Уникальный идентификатор заметки',
             type: 'integer',
         )]
         private int $id,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Наименование',
             type: 'string',
         )]
         private string $name,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Описание',
             type: 'string',
         )]
         private string $description,
-        #[Groups([Group::PUBLIC->value, Group::ADMIN->value])]
+        #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Пользователь (владелец заметки)',
         )]
