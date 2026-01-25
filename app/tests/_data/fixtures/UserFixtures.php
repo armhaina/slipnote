@@ -2,7 +2,6 @@
 
 namespace App\Tests\_data\fixtures;
 
-use App\Contract\Entity\EntityInterface;
 use App\Entity\User;
 use App\Enum\Role;
 use App\Tests\Support\FunctionalTester;
@@ -14,7 +13,7 @@ class UserFixtures
     public const string USER_AUTHORIZED_EMAIL = 'userAuthorized@mail.ru';
     public const string USER_AUTHORIZED_PASSWORD = 'userAuthorizedPassword';
 
-    public static function load(FunctionalTester $I, array $data = []): EntityInterface
+    public static function load(FunctionalTester $I, array $data = []): User
     {
         $faker = Factory::create();
 
