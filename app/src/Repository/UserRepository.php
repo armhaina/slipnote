@@ -11,12 +11,16 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
+use Knp\Component\Pager\PaginatorInterface;
 
 class UserRepository extends AbstractRepository implements RepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
-    {
-        parent::__construct(entityClass: User::class, registry: $registry, em: $em);
+    public function __construct(
+        ManagerRegistry $registry,
+        EntityManagerInterface $em,
+        PaginatorInterface $paginator
+    ) {
+        parent::__construct(entityClass: User::class, registry: $registry, em: $em, paginator: $paginator);
     }
 
     public function get(int $id): ?User

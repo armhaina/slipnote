@@ -7,6 +7,7 @@ namespace App\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * @extends ServiceEntityRepository<object>
@@ -17,6 +18,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
         string $entityClass,
         ManagerRegistry $registry,
         protected readonly EntityManagerInterface $em,
+        protected readonly PaginatorInterface $paginator
     ) {
         parent::__construct(registry: $registry, entityClass: $entityClass);
     }

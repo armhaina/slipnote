@@ -7,7 +7,7 @@ namespace App\Model\Query;
 class UserQueryModel
 {
     private int $limit = 20;
-    private int $offset = 0;
+    private int $offset = 1;
     /** @var array<int> */
     private ?array $ids = null;
     /** @var array<int> */
