@@ -61,7 +61,7 @@ readonly class NoteMapper
         }
 
         return new NotePaginationResponseModelEntity(
-            count: $pagination->getItemNumberPerPage(),
+            count: $pagination->count(),
             page: $pagination->getCurrentPageNumber(),
             total: $pagination->getTotalItemCount(),
             pages: $pages,
