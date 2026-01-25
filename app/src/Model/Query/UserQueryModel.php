@@ -7,7 +7,8 @@ namespace App\Model\Query;
 class UserQueryModel
 {
     private int $limit = 20;
-    private int $offset = 1;
+    private int $offset = 0;
+    private ?string $email = null;
     /** @var array<int> */
     private ?array $ids = null;
     /** @var array<int> */
@@ -37,6 +38,18 @@ class UserQueryModel
     public function setOffset(int $offset): self
     {
         $this->offset = $offset;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }

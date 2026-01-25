@@ -33,10 +33,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/v1/notes')]
-#[OA\Tag(name: 'notes')]
+#[OA\Tag(name: 'notes', description: 'Заметки')]
 #[IsGranted(
     attribute: Role::ROLE_USER->value,
-    message: 'Вы не авторизованы!',
     statusCode: Response::HTTP_FORBIDDEN
 )]
 #[Security(name: 'Bearer')]
@@ -44,7 +43,7 @@ class NoteController extends AbstractController
 {
     public function __construct(
         private readonly NoteService $noteService,
-        private readonly NoteMapper $noteResponseMapper
+        private readonly NoteMapper $noteMapper
     ) {}
 
     #[Route(
@@ -87,7 +86,7 @@ class NoteController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $responseModel = $this->noteResponseMapper->one(note: $note);
+        $responseModel = $this->noteMapper->one(note: $note);
 
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
@@ -226,7 +225,7 @@ class NoteController extends AbstractController
         $model->setUserIds(userIds: [$user->getId()]);
         $pagination = $this->noteService->pagination(queryModel: $model);
 
-        $responseModel = $this->noteResponseMapper->pagination(pagination: $pagination);
+        $responseModel = $this->noteMapper->pagination(pagination: $pagination);
 
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
@@ -276,7 +275,7 @@ class NoteController extends AbstractController
 
         $note = $this->noteService->create(entity: $note);
 
-        $responseModel = $this->noteResponseMapper->one(note: $note);
+        $responseModel = $this->noteMapper->one(note: $note);
 
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
@@ -344,7 +343,7 @@ class NoteController extends AbstractController
 
         $note = $this->noteService->update(entity: $note);
 
-        $responseModel = $this->noteResponseMapper->one(note: $note);
+        $responseModel = $this->noteMapper->one(note: $note);
 
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }

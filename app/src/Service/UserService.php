@@ -82,4 +82,9 @@ readonly class UserService extends AbstractService
 
         $this->userRepository->delete(entity: $entity);
     }
+
+    public function checkExistsEmail(string $email): bool
+    {
+        return (bool) $this->one(queryModel: new UserQueryModel()->setEmail(email: $email));
+    }
 }

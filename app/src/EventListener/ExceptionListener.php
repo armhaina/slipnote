@@ -72,7 +72,8 @@ readonly class ExceptionListener
 
         return new DefaultResponseModelException(
             success: false,
-            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
+            message: $this->isUserException(exception: $exception) ? $exception->getMessage(
+            ) : HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
             context: new ContextResponseModelException(
                 file: $exception->getFile(),
                 line: $exception->getLine(),
@@ -132,5 +133,14 @@ readonly class ExceptionListener
         }
 
         return $groups;
+    }
+
+    private function isUserException(\Throwable $exception): bool
+    {
+        if ($exception instanceof \App\Contract\Exception\ExceptionInterface) {
+            return true;
+        }
+
+        return false;
     }
 }

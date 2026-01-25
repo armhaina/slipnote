@@ -9,10 +9,10 @@ use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class NotePaginationResponseModelEntity
+readonly class UserPaginationResponseModelEntity
 {
     /**
-     * @param array<int, NoteResponseModelEntity> $items
+     * @param array<int, UserResponseModelEntity> $items
      */
     public function __construct(
         #[Groups([Group::PUBLIC->value])]
@@ -41,11 +41,11 @@ readonly class NotePaginationResponseModelEntity
         private int $pages,
         #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
-            description: 'Заметки',
+            description: 'Пользователи',
             type: 'array',
             items: new OA\Items(
                 ref: new Model(
-                    type: NoteResponseModelEntity::class,
+                    type: UserResponseModelEntity::class,
                 )
             )
         )]
@@ -73,7 +73,7 @@ readonly class NotePaginationResponseModelEntity
     }
 
     /**
-     * @return array<NoteResponseModelEntity>
+     * @return array<UserResponseModelEntity>
      */
     public function getItems(): array
     {

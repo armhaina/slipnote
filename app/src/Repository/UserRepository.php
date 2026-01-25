@@ -90,6 +90,13 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
             ;
         }
 
+        if ($queryModel->getEmail()) {
+            $query
+                ->setParameter('email', $queryModel->getEmail())
+                ->andWhere(User::shortName().'.email = :email')
+            ;
+        }
+
         return $query;
     }
 }

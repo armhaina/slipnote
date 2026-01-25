@@ -12,7 +12,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`users`')]
-#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -139,10 +138,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
-    public function setCreatedAt(): self
+    public function setCreatedAt(\DateTimeImmutable $dateTimeImmutable): self
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = $dateTimeImmutable;
 
         return $this;
     }
@@ -152,11 +150,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->updatedAt;
     }
 
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function setUpdatedAt(): self
+    public function setUpdatedAt(\DateTimeImmutable $dateTimeImmutable): self
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = $dateTimeImmutable;
 
         return $this;
     }
