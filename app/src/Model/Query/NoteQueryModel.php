@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
-use App\Contract\Entity\EntityQueryModelInterface;
 use App\Validator\OrderBy;
 use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 
-class NoteQueryModel implements EntityQueryModelInterface
+class NoteQueryModel
 {
     private int $limit = 20;
     private int $offset = 0;
