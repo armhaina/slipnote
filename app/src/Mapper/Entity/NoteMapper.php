@@ -18,6 +18,7 @@ readonly class NoteMapper
     {
         $user = $note->getUser();
 
+        // TODO: переделать
         if (!$user instanceof User) {
             throw new \RuntimeException('Note user must be instance of App\Entity\User');
         }
