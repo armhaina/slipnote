@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Contract\Entity\EntityInterface;
 use App\Repository\NoteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,7 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
-class Note implements EntityInterface
+class Note
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
