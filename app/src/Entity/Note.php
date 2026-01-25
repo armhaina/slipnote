@@ -139,4 +139,9 @@ class Note implements EntityInterface
 
         return $this;
     }
+
+    public static function shortName(): string
+    {
+        return new \ReflectionClass(self::class)->getShortName();
+    }
 }

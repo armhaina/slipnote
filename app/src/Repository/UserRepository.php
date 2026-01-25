@@ -14,8 +14,6 @@ use Ds\Vector;
 
 class UserRepository extends AbstractRepository implements RepositoryInterface
 {
-    public const QUERY_ALIAS = 'UserEntity';
-
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct(entityClass: User::class, registry: $registry, em: $em);
@@ -59,11 +57,11 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
 
     private function queryBuilder(UserQueryModel $queryModel): QueryBuilder
     {
-        $query = $this->createQueryBuilder(self::QUERY_ALIAS);
+        $query = $this->createQueryBuilder(User::shortName());
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
-            $query->addOrderBy(sort: self::QUERY_ALIAS.'.'.$column, order: $order);
+            $query->addOrderBy(sort: User::shortName().'.'.$column, order: $order);
         }
 
         if (!empty($queryModel->getOffset())) {
@@ -77,14 +75,14 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
         if ($queryModel->getIds()) {
             $query
                 ->setParameter('ids', $queryModel->getIds())
-                ->andWhere(self::QUERY_ALIAS.'.id IN (:ids)')
+                ->andWhere(User::shortName().'.id IN (:ids)')
             ;
         }
 
         if ($queryModel->getExcludeIds()) {
             $query
                 ->setParameter('excludeIds', $queryModel->getExcludeIds())
-                ->andWhere(self::QUERY_ALIAS.'.id NOT IN (:excludeIds)')
+                ->andWhere(User::shortName().'.id NOT IN (:excludeIds)')
             ;
         }
 

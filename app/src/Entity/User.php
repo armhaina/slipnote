@@ -188,4 +188,9 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     {
         return $this->notes;
     }
+
+    public static function shortName(): string
+    {
+        return new \ReflectionClass(self::class)->getShortName();
+    }
 }

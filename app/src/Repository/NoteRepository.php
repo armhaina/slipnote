@@ -14,8 +14,6 @@ use Ds\Vector;
 
 class NoteRepository extends AbstractRepository implements RepositoryInterface
 {
-    public const QUERY_ALIAS = 'NoteEntity';
-
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct(entityClass: Note::class, registry: $registry, em: $em);
@@ -59,11 +57,11 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
 
     private function queryBuilder(NoteQueryModel $queryModel): QueryBuilder
     {
-        $query = $this->createQueryBuilder(self::QUERY_ALIAS);
+        $query = $this->createQueryBuilder(Note::shortName());
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
-            $query->addOrderBy(sort: self::QUERY_ALIAS.'.'.$column, order: $order);
+            $query->addOrderBy(sort: Note::shortName().'.'.$column, order: $order);
         }
 
         if (!empty($queryModel->getOffset())) {
@@ -77,21 +75,21 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
         if ($queryModel->getIds()) {
             $query
                 ->setParameter('ids', $queryModel->getIds())
-                ->andWhere(self::QUERY_ALIAS.'.id IN (:ids)')
+                ->andWhere(Note::shortName().'.id IN (:ids)')
             ;
         }
 
         if ($queryModel->getUserIds()) {
             $query
                 ->setParameter('userIds', $queryModel->getUserIds())
-                ->andWhere(self::QUERY_ALIAS.'.user IN (:userIds)')
+                ->andWhere(Note::shortName().'.user IN (:userIds)')
             ;
         }
 
         if ($queryModel->getUpdatedAtLess()) {
             $query
                 ->setParameter('updatedAtLess', $queryModel->getUpdatedAtLess())
-                ->andWhere(self::QUERY_ALIAS.'.updatedAt < :updatedAtLess')
+                ->andWhere(Note::shortName().'.updatedAt < :updatedAtLess')
             ;
         }
 
