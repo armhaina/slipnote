@@ -33,7 +33,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/v1/users')]
-#[OA\Tag(name: 'users', description: 'Пользователи')]
+#[OA\Tag(name: 'users', description: 'Операции с пользователями')]
 class UserController extends AbstractController
 {
     public function __construct(
