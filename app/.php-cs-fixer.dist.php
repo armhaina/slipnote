@@ -18,6 +18,7 @@ $rules = [
 
     // Правила для док-блоков
     'align_multiline_comment' => true, // Выравнивает многострочные комментарии
+    'general_phpdoc_tag_rename' => true, // Исправляет теги (например, @inheritDoc -> @inheritdoc)
 ];
 
 $finder = new PhpCsFixer\Finder()
