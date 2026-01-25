@@ -7,10 +7,8 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
-use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
-use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
 use App\Model\Payload\UserPayloadModel;
 use App\Service\UserService;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -49,10 +47,6 @@ class UserController extends AbstractController
         return $this->json(data: $user, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
-     */
     #[Route(methods: [Request::METHOD_POST])]
     public function create(#[MapRequestPayload] UserPayloadModel $model): JsonResponse
     {
@@ -71,10 +65,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws EntityModelInvalidObjectTypeException
      * @throws EntityNotFoundWhenUpdateException
-     * @throws EntityInvalidObjectTypeException
-     * @throws \Exception
      */
     #[Route(
         path: '/{id}',
@@ -103,10 +94,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws EntityModelInvalidObjectTypeException
      * @throws EntityNotFoundWhenDeleteException
-     * @throws EntityInvalidObjectTypeException
-     * @throws \Exception
      */
     #[Route(
         path: '/{id}',
