@@ -15,6 +15,9 @@ $rules = [
     ],
     'strict_comparison' => true,
     'line_ending' => true,
+
+    // Правила для док-блоков
+    'align_multiline_comment' => true, // Выравнивает многострочные комментарии
 ];
 
 $finder = new PhpCsFixer\Finder()
