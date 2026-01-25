@@ -9,8 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @template T of object
- * @extends ServiceEntityRepository<T>
+ * @extends ServiceEntityRepository<object>
  */
 abstract class AbstractRepository extends ServiceEntityRepository
 {

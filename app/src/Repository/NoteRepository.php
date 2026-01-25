@@ -4,21 +4,14 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\Entity\EntityInterface;
-use App\Contract\Entity\EntityQueryModelInterface;
 use App\Contract\RepositoryInterface;
 use App\Entity\Note;
-use App\Exception\Entity\EntityInvalidObjectTypeException;
-use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\NoteQueryModel;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
 
-/**
- * @extends AbstractRepository<Note>
- */
 class NoteRepository extends AbstractRepository implements RepositoryInterface
 {
     public const QUERY_ALIAS = 'NoteEntity';
@@ -33,59 +26,33 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
         return $this->find($id);
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
-    public function one(EntityQueryModelInterface $queryModel): ?Note
+    public function one(NoteQueryModel $queryModel): ?Note
     {
-        if (!$queryModel instanceof NoteQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $queryBuilder = $this->queryBuilder(queryModel: $queryModel)->setMaxResults(maxResults: 1);
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
     /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Vector<EntityInterface>
+     * @return Vector<Note>
      */
-    public function list(EntityQueryModelInterface $queryModel): Vector
+    public function list(NoteQueryModel $queryModel): Vector
     {
-        if (!$queryModel instanceof NoteQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $queryBuilder = $this->queryBuilder(queryModel: $queryModel);
 
         return new Vector($queryBuilder->getQuery()->getResult());
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     */
-    public function save(EntityInterface $entity): Note
+    public function save(Note $entity): Note
     {
-        if (!$entity instanceof Note) {
-            throw new EntityInvalidObjectTypeException();
-        }
-
         $this->em->persist(object: $entity);
         $this->em->flush();
 
         return $entity;
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     */
-    public function delete(EntityInterface $entity): void
+    public function delete(Note $entity): void
     {
-        if (!$entity instanceof Note) {
-            throw new EntityInvalidObjectTypeException();
-        }
-
         $this->em->remove(object: $entity);
         $this->em->flush();
     }
@@ -96,7 +63,7 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
 
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
-            $query->addOrderBy(sort: self::QUERY_ALIAS . '.' . $column, order: $order);
+            $query->addOrderBy(sort: self::QUERY_ALIAS.'.'.$column, order: $order);
         }
 
         if (!empty($queryModel->getOffset())) {
@@ -110,21 +77,21 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
         if ($queryModel->getIds()) {
             $query
                 ->setParameter('ids', $queryModel->getIds())
-                ->andWhere(self::QUERY_ALIAS . '.id IN (:ids)')
+                ->andWhere(self::QUERY_ALIAS.'.id IN (:ids)')
             ;
         }
 
         if ($queryModel->getUserIds()) {
             $query
                 ->setParameter('userIds', $queryModel->getUserIds())
-                ->andWhere(self::QUERY_ALIAS . '.user IN (:userIds)')
+                ->andWhere(self::QUERY_ALIAS.'.user IN (:userIds)')
             ;
         }
 
         if ($queryModel->getUpdatedAtLess()) {
             $query
                 ->setParameter('updatedAtLess', $queryModel->getUpdatedAtLess())
-                ->andWhere(self::QUERY_ALIAS . '.updatedAt < :updatedAtLess')
+                ->andWhere(self::QUERY_ALIAS.'.updatedAt < :updatedAtLess')
             ;
         }
 

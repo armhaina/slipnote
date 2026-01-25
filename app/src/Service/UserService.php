@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Contract\Entity\EntityInterface;
-use App\Contract\Entity\EntityQueryModelInterface;
 use App\Contract\ServiceInterface;
 use App\Entity\User;
-use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
-use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
-use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\UserQueryModel;
 use App\Repository\UserRepository;
 use Ds\Sequence;
@@ -26,15 +21,8 @@ readonly class UserService extends AbstractService implements ServiceInterface
         parent::__construct(repository: $userRepository);
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
-    public function count(EntityQueryModelInterface $queryModel): int
+    public function count(UserQueryModel $queryModel): int
     {
-        if (!$queryModel instanceof UserQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         $criteria = [];
 
         return $this->userRepository->count(criteria: $criteria);
@@ -54,55 +42,29 @@ readonly class UserService extends AbstractService implements ServiceInterface
         return $entity;
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
-    public function one(EntityQueryModelInterface $queryModel): ?User
+    public function one(UserQueryModel $queryModel): ?User
     {
-        if (!$queryModel instanceof UserQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         return $this->userRepository->one(queryModel: $queryModel);
     }
 
     /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     * @return Sequence<EntityInterface>
+     * @return Sequence<User>
      */
-    public function list(EntityQueryModelInterface $queryModel): Sequence
+    public function list(UserQueryModel $queryModel): Sequence
     {
-        if (!$queryModel instanceof UserQueryModel) {
-            throw new EntityQueryModelInvalidObjectTypeException();
-        }
-
         return $this->userRepository->list(queryModel: $queryModel);
     }
 
-    /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
-     */
-    public function create(EntityInterface $entity): User
+    public function create(User $entity): User
     {
-        if (!$entity instanceof User) {
-            throw new EntityModelInvalidObjectTypeException();
-        }
-
         return $this->userRepository->save(entity: $entity);
     }
 
     /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
      * @throws EntityNotFoundWhenUpdateException
      */
-    public function update(EntityInterface $entity): User
+    public function update(User $entity): User
     {
-        if (!$entity instanceof User) {
-            throw new EntityModelInvalidObjectTypeException();
-        }
-
         if (!$entity->getId()) {
             throw new EntityNotFoundWhenUpdateException(entity: $entity::class);
         }
@@ -111,16 +73,10 @@ readonly class UserService extends AbstractService implements ServiceInterface
     }
 
     /**
-     * @throws EntityInvalidObjectTypeException
-     * @throws EntityModelInvalidObjectTypeException
      * @throws EntityNotFoundWhenDeleteException
      */
-    public function delete(EntityInterface $entity): void
+    public function delete(User $entity): void
     {
-        if (!$entity instanceof User) {
-            throw new EntityModelInvalidObjectTypeException();
-        }
-
         if (!$entity->getId()) {
             throw new EntityNotFoundWhenDeleteException(entity: $entity::class);
         }

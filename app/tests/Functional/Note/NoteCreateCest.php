@@ -87,8 +87,8 @@ final class NoteCreateCest extends AbstractCest
         return [
             [
                 'request' => [
-                    'name' => $faker->regexify('[A-Za-z0-9]{' . mt_rand(101, 101) . '}'),
-                    'description' => $faker->regexify('[A-Za-z0-9]{' . mt_rand(10001, 10001) . '}')
+                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
+                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
                 ],
                 'response' => [
                     'success' => false,
@@ -96,12 +96,12 @@ final class NoteCreateCest extends AbstractCest
                     'errors' => [
                         [
                             'property' => 'name',
-                            'message' => 'Название должно содержать максимум 100 символов'
+                            'message' => 'Название должно содержать максимум 100 символов',
                         ],
                         [
                             'property' => 'description',
-                            'message' => 'Описание должно содержать максимум 10000 символов'
-                        ]
+                            'message' => 'Описание должно содержать максимум 10000 символов',
+                        ],
                     ],
                 ],
             ],

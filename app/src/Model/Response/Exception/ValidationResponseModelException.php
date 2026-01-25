@@ -30,7 +30,7 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
         private string $message,
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
-            description: 'Код ошибки (' . Group::ADMIN->value . ')',
+            description: 'Код ошибки ('.Group::ADMIN->value.')',
             type: 'integer',
             nullable: true
         )]
@@ -46,8 +46,7 @@ readonly class ValidationResponseModelException implements ExceptionResponseInte
             )
         )]
         private array $errors,
-    ) {
-    }
+    ) {}
 
     public function getSuccess(): bool
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Mapper\Entity;
 
-use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
 use App\Entity\User;
 use App\Model\Response\Entity\NoteResponseModelEntity;
@@ -33,14 +32,14 @@ readonly class NoteMapper
 
     /**
      * @param array<string, mixed> $context
-     * @param EntityInterface[] $notes
+     * @param Note[]               $notes
+     *
      * @return NoteResponseModelEntity[]
      */
     public function collection(array $notes, array $context = []): array
     {
-        /** @var Note[] $notes */
         return array_map(
-            fn(Note $note) => $this->one(note: $note, context: $context),
+            fn (Note $note): NoteResponseModelEntity => $this->one(note: $note, context: $context),
             $notes
         );
     }

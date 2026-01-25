@@ -22,7 +22,7 @@ final class NoteDeleteCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/' . $note->getId());
+        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -40,7 +40,7 @@ final class NoteDeleteCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/' . $note->getId());
+        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -57,7 +57,7 @@ final class NoteDeleteCest extends AbstractCest
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/' . $note->getId());
+        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 

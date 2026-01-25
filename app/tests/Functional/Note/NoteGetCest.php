@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\Entity\Note;
 use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
@@ -23,7 +22,7 @@ final class NoteGetCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: '/api/v1/notes/' . $note->getId());
+        $I->sendGet(url: '/api/v1/notes/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -40,7 +39,7 @@ final class NoteGetCest extends AbstractCest
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: '/api/v1/notes/' . $note->getId());
+        $I->sendGet(url: '/api/v1/notes/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -58,7 +57,7 @@ final class NoteGetCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: '/api/v1/notes/' . $note->getId());
+        $I->sendGet(url: '/api/v1/notes/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 

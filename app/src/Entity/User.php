@@ -90,6 +90,7 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
 
     /**
      * @see UserInterface
+     *
      * @return array<string>
      */
     public function getRoles(): array

@@ -2,7 +2,6 @@
 
 namespace App\Tests\_data\fixtures;
 
-use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
 use App\Tests\Support\FunctionalTester;
 use Faker\Factory;

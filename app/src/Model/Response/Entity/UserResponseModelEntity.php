@@ -23,8 +23,7 @@ readonly class UserResponseModelEntity
             type: 'string',
         )]
         private string $email,
-    ) {
-    }
+    ) {}
 
     public function getId(): int
     {

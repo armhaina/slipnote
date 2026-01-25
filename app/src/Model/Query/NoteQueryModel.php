@@ -6,10 +6,8 @@ namespace App\Model\Query;
 
 use App\Contract\Entity\EntityQueryModelInterface;
 use App\Validator\OrderBy;
-use App\Validator\OrderByValidator;
 use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
-use OpenApi\Attributes as OA;
 
 class NoteQueryModel implements EntityQueryModelInterface
 {
@@ -55,7 +53,7 @@ class NoteQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @return array<int>|null
+     * @return null|array<int>
      */
     public function getIds(): ?array
     {
@@ -64,7 +62,6 @@ class NoteQueryModel implements EntityQueryModelInterface
 
     /**
      * @param array<int> $ids
-     * @return NoteQueryModel
      */
     public function setIds(array $ids): self
     {
@@ -74,7 +71,7 @@ class NoteQueryModel implements EntityQueryModelInterface
     }
 
     /**
-     * @return array<int>|null
+     * @return null|array<int>
      */
     public function getUserIds(): ?array
     {
@@ -83,7 +80,6 @@ class NoteQueryModel implements EntityQueryModelInterface
 
     /**
      * @param array<int> $userIds
-     * @return NoteQueryModel
      */
     public function setUserIds(array $userIds): self
     {
@@ -102,7 +98,6 @@ class NoteQueryModel implements EntityQueryModelInterface
 
     /**
      * @param array<string> $orderBy
-     * @return NoteQueryModel
      */
     public function setOrderBy(array $orderBy): self
     {

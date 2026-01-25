@@ -22,7 +22,6 @@ use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\NoteService;
-use DateTimeImmutable;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use OpenApi\Attributes as OA;
@@ -38,7 +37,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/v1/notes')]
 #[OA\Tag(name: 'notes')]
 #[IsGranted(
-    attribute: ROLE::ROLE_USER->value,
+    attribute: Role::ROLE_USER->value,
     message: 'Вы не авторизованы!',
     statusCode: Response::HTTP_FORBIDDEN
 )]
@@ -48,13 +47,8 @@ class NoteController extends AbstractController
     public function __construct(
         private readonly NoteService $noteService,
         private readonly NoteMapper $noteResponseMapper
-    ) {
-    }
+    ) {}
 
-    /**
-     * @param Note $note
-     * @return JsonResponse
-     */
     #[Route(
         path: '/{id}',
         requirements: ['id' => '\d+'],
@@ -91,7 +85,6 @@ class NoteController extends AbstractController
     )]
     public function get(Note $note): JsonResponse
     {
-        //
         if ($note->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
@@ -280,14 +273,15 @@ class NoteController extends AbstractController
     )]
     public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
     {
-        $dateTimeImmutable = new DateTimeImmutable();
+        $dateTimeImmutable = new \DateTimeImmutable();
 
         $note = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
             ->setUser(user: $this->getUser())
             ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
-            ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable);
+            ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
+        ;
 
         $note = $this->noteService->create(entity: $note);
 
@@ -357,7 +351,8 @@ class NoteController extends AbstractController
 
         $note
             ->setName(name: $model->getName())
-            ->setDescription(description: $model->getDescription());
+            ->setDescription(description: $model->getDescription())
+        ;
 
         $note = $this->noteService->update(entity: $note);
 
@@ -366,10 +361,6 @@ class NoteController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
-    /**
-     * @param Note $note
-     * @return JsonResponse
-     */
     #[Route(
         path: '/{id}',
         requirements: ['id' => '\d+'],

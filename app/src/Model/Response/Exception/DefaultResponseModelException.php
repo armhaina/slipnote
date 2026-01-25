@@ -30,13 +30,12 @@ readonly class DefaultResponseModelException implements ExceptionResponseInterfa
             ref: new Model(
                 type: ContextResponseModelException::class,
             ),
-            description: 'Контекст (' . Group::ADMIN->value . ')',
+            description: 'Контекст ('.Group::ADMIN->value.')',
             type: 'object',
             nullable: true
         )]
         private ContextResponseModelException $context,
-    ) {
-    }
+    ) {}
 
     public function getSuccess(): bool
     {

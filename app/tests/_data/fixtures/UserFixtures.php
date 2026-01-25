@@ -6,7 +6,6 @@ use App\Contract\Entity\EntityInterface;
 use App\Entity\User;
 use App\Enum\Role;
 use App\Tests\Support\FunctionalTester;
-use Exception;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -24,7 +23,7 @@ class UserFixtures
         $roles = $data['roles'] ?? [Role::ROLE_USER->value];
         $email = $data['email'] ?? $faker->email();
 
-        if ($email === self::USER_AUTHORIZED_EMAIL) {
+        if (self::USER_AUTHORIZED_EMAIL === $email) {
             $password = self::USER_AUTHORIZED_PASSWORD;
         } else {
             $password = $data['password'] ?? $faker->password();
@@ -34,7 +33,7 @@ class UserFixtures
 
         try {
             $entity = $I->grabEntityFromRepository(entity: User::class, params: ['email' => $email]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $id = $I->haveInRepository(classNameOrInstance: User::class, data: [
                 'email' => $email,
                 'password' => $password,

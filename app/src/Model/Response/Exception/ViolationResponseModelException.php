@@ -31,8 +31,7 @@ readonly class ViolationResponseModelException implements ExceptionResponseInter
             nullable: true
         )]
         private ?string $code,
-    ) {
-    }
+    ) {}
 
     public function getProperty(): string
     {

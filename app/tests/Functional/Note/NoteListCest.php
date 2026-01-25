@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\Entity\User;
 use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
@@ -12,7 +11,6 @@ use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
-use DateTimeImmutable;
 
 final class NoteListCest extends AbstractCest
 {
@@ -55,7 +53,6 @@ final class NoteListCest extends AbstractCest
 
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
-
 
     #[DataProvider('idsProvider')]
     public function paramIds(FunctionalTester $I, Example $example): void
@@ -274,7 +271,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -298,7 +295,7 @@ final class NoteListCest extends AbstractCest
                     'code' => 401,
                     'message' => 'JWT Token not found',
                 ],
-            ]
+            ],
         ];
     }
 
@@ -325,7 +322,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -334,20 +331,20 @@ final class NoteListCest extends AbstractCest
         return [
             [
                 'query' => [
-                    'updated_at_less' => new DateTimeImmutable('01.02.2025')->format(format: DATE_ATOM)
+                    'updated_at_less' => new \DateTimeImmutable('01.02.2025')->format(format: DATE_ATOM),
                 ],
                 'fixtures' => [
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new DateTimeImmutable('01.03.2025'),
+                        'updated_at' => new \DateTimeImmutable('01.03.2025'),
                     ],
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new DateTimeImmutable('01.01.2025'),
+                        'updated_at' => new \DateTimeImmutable('01.01.2025'),
                     ],
                 ],
                 'response' => [
@@ -357,7 +354,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -384,7 +381,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -416,7 +413,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -448,7 +445,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -480,7 +477,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -512,7 +509,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -525,13 +522,13 @@ final class NoteListCest extends AbstractCest
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new DateTimeImmutable('01.01.2025')
+                        'updated_at' => new \DateTimeImmutable('01.01.2025'),
                     ],
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new DateTimeImmutable('01.01.2030')
+                        'updated_at' => new \DateTimeImmutable('01.01.2030'),
                     ],
                 ],
                 'response' => [
@@ -546,7 +543,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -559,13 +556,13 @@ final class NoteListCest extends AbstractCest
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new DateTimeImmutable('01.01.2030')
+                        'updated_at' => new \DateTimeImmutable('01.01.2030'),
                     ],
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new DateTimeImmutable('01.01.2025')
+                        'updated_at' => new \DateTimeImmutable('01.01.2025'),
                     ],
                 ],
                 'response' => [
@@ -580,7 +577,7 @@ final class NoteListCest extends AbstractCest
                         'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
-            ]
+            ],
         ];
     }
 }

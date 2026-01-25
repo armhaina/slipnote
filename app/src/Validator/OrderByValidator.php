@@ -4,7 +4,6 @@ namespace App\Validator;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 
 class OrderByValidator extends ConstraintValidator
 {
@@ -24,7 +23,8 @@ class OrderByValidator extends ConstraintValidator
                 $this->context->buildViolation($constraint->invalidFieldMessage)
                     ->setParameter('{{ field }}', $field)
                     ->setParameter('{{ allowed }}', implode(', ', $constraint->allowedFields))
-                    ->addViolation();
+                    ->addViolation()
+                ;
             }
         }
 
@@ -33,7 +33,8 @@ class OrderByValidator extends ConstraintValidator
             if (!in_array($direction, $constraint->allowedDirections, true)) {
                 $this->context->buildViolation($constraint->invalidDirectionMessage)
                     ->setParameter('{{ direction }}', $direction)
-                    ->addViolation();
+                    ->addViolation()
+                ;
             }
         }
     }

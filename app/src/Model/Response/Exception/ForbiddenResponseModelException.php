@@ -8,7 +8,6 @@ use App\Contract\Exception\ExceptionResponseInterface;
 use App\Enum\Group;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 readonly class ForbiddenResponseModelException implements ExceptionResponseInterface
 {
@@ -27,13 +26,12 @@ readonly class ForbiddenResponseModelException implements ExceptionResponseInter
         private string $message,
         #[Groups([Group::ADMIN->value])]
         #[OA\Property(
-            description: 'Код ошибки (' . Group::ADMIN->value . ')',
+            description: 'Код ошибки ('.Group::ADMIN->value.')',
             type: 'integer',
             nullable: true,
         )]
         private int $code
-    ) {
-    }
+    ) {}
 
     public function getSuccess(): bool
     {

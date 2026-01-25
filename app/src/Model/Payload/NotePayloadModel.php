@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Model\Payload;
 
 use Doctrine\DBAL\Types\Types;
-use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 readonly class NotePayloadModel
 {
@@ -31,8 +31,7 @@ readonly class NotePayloadModel
         )]
         #[OA\Property(description: 'Описание')]
         private string $description,
-    ) {
-    }
+    ) {}
 
     public function getName(): string
     {

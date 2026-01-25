@@ -34,8 +34,7 @@ readonly class NoteResponseModelEntity
             description: 'Пользователь (владелец заметки)',
         )]
         private UserResponseModelEntity $user,
-    ) {
-    }
+    ) {}
 
     public function getId(): int
     {

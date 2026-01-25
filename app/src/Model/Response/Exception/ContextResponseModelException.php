@@ -30,8 +30,7 @@ readonly class ContextResponseModelException implements ExceptionResponseInterfa
             type: 'string',
         )]
         private string $message,
-    ) {
-    }
+    ) {}
 
     public function getFile(): string
     {

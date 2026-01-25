@@ -36,7 +36,7 @@ abstract class AbstractCest
 
         $I->haveHttpHeader(
             name: 'Authorization',
-            value: 'Bearer ' . json_decode($I->grabResponse(), true)['token']
+            value: 'Bearer '.json_decode($I->grabResponse(), true)['token']
         );
 
         return $user;

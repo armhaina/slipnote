@@ -2,6 +2,4 @@
 
 namespace App\Contract\Entity;
 
-interface EntityQueryModelInterface
-{
-}
+interface EntityQueryModelInterface {}

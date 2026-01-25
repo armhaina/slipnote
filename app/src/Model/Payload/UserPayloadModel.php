@@ -14,8 +14,7 @@ readonly class UserPayloadModel
         private string $email,
         #[Assert\NotBlank]
         private string $password,
-    ) {
-    }
+    ) {}
 
     public function getEmail(): string
     {

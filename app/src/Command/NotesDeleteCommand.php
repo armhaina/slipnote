@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Contract\Entity\EntityInterface;
 use App\Entity\Note;
-use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Model\Query\NoteQueryModel;
 use App\Service\NoteService;
 use Ds\Sequence;
@@ -22,8 +20,7 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 #[AsCommand(
     name: 'cron:notes-delete',
     description: 'Notes delete command'
-)
-]
+)]
 #[AsCronTask(expression: '0 0 * * *')]
 class NotesDeleteCommand extends Command
 {
@@ -35,10 +32,6 @@ class NotesDeleteCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     * @throws EntityQueryModelInvalidObjectTypeException
      * @throws \DateMalformedStringException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -54,11 +47,7 @@ class NotesDeleteCommand extends Command
                 break;
             }
 
-            $notes->map(function (EntityInterface $note) {
-                if (!$note instanceof Note) {
-                    return;
-                }
-
+            $notes->map(function (Note $note) {
                 $this->noteService->transaction(func: function () use ($note) {
                     $this->noteService->delete(entity: $note);
                 });
@@ -71,9 +60,8 @@ class NotesDeleteCommand extends Command
     }
 
     /**
-     * @param int $offset
-     * @return Sequence<EntityInterface>
-     * @throws EntityQueryModelInvalidObjectTypeException
+     * @return Sequence<Note>
+     *
      * @throws \DateMalformedStringException
      */
     private function getNotes(int $offset): Sequence
