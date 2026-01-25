@@ -11,12 +11,12 @@ use App\Enum\Role;
 use App\Exception\Entity\EntityInvalidObjectTypeException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\EntityModel\EntityModelInvalidObjectTypeException;
-use App\Exception\EntityQueryModel\EntityQueryModelInvalidObjectTypeException;
 use App\Mapper\Entity\NoteMapper;
 use App\Message\HttpStatusMessage;
 use App\Model\Payload\NotePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
+use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
@@ -94,9 +94,6 @@ class NoteController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
-    /**
-     * @throws EntityQueryModelInvalidObjectTypeException
-     */
     #[Route(methods: [Request::METHOD_GET])]
     #[OA\Get(
         operationId: 'getListNote',
@@ -109,7 +106,7 @@ class NoteController extends AbstractController
             type: 'array',
             items: new OA\Items(
                 ref: new Model(
-                    type: NoteResponseModelEntity::class,
+                    type: NotePaginationResponseModelEntity::class,
                     groups: [Group::PUBLIC->value]
                 )
             )
@@ -231,9 +228,9 @@ class NoteController extends AbstractController
         $model->setUserIds(userIds: [$user->getId()]);
         $pagination = $this->noteService->pagination(queryModel: $model);
 
-        $responseModels = $this->noteResponseMapper->pagination(pagination: $pagination);
+        $responseModel = $this->noteResponseMapper->pagination(pagination: $pagination);
 
-        return $this->json(data: $responseModels, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
     /**
