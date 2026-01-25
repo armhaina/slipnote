@@ -1,5 +1,17 @@
 nelmio_api_doc:
   documentation:
+    info:
+      title: Slipnote
+      description: Сервис быстрых заметок!
+      version: 1.0.0
+    components:
+      securitySchemes:
+        Bearer:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+    security:
+      - Bearer: [ ]
     paths:
       /api/login_check:
         post:
@@ -40,18 +52,6 @@ nelmio_api_doc:
                         type: string
                         example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE3NjkyODk3NDEsImV4cCI6MTc2OTI5MzM0MSwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoidGVzdEBtYWlsLnJ1In0.LUkyfjl04qVQd1KLJonrtHnHx6Z6JwTpysYokH6TnWjToTxTXANXwqi9ukPSXRIqZYmGTCPie6lSs_Snc1nsN17uorK8mkatNdqdHd40Zzy9vTG5xkzcrreA8Z5hYoRDiCkuqs29M_pNW3I7nXXVCn3R8Fwug0ODG5RYdbgo-JkULOWJC6q6LwotqLTukU3w8kM8H0q2cdIJt5EhtfqOn1MjPrbe77ebfLxr2518XOj68g6h-G1_1R8MI25i_rNSUmZ9shImUyzDfv_KFY-xv5UWTzPuwsfOMm_AXWala7nB4qFRxP3QJAv08YckFU-4E5znW39m86PmIHISgTGaEQ'
                         description: 'Токен'
-    info:
-      title: Slipnote
-      description: Сервис быстрых заметок!
-      version: 1.0.0
-    components:
-      securitySchemes:
-        Bearer:
-          type: http
-          scheme: bearer
-          bearerFormat: JWT
-    security:
-      - Bearer: [ ]
   html_config:
     swagger_ui_config:
       defaultModelsExpandDepth: 0 # свернуть схемы
