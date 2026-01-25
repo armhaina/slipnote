@@ -21,6 +21,8 @@ $rules = [
     'general_phpdoc_tag_rename' => true, // Исправляет теги (например, @inheritDoc -> @inheritdoc)
     'multiline_comment_opening_closing' => true, // Форматирование многострочных комментариев
     'phpdoc_add_missing_param_annotation' => ['only_untyped' => true], // Добавляет недостающие @param
+    'phpdoc_align' => true, // Выравнивает док-блоки
+    'phpdoc_annotation_without_dot' => true, // Убирает точки в конце аннотаций
 ];
 
 $finder = new PhpCsFixer\Finder()
