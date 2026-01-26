@@ -49,9 +49,44 @@ class UserController extends AbstractController
     )]
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[Security(name: 'Bearer')]
+    #[OA\Get(operationId: 'getUser', summary: 'Получить пользователя (только текущий пользователь)')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: UserResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
     public function get(User $user): JsonResponse
     {
-        return $this->json(data: $user, context: ['groups' => [Group::PUBLIC->value]]);
+        if ($user !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $responseModel = $this->userMapper->one(user: $user);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
     /**
@@ -134,6 +169,54 @@ class UserController extends AbstractController
     )]
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[Security(name: 'Bearer')]
+    #[OA\Put(operationId: 'updateUser', summary: 'Изменить пользователя (только текущий пользователь)')]
+    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: UserResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNPROCESSABLE_ENTITY,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ValidationResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_CONFLICT,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_CONFLICT],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
     public function update(
         User $user,
         #[MapRequestPayload]
@@ -143,16 +226,23 @@ class UserController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
+            throw new UserFoundException(email: $model->getEmail());
+        }
+
         $hashedPassword = $this->passwordHasher->hashPassword($user, $model->getPassword());
 
         $user
             ->setEmail(email: $model->getEmail())
             ->setPassword(password: $hashedPassword)
+            ->setUpdatedAt(dateTimeImmutable: new \DateTimeImmutable())
         ;
 
-        $this->userService->update(entity: $user);
+        $entity = $this->userService->update(entity: $user);
 
-        return $this->json(data: $user, context: ['groups' => [Group::PUBLIC->value]]);
+        $responseModel = $this->userMapper->one(user: $entity);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
     /**

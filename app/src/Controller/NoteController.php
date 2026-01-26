@@ -336,9 +336,12 @@ class NoteController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        $dateTimeImmutable = new \DateTimeImmutable();
+
         $note
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
+            ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
         ;
 
         $note = $this->noteService->update(entity: $note);
