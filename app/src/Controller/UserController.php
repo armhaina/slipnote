@@ -12,7 +12,6 @@ use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\UserFoundException;
 use App\Mapper\Entity\UserMapper;
 use App\Message\HttpStatusMessage;
-use App\Model\Payload\NotePayloadModel;
 use App\Model\Payload\UserPayloadModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
@@ -95,7 +94,7 @@ class UserController extends AbstractController
     #[Route(methods: [Request::METHOD_POST])]
     #[Security]
     #[OA\Post(operationId: 'createUser', summary: 'Создать пользователя')]
-    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -170,7 +169,7 @@ class UserController extends AbstractController
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[Security(name: 'Bearer')]
     #[OA\Put(operationId: 'updateUser', summary: 'Изменить пользователя (только текущий пользователь)')]
-    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],

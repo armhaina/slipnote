@@ -4,6 +4,9 @@ nelmio_api_doc:
       title: Slipnote
       description: Сервис быстрых заметок!
       version: 1.0.0
+    servers:
+      - url: 'http://%env(SERVER_NAME)%'
+        description: 'Local сервер (HTTP)'
     components:
       securitySchemes:
         Bearer:
