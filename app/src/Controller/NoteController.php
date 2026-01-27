@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
+use App\Exception\Entity\User\ForbiddenException;
 use App\Mapper\Entity\NoteMapper;
 use App\Message\HttpStatusMessage;
 use App\Model\Payload\NotePayloadModel;
@@ -83,7 +84,7 @@ class NoteController extends AbstractController
     public function get(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         $responseModel = $this->noteMapper->one(note: $note);
@@ -219,7 +220,7 @@ class NoteController extends AbstractController
         $user = $this->getUser();
 
         if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         $model->setUserIds(userIds: [$user->getId()]);
@@ -333,7 +334,7 @@ class NoteController extends AbstractController
         NotePayloadModel $model,
     ): JsonResponse {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         $dateTimeImmutable = new \DateTimeImmutable();
@@ -385,7 +386,7 @@ class NoteController extends AbstractController
     public function delete(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         return $this->json(data: new DeleteResponseModelAction());
