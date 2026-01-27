@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\RepositoryInterface;
 use App\Entity\User;
 use App\Model\Query\UserQueryModel;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
 use Knp\Component\Pager\PaginatorInterface;
 
-class UserRepository extends AbstractRepository implements RepositoryInterface
+class UserRepository extends AbstractRepository
 {
     public function __construct(
         ManagerRegistry $registry,

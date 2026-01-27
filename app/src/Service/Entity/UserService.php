@@ -12,12 +12,15 @@ use App\Model\Query\UserQueryModel;
 use App\Repository\UserRepository;
 use Ds\Sequence;
 
-readonly class UserService extends AbstractService
+readonly class UserService
 {
     public function __construct(
         private UserRepository $userRepository,
-    ) {
-        parent::__construct(repository: $userRepository);
+    ) {}
+
+    public function transaction(callable $func): void
+    {
+        $this->userRepository->transaction(func: $func);
     }
 
     public function count(UserQueryModel $queryModel): int

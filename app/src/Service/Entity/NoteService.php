@@ -13,12 +13,15 @@ use App\Repository\NoteRepository;
 use Ds\Sequence;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 
-readonly class NoteService extends AbstractService
+readonly class NoteService
 {
     public function __construct(
         private NoteRepository $noteRepository,
-    ) {
-        parent::__construct(repository: $noteRepository);
+    ) {}
+
+    public function transaction(callable $func): void
+    {
+        $this->noteRepository->transaction(func: $func);
     }
 
     public function count(NoteQueryModel $queryModel): int

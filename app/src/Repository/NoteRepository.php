@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\RepositoryInterface;
 use App\Entity\Note;
 use App\Model\Query\NoteQueryModel;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,7 +13,7 @@ use Ds\Vector;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
-class NoteRepository extends AbstractRepository implements RepositoryInterface
+class NoteRepository extends AbstractRepository
 {
     public function __construct(
         ManagerRegistry $registry,
