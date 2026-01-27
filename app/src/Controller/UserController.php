@@ -19,16 +19,20 @@ use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\UserService;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
-use Nelmio\ApiDocBundle\Attribute\Security;
+use Nelmio\ApiDocBundle\Attribute\Security as DocSecurity;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/v1/users')]
@@ -38,7 +42,7 @@ class UserController extends AbstractController
     public function __construct(
         private readonly UserService $userService,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly UserMapper $userMapper,
+        private readonly UserMapper $userMapper
     ) {}
 
     #[Route(
@@ -47,7 +51,7 @@ class UserController extends AbstractController
         methods: [Request::METHOD_GET]
     )]
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
-    #[Security(name: 'Bearer')]
+    #[DocSecurity(name: 'Bearer')]
     #[OA\Get(operationId: 'getUser', summary: 'Получить пользователя (только текущий пользователь)')]
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -92,7 +96,7 @@ class UserController extends AbstractController
      * @throws UserFoundException
      */
     #[Route(methods: [Request::METHOD_POST])]
-    #[Security]
+    #[DocSecurity]
     #[OA\Post(operationId: 'createUser', summary: 'Создать пользователя')]
     #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
     #[OA\Response(
@@ -132,8 +136,26 @@ class UserController extends AbstractController
             )
         )
     )]
-    public function create(#[MapRequestPayload] UserPayloadModel $model): JsonResponse
-    {
+    public function create(
+        #[MapRequestPayload]
+        UserPayloadModel $model,
+        TokenStorageInterface $tokenStorage,
+        JWTTokenManagerInterface $jwtManager
+    ): JsonResponse {
+        //        // Проверяем, есть ли уже валидный токен
+        //        $token = $tokenStorage->getToken();
+        //
+        //        if ($token && $token->getUser()) {
+        //            // Проверяем, что это именно JWT токен (не анонимный или другой тип)
+        //            if ($token->hasAttribute('jwt') || $token->getCredentials()) {
+        //                throw new AccessDeniedHttpException(
+        //                    'Вы уже авторизованы. Пожалуйста, сначала выполните logout.'
+        //                );
+        //            }
+        //        }
+        //
+        //        $test = $this->security->getUser();
+
         if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
             throw new UserFoundException(email: $model->getEmail());
         }
@@ -167,7 +189,7 @@ class UserController extends AbstractController
         methods: [Request::METHOD_PUT]
     )]
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
-    #[Security(name: 'Bearer')]
+    #[DocSecurity(name: 'Bearer')]
     #[OA\Put(operationId: 'updateUser', summary: 'Изменить пользователя (только текущий пользователь)')]
     #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
     #[OA\Response(
@@ -253,7 +275,7 @@ class UserController extends AbstractController
         methods: [Request::METHOD_DELETE]
     )]
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
-    #[Security(name: 'Bearer')]
+    #[DocSecurity(name: 'Bearer')]
     #[OA\Delete(operationId: 'deleteUser', summary: 'Удалить пользователя по ID (только текущий пользователь)')]
     #[OA\Response(
         response: Response::HTTP_OK,
