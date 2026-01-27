@@ -17,7 +17,7 @@ readonly class SecurityService
     {
         $token = $request->headers->get(key: 'Authorization');
 
-        if (preg_match(pattern: '/^Bearer\s+\S+/', subject: $token)) {
+        if ($token && preg_match(pattern: '/^Bearer\s+\S+/', subject: $token)) {
             return substr(string: $token, offset: 7);
         }
 
