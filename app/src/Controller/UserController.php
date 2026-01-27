@@ -41,6 +41,7 @@ class UserController extends AbstractController
         private readonly UserService $userService,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserMapper $userMapper,
+        private readonly SecurityService $securityService
     ) {}
 
     #[Route(
@@ -90,83 +91,84 @@ class UserController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
-    //    /**
-    //     * @throws UserFoundException
-    //     */
-    //    #[Route(methods: [Request::METHOD_POST])]
-    //    #[DocSecurity]
-    //    #[OA\Post(operationId: 'createUser', summary: 'Создать пользователя')]
-    //    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
-    //    #[OA\Response(
-    //        response: Response::HTTP_OK,
-    //        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
-    //        content: new OA\JsonContent(
-    //            ref: new Model(
-    //                type: UserResponseModelEntity::class,
-    //                groups: [Group::PUBLIC->value]
-    //            )
-    //        )
-    //    )]
-    //    #[OA\Response(
-    //        response: Response::HTTP_UNPROCESSABLE_ENTITY,
-    //        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
-    //        content: new OA\JsonContent(
-    //            ref: new Model(
-    //                type: ValidationResponseModelException::class
-    //            )
-    //        )
-    //    )]
-    //    #[OA\Response(
-    //        response: Response::HTTP_CONFLICT,
-    //        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_CONFLICT],
-    //        content: new OA\JsonContent(
-    //            ref: new Model(
-    //                type: DefaultResponseModelException::class
-    //            )
-    //        )
-    //    )]
-    //    #[OA\Response(
-    //        response: Response::HTTP_INTERNAL_SERVER_ERROR,
-    //        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
-    //        content: new OA\JsonContent(
-    //            ref: new Model(
-    //                type: DefaultResponseModelException::class
-    //            )
-    //        )
-    //    )]
-    //    public function create(
-    //        #[MapRequestPayload]
-    //        UserPayloadModel $model,
-    //        Request $request
-    //    ): JsonResponse {
-    //        $token = $this->securityService->getBearerToken(request: $request);
-    //
-    //        if ($token && $this->securityService->isValidJwtToken(token: $token)) {
-    //            throw new ForbiddenException;
-    //        }
-    //
-    //        if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
-    //            throw new UserFoundException(email: $model->getEmail());
-    //        }
-    //
-    //        $dateTimeImmutable = new \DateTimeImmutable();
-    //
-    //        $entity = new User();
-    //        $hashedPassword = $this->passwordHasher->hashPassword($entity, $model->getPassword());
-    //
-    //        $entity
-    //            ->setEmail(email: $model->getEmail())
-    //            ->setPassword(password: $hashedPassword)
-    //            ->setRoles(roles: [Role::ROLE_USER->value])
-    //            ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
-    //            ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable);
-    //
-    //        $entity = $this->userService->create(entity: $entity);
-    //
-    //        $responseModel = $this->userMapper->one(user: $entity);
-    //
-    //        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
-    //    }
+    /**
+     * @throws UserFoundException
+     */
+    #[Route(methods: [Request::METHOD_POST])]
+    #[DocSecurity]
+    #[OA\Post(operationId: 'createUser', summary: 'Создать пользователя')]
+    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: UserResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNPROCESSABLE_ENTITY,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ValidationResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_CONFLICT,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_CONFLICT],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    public function create(
+        #[MapRequestPayload]
+        UserPayloadModel $model,
+        Request $request
+    ): JsonResponse {
+        $token = $this->securityService->getBearerToken(request: $request);
+
+        if ($token && $this->securityService->isValidJwtToken(token: $token)) {
+            throw new ForbiddenException();
+        }
+
+        if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
+            throw new UserFoundException(email: $model->getEmail());
+        }
+
+        $dateTimeImmutable = new \DateTimeImmutable();
+
+        $entity = new User();
+        $hashedPassword = $this->passwordHasher->hashPassword($entity, $model->getPassword());
+
+        $entity
+            ->setEmail(email: $model->getEmail())
+            ->setPassword(password: $hashedPassword)
+            ->setRoles(roles: [Role::ROLE_USER->value])
+            ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
+            ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
+        ;
+
+        $entity = $this->userService->create(entity: $entity);
+
+        $responseModel = $this->userMapper->one(user: $entity);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+    }
 
     /**
      * @throws EntityNotFoundWhenUpdateException

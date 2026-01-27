@@ -11,12 +11,13 @@ security:
         property: email
   firewalls:
     register:
-      pattern: ^/api/v1/auth/register
+      pattern: ^/api/v1/users$ # точный маршрут (для запроса со слэшом на конце: ^/api/v1/users/?$)
+      methods: [POST]
     login:
-      pattern: ^/api/v1/auth/login
+      pattern: ^/api/login
       stateless: true
       json_login:
-        check_path: /api/v1/auth/login_check
+        check_path: /api/login_check
         success_handler: lexik_jwt_authentication.handler.authentication_success
         failure_handler: lexik_jwt_authentication.handler.authentication_failure
     api:
@@ -38,7 +39,8 @@ security:
 
   # Note: Only the *first* matching rule is applied
   access_control:
-    - { path: ^/api/v1/auth, roles: PUBLIC_ACCESS }
+    - { path: ^/api/v1/users, methods: [ POST ], roles: PUBLIC_ACCESS }
+    - { path: ^/api/login, roles: PUBLIC_ACCESS }
     - { path: ^/api/doc, roles: PUBLIC_ACCESS }
     - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
