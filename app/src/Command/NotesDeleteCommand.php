@@ -6,7 +6,7 @@ namespace App\Command;
 
 use App\Entity\Note;
 use App\Model\Query\NoteQueryModel;
-use App\Service\NoteService;
+use App\Service\Entity\NoteService;
 use Ds\Sequence;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

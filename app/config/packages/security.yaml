@@ -10,6 +10,9 @@ security:
         class: App\Entity\User
         property: email
   firewalls:
+    public:
+      pattern:
+        - ^/api/v1/auth
     login:
       pattern: ^/api/login
       stateless: true

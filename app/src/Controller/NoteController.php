@@ -19,7 +19,7 @@ use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
-use App\Service\NoteService;
+use App\Service\Entity\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use OpenApi\Attributes as OA;
