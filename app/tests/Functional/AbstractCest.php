@@ -25,7 +25,7 @@ abstract class AbstractCest
         ]);
 
         $I->sendPost(
-            url: '/api/v1/auth/login_check',
+            url: '/api/login_check',
             params: [
                 'username' => UserFixtures::USER_AUTHORIZED_EMAIL,
                 'password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
