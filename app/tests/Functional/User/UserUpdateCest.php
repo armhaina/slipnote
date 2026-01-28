@@ -19,7 +19,7 @@ final class UserUpdateCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Изменить пользователя');
+        $I->wantTo('PUT/200: Изменить пользователя');
 
         $user = $this->authorized(I: $I);
 
@@ -33,27 +33,10 @@ final class UserUpdateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT: Ошибка валидации');
-
-        $user = $this->authorized(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Ошибка авторизации');
+        $I->wantTo('PUT/401: Ошибка авторизации');
         $user = UserFixtures::load(I: $I);
 
         $I->sendPut(url: self::URL.'/'.$user->getId());
@@ -69,7 +52,7 @@ final class UserUpdateCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Доступ запрещен');
+        $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
         $user = UserFixtures::load(I: $I);
@@ -87,13 +70,30 @@ final class UserUpdateCest extends AbstractCest
     #[DataProvider('failedEmailAlreadyExistsProvider')]
     public function failedEmailAlreadyExists(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Почта уже существует (ошибка)');
+        $I->wantTo('PUT/409: Почта уже существует');
 
         $user = $this->authorized(I: $I);
         UserFixtures::load(I: $I, data: $example['fixtures']);
 
         $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::CONFLICT);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedValidationProvider')]
+    public function failedValidation(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('PUT/422: Ошибка валидации');
+
+        $user = $this->authorized(I: $I);
+
+        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
