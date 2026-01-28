@@ -10,7 +10,7 @@ use App\Enum\Role;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\ForbiddenException;
-use App\Exception\Entity\User\UserFoundException;
+use App\Exception\Entity\User\UserWithThisEmailAlreadyExistsException;
 use App\Mapper\Entity\UserMapper;
 use App\Message\HttpStatusMessage;
 use App\Model\Payload\UserPayloadModel;
@@ -92,7 +92,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws UserFoundException
+     * @throws UserWithThisEmailAlreadyExistsException
      */
     #[Route(methods: [Request::METHOD_POST])]
     #[DocSecurity]
@@ -147,7 +147,7 @@ class UserController extends AbstractController
         }
 
         if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
-            throw new UserFoundException(email: $model->getEmail());
+            throw new UserWithThisEmailAlreadyExistsException(email: $model->getEmail());
         }
 
         $dateTimeImmutable = new \DateTimeImmutable();
@@ -238,7 +238,7 @@ class UserController extends AbstractController
         }
 
         if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
-            throw new UserFoundException(email: $model->getEmail());
+            throw new UserWithThisEmailAlreadyExistsException(email: $model->getEmail());
         }
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $model->getPassword());
