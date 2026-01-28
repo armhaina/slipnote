@@ -10,7 +10,6 @@ use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
-use Faker\Factory;
 
 final class UserUpdateCest extends AbstractCest
 {
@@ -118,8 +117,6 @@ final class UserUpdateCest extends AbstractCest
 
     protected function failedValidationProvider(): array
     {
-        $faker = Factory::create();
-
         return [
             [
                 'request' => [

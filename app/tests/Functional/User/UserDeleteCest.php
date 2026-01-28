@@ -11,18 +11,18 @@ use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
 
-final class UserGetCest extends AbstractCest
+final class UserDeleteCest extends AbstractCest
 {
     private const string URL = '/api/v1/users';
 
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/200: Получить пользователя (только текущий пользователь)');
+        $I->wantTo('PUT/200: удалить пользователя');
 
         $user = $this->authorized(I: $I);
 
-        $I->sendGet(url: self::URL.'/'.$user->getId());
+        $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -35,11 +35,10 @@ final class UserGetCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/401: Ошибка авторизации');
+        $I->wantTo('PUT/401: Ошибка авторизации');
+        $user = UserFixtures::load(I: $I);
 
-        $user = UserFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendGet(url: self::URL.'/'.$user->getId());
+        $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -52,12 +51,12 @@ final class UserGetCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/403: Доступ запрещен');
+        $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $user = UserFixtures::load(I: $I, data: $example['fixtures']);
+        $user = UserFixtures::load(I: $I);
 
-        $I->sendGet(url: self::URL.'/'.$user->getId());
+        $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -72,7 +71,8 @@ final class UserGetCest extends AbstractCest
         return [
             [
                 'response' => [
-                    'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
+                    'success' => true,
+                    'message' => 'Запись успешно удалена',
                 ],
             ],
         ];
@@ -82,9 +82,6 @@ final class UserGetCest extends AbstractCest
     {
         return [
             [
-                'fixtures' => [
-                    'email' => 'test@mail.ru',
-                ],
                 'response' => [
                     'code' => 401,
                     'message' => 'JWT Token not found',
@@ -97,8 +94,8 @@ final class UserGetCest extends AbstractCest
     {
         return [
             [
-                'fixtures' => [
-                    'email' => 'test@mail.ru',
+                'request' => [
+                    'email' => 'update@mail.ru',
                 ],
                 'response' => [
                     'success' => false,
