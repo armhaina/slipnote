@@ -10,10 +10,12 @@ use App\Enum\Role;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\ForbiddenException;
+use App\Exception\Entity\User\InvalidCurrentPasswordException;
 use App\Exception\Entity\User\UserWithThisEmailAlreadyExistsException;
 use App\Mapper\Entity\UserMapper;
 use App\Message\HttpStatusMessage;
 use App\Model\Payload\UserCreatePayloadModel;
+use App\Model\Payload\UserUpdatePasswordPayloadModel;
 use App\Model\Payload\UserUpdatePayloadModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
@@ -244,6 +246,82 @@ class UserController extends AbstractController
 
         $user
             ->setEmail(email: $model->getEmail())
+            ->setUpdatedAt(dateTimeImmutable: new \DateTimeImmutable())
+        ;
+
+        $entity = $this->userService->update(entity: $user);
+
+        $responseModel = $this->userMapper->one(user: $entity);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+    }
+
+    /**
+     * @throws EntityNotFoundWhenUpdateException
+     */
+    #[Route(
+        path: '/{id}/password',
+        requirements: ['id' => '\d+'],
+        methods: [Request::METHOD_PUT]
+    )]
+    #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
+    #[DocSecurity(name: 'Bearer')]
+    #[OA\Put(operationId: 'updatePasswordUser', summary: 'Изменить пароль пользователя (только текущий пользователь)')]
+    #[OA\RequestBody(content: new Model(type: UserUpdatePasswordPayloadModel::class))]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: UserResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNPROCESSABLE_ENTITY,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ValidationResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    public function updatePassword(
+        User $user,
+        #[MapRequestPayload]
+        UserUpdatePasswordPayloadModel $model
+    ): JsonResponse {
+        if ($user !== $this->getUser()) {
+            throw new ForbiddenException();
+        }
+
+        if (!$this->passwordHasher->isPasswordValid(user: $user, plainPassword: $model->getCurrentPassword())) {
+            throw new InvalidCurrentPasswordException();
+        }
+
+        $hashedPassword = $this->passwordHasher->hashPassword(user: $user, plainPassword: $model->getNewPassword());
+
+        $user
+            ->setPassword(password: $hashedPassword)
             ->setUpdatedAt(dateTimeImmutable: new \DateTimeImmutable())
         ;
 
