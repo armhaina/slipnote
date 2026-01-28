@@ -18,7 +18,7 @@ final class UserDeleteCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT/200: удалить пользователя');
+        $I->wantTo('DELETE/200: Удалить пользователя');
 
         $user = $this->authorized(I: $I);
 
@@ -35,7 +35,7 @@ final class UserDeleteCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT/401: Ошибка авторизации');
+        $I->wantTo('DELETE/401: Ошибка авторизации');
         $user = UserFixtures::load(I: $I);
 
         $I->sendDelete(url: self::URL.'/'.$user->getId());
@@ -51,7 +51,7 @@ final class UserDeleteCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT/403: Доступ запрещен');
+        $I->wantTo('DELETE/403: Доступ запрещен');
 
         $this->authorized(I: $I);
         $user = UserFixtures::load(I: $I);
