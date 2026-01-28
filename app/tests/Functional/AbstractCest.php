@@ -9,6 +9,7 @@ use App\Enum\Role;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Scenario;
+use Codeception\Util\HttpCode;
 
 abstract class AbstractCest
 {
@@ -32,7 +33,7 @@ abstract class AbstractCest
                 'password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
             ]
         );
-        $I->seeResponseCodeIs(code: 200);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
         $I->haveHttpHeader(
