@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\Role;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Support\FunctionalTester;
+use Codeception\Scenario;
 
 abstract class AbstractCest
 {
@@ -57,5 +58,11 @@ abstract class AbstractCest
         }
 
         return $data;
+    }
+
+    protected static function setWantTo(Scenario $scenario, string $wantTo): void
+    {
+        $result = preg_replace('/^.*?\s+\|\s+/', $wantTo.' | ', $scenario->getFeature());
+        $scenario->setFeature($result);
     }
 }
