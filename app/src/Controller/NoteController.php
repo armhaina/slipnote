@@ -12,7 +12,8 @@ use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\ForbiddenException;
 use App\Mapper\Entity\NoteMapper;
 use App\Message\HttpStatusMessage;
-use App\Model\Payload\NotePayloadModel;
+use App\Model\Payload\NoteCreatePayloadModel;
+use App\Model\Payload\NoteUpdatePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NotePaginationResponseModelEntity;
@@ -233,7 +234,7 @@ class NoteController extends AbstractController
 
     #[Route(methods: [Request::METHOD_POST])]
     #[OA\Post(operationId: 'createNote', summary: 'Создать заметку')]
-    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: NoteCreatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -262,7 +263,7 @@ class NoteController extends AbstractController
             )
         )
     )]
-    public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
+    public function create(#[MapRequestPayload] NoteCreatePayloadModel $model): JsonResponse
     {
         $dateTimeImmutable = new \DateTimeImmutable();
 
@@ -290,7 +291,7 @@ class NoteController extends AbstractController
         methods: [Request::METHOD_PUT]
     )]
     #[OA\Put(operationId: 'updateNote', summary: 'Изменить заметку по ID')]
-    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: NoteUpdatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -331,7 +332,7 @@ class NoteController extends AbstractController
     public function update(
         Note $note,
         #[MapRequestPayload]
-        NotePayloadModel $model,
+        NoteUpdatePayloadModel $model,
     ): JsonResponse {
         if ($note->getUser() !== $this->getUser()) {
             throw new ForbiddenException();

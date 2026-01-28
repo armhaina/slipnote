@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints as Assert;
 
-readonly class UserPayloadModel
+readonly class UserCreatePayloadModel
 {
     public function __construct(
         #[Assert\NotBlank]

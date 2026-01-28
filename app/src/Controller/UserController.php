@@ -13,7 +13,8 @@ use App\Exception\Entity\User\ForbiddenException;
 use App\Exception\Entity\User\UserWithThisEmailAlreadyExistsException;
 use App\Mapper\Entity\UserMapper;
 use App\Message\HttpStatusMessage;
-use App\Model\Payload\UserPayloadModel;
+use App\Model\Payload\UserCreatePayloadModel;
+use App\Model\Payload\UserUpdatePayloadModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
@@ -97,7 +98,7 @@ class UserController extends AbstractController
     #[Route(methods: [Request::METHOD_POST])]
     #[DocSecurity]
     #[OA\Post(operationId: 'createUser', summary: 'Создать пользователя')]
-    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: UserCreatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -137,7 +138,7 @@ class UserController extends AbstractController
     )]
     public function create(
         #[MapRequestPayload]
-        UserPayloadModel $model,
+        UserCreatePayloadModel $model,
         Request $request
     ): JsonResponse {
         $token = $this->securityService->getBearerToken(request: $request);
@@ -181,7 +182,7 @@ class UserController extends AbstractController
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[DocSecurity(name: 'Bearer')]
     #[OA\Put(operationId: 'updateUser', summary: 'Изменить пользователя (только текущий пользователь)')]
-    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: UserUpdatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -231,7 +232,7 @@ class UserController extends AbstractController
     public function update(
         User $user,
         #[MapRequestPayload]
-        UserPayloadModel $model
+        UserUpdatePayloadModel $model
     ): JsonResponse {
         if ($user !== $this->getUser()) {
             throw new ForbiddenException();
@@ -241,11 +242,8 @@ class UserController extends AbstractController
             throw new UserWithThisEmailAlreadyExistsException(email: $model->getEmail());
         }
 
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $model->getPassword());
-
         $user
             ->setEmail(email: $model->getEmail())
-            ->setPassword(password: $hashedPassword)
             ->setUpdatedAt(dateTimeImmutable: new \DateTimeImmutable())
         ;
 
