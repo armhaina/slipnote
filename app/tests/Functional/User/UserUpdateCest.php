@@ -52,7 +52,7 @@ final class UserUpdateCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT/'.HttpCode::FORBIDDEN.': Доступ запрещен');
+        $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
         $user = UserFixtures::load(I: $I);
