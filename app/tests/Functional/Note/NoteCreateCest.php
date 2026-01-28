@@ -14,6 +14,8 @@ use Faker\Factory;
 
 final class NoteCreateCest extends AbstractCest
 {
+    private const string URL = '/api/v1/notes';
+
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
@@ -21,7 +23,7 @@ final class NoteCreateCest extends AbstractCest
 
         $this->authorized(I: $I);
 
-        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
+        $I->sendPost(url: self::URL, params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -38,7 +40,7 @@ final class NoteCreateCest extends AbstractCest
 
         $this->authorized(I: $I);
 
-        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
+        $I->sendPost(url: self::URL, params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
@@ -53,7 +55,7 @@ final class NoteCreateCest extends AbstractCest
     {
         $I->wantTo('POST: Ошибка авторизации');
 
-        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
+        $I->sendPost(url: self::URL, params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 

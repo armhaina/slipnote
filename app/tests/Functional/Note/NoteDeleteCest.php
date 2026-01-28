@@ -14,6 +14,8 @@ use Codeception\Util\HttpCode;
 
 final class NoteDeleteCest extends AbstractCest
 {
+    private const string URL = '/api/v1/notes';
+
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
@@ -22,7 +24,7 @@ final class NoteDeleteCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -40,7 +42,7 @@ final class NoteDeleteCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -57,7 +59,7 @@ final class NoteDeleteCest extends AbstractCest
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 

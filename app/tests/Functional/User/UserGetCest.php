@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Note;
+namespace App\Tests\Functional\User;
 
-use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
@@ -12,19 +11,18 @@ use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
 
-final class NoteGetCest extends AbstractCest
+final class UserGetCest extends AbstractCest
 {
-    private const string URL = '/api/v1/notes';
+    private const string URL = '/api/v1/users';
 
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить заметку');
+        $I->wantTo('GET: Получить пользователя (только текущий пользователь)');
 
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $user = $this->authorized(I: $I);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendGet(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -39,9 +37,9 @@ final class NoteGetCest extends AbstractCest
     {
         $I->wantTo('GET: Ошибка авторизации');
 
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $user = UserFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendGet(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -57,9 +55,9 @@ final class NoteGetCest extends AbstractCest
         $I->wantTo('GET: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $user = UserFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendGet(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -73,15 +71,8 @@ final class NoteGetCest extends AbstractCest
     {
         return [
             [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
                 'response' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
                 ],
             ],
         ];
@@ -92,9 +83,7 @@ final class NoteGetCest extends AbstractCest
         return [
             [
                 'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'email' => 'test@mail.ru',
                 ],
                 'response' => [
                     'code' => 401,
@@ -109,9 +98,7 @@ final class NoteGetCest extends AbstractCest
         return [
             [
                 'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => 'test_0@mail.ru'],
+                    'email' => 'test@mail.ru',
                 ],
                 'response' => [
                     'success' => false,

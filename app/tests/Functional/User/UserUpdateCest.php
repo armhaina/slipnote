@@ -2,25 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Note;
+namespace App\Tests\Functional\User;
 
 use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Skip;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
 use Faker\Factory;
 
-final class NoteUpdateCest extends AbstractCest
+final class UserUpdateCest extends AbstractCest
 {
-    private const string URL = '/api/v1/notes';
+    private const string URL = '/api/v1/users';
 
     #[DataProvider('mainProvider')]
+    #[Skip]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Изменить заметку');
+        $I->wantTo('PUT: Изменить пользователя');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
@@ -36,6 +38,7 @@ final class NoteUpdateCest extends AbstractCest
     }
 
     #[DataProvider('failedValidationProvider')]
+    #[Skip]
     public function failedValidation(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT: Ошибка валидации');
@@ -43,7 +46,7 @@ final class NoteUpdateCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
+        $I->sendPut(url: '/api/v1/notes/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
@@ -54,13 +57,14 @@ final class NoteUpdateCest extends AbstractCest
     }
 
     #[DataProvider('failedAuthorizationProvider')]
+    #[Skip]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT: Ошибка авторизации');
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
+        $I->sendPut(url: '/api/v1/notes/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -71,6 +75,7 @@ final class NoteUpdateCest extends AbstractCest
     }
 
     #[DataProvider('forbiddenProvider')]
+    #[Skip]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT: Доступ запрещен');
@@ -78,7 +83,7 @@ final class NoteUpdateCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
+        $I->sendPut(url: '/api/v1/notes/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 

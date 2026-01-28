@@ -14,6 +14,8 @@ use Codeception\Util\HttpCode;
 
 final class NoteListCest extends AbstractCest
 {
+    private const string URL = '/api/v1/notes';
+
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
@@ -25,7 +27,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture);
         }
 
-        $I->sendGet(url: '/api/v1/notes');
+        $I->sendGet(url: self::URL);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -44,7 +46,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture);
         }
 
-        $I->sendGet(url: '/api/v1/notes');
+        $I->sendGet(url: self::URL);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -67,7 +69,7 @@ final class NoteListCest extends AbstractCest
             $noteIds[] = NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['ids' => $noteIds]);
+        $I->sendGet(url: self::URL, params: ['ids' => $noteIds]);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -91,7 +93,7 @@ final class NoteListCest extends AbstractCest
             $users[] = $note->getUser()->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['user_ids' => $users]);
+        $I->sendGet(url: self::URL, params: ['user_ids' => $users]);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -112,7 +114,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture);
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['updated_at_less' => $example['query']['updated_at_less']]);
+        $I->sendGet(url: self::URL, params: ['updated_at_less' => $example['query']['updated_at_less']]);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -133,7 +135,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[name]' => 'asc']);
+        $I->sendGet(url: self::URL, params: ['order_by[name]' => 'asc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -154,7 +156,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[name]' => 'desc']);
+        $I->sendGet(url: self::URL, params: ['order_by[name]' => 'desc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -175,7 +177,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[created_at]' => 'asc']);
+        $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'asc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -196,7 +198,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[created_at]' => 'desc']);
+        $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'desc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -217,7 +219,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[updated_at]' => 'asc']);
+        $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'asc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -238,7 +240,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[updated_at]' => 'desc']);
+        $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'desc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
