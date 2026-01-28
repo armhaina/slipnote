@@ -20,7 +20,7 @@ final class NoteUpdateCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Изменить заметку');
+        $I->wantTo('PUT/200: Изменить заметку');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
@@ -38,7 +38,7 @@ final class NoteUpdateCest extends AbstractCest
     #[DataProvider('failedValidationProvider')]
     public function failedValidation(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Ошибка валидации');
+        $I->wantTo('PUT/422: Ошибка валидации');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
@@ -56,7 +56,7 @@ final class NoteUpdateCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Ошибка авторизации');
+        $I->wantTo('PUT/401: Ошибка авторизации');
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
@@ -73,7 +73,7 @@ final class NoteUpdateCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT: Доступ запрещен');
+        $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);

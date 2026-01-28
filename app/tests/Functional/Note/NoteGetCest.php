@@ -19,7 +19,7 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить заметку');
+        $I->wantTo('GET/200: Получить заметку');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
@@ -37,7 +37,7 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Ошибка авторизации');
+        $I->wantTo('GET/401: Ошибка авторизации');
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
@@ -54,7 +54,7 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Доступ запрещен');
+        $I->wantTo('GET/403: Доступ запрещен');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);

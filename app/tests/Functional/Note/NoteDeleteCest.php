@@ -19,7 +19,7 @@ final class NoteDeleteCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('DELETE: Удалить заметку');
+        $I->wantTo('DELETE/200: Удалить заметку');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
@@ -34,16 +34,15 @@ final class NoteDeleteCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('forbiddenProvider')]
-    public function forbidden(FunctionalTester $I, Example $example): void
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('DELETE: Доступ запрещен');
+        $I->wantTo('DELETE/401: Ошибка авторизации');
 
-        $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
         $I->sendDelete(url: self::URL.'/'.$note->getId());
-        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -52,15 +51,16 @@ final class NoteDeleteCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    #[DataProvider('forbiddenProvider')]
+    public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('DELETE: Ошибка авторизации');
+        $I->wantTo('DELETE/403: Доступ запрещен');
 
+        $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
         $I->sendDelete(url: self::URL.'/'.$note->getId());
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);

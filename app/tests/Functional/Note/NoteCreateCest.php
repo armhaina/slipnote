@@ -19,7 +19,7 @@ final class NoteCreateCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST: Создать заметку');
+        $I->wantTo('POST/200: Создать заметку');
 
         $this->authorized(I: $I);
 
@@ -33,15 +33,13 @@ final class NoteCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST: Ошибка валидации');
-
-        $this->authorized(I: $I);
+        $I->wantTo('POST/401: Ошибка авторизации');
 
         $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -50,13 +48,15 @@ final class NoteCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    #[DataProvider('failedValidationProvider')]
+    public function failedValidation(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST: Ошибка авторизации');
+        $I->wantTo('POST/422: Ошибка валидации');
+
+        $this->authorized(I: $I);
 
         $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);

@@ -19,7 +19,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок');
+        $I->wantTo('GET/200: Получить список заметок');
 
         $this->authorized(I: $I);
 
@@ -37,29 +37,10 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET: Ошибка авторизации');
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
-        }
-
-        $I->sendGet(url: self::URL);
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
     #[DataProvider('idsProvider')]
     public function paramIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [ids]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [ids]');
 
         $this->authorized(I: $I);
 
@@ -79,10 +60,29 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET/401: Ошибка авторизации');
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture);
+        }
+
+        $I->sendGet(url: self::URL);
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     #[DataProvider('userIdsProvider')]
     public function paramUserIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [user_ids]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [user_ids]');
 
         $this->authorized(I: $I);
 
@@ -106,7 +106,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('updatedAtLessProvider')]
     public function paramUpdatedAtLess(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [updated_at_less]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [updated_at_less]');
 
         $this->authorized(I: $I);
 
@@ -127,7 +127,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByNameAscProvider')]
     public function paramOrderByNameAsc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[name]=asc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[name]=asc]');
 
         $this->authorized(I: $I);
 
@@ -148,7 +148,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByNameDescProvider')]
     public function paramOrderByNameDesc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[name]=desc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[name]=desc]');
 
         $this->authorized(I: $I);
 
@@ -169,7 +169,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByCreatedAtAscProvider')]
     public function paramOrderByCreatedAtAsc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[created_at]=asc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[created_at]=asc]');
 
         $this->authorized(I: $I);
 
@@ -190,7 +190,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByCreatedAtDescProvider')]
     public function paramOrderByCreatedAtDesc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[created_at]=desc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[created_at]=desc]');
 
         $this->authorized(I: $I);
 
@@ -211,7 +211,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByUpdatedAtAscProvider')]
     public function paramOrderByUpdatedAtAsc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[updated_at]=asc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[updated_at]=asc]');
 
         $this->authorized(I: $I);
 
@@ -232,7 +232,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByUpdatedAtDescProvider')]
     public function paramOrderByUpdatedAtDesc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[updated_at]=desc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[updated_at]=desc]');
 
         $this->authorized(I: $I);
 
