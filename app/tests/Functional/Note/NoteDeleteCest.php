@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
+use App\Entity\Note;
 use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
@@ -30,6 +31,8 @@ final class NoteDeleteCest extends AbstractCest
 
         $data = json_decode($I->grabResponse(), true);
         $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->dontSeeInRepository(entity: Note::class, params: ['name' => $note->getName()]);
 
         $I->assertEquals(expected: $example['response'], actual: $data);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\User;
 
+use App\Entity\User;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
@@ -28,6 +29,8 @@ final class UserDeleteCest extends AbstractCest
 
         $data = json_decode($I->grabResponse(), true);
         $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->dontSeeInRepository(entity: User::class, params: ['email' => $user->getEmail()]);
 
         $I->assertEquals(expected: $example['response'], actual: $data);
     }

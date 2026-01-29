@@ -8,6 +8,7 @@ use App\Entity\Note;
 use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
+use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\ForbiddenException;
 use App\Mapper\Entity\NoteMapper;
@@ -391,6 +392,9 @@ class NoteController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
+    /**
+     * @throws EntityNotFoundWhenDeleteException
+     */
     #[Route(
         path: '/{id}',
         requirements: ['id' => '\d+'],
@@ -437,6 +441,69 @@ class NoteController extends AbstractController
             throw new ForbiddenException();
         }
 
+        $this->noteService->delete(entity: $note);
+
         return $this->json(data: new DeleteResponseModelAction());
+    }
+
+    /**
+     * @throws EntityNotFoundWhenUpdateException
+     */
+    #[Route(
+        path: '/{id}/trash',
+        requirements: ['id' => '\d+'],
+        methods: [Request::METHOD_DELETE]
+    )]
+    #[OA\Delete(operationId: 'trashNote', summary: 'Переместить заметку в корзину по ID')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(type: DeleteResponseModelAction::class)
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
+    public function trash(Note $note): JsonResponse
+    {
+        if ($note->getUser() !== $this->getUser()) {
+            throw new ForbiddenException();
+        }
+
+        if (!$note->getIsTrash()) {
+            $note
+                ->setIsTrash(isTrash: true)
+                ->setDeletedAt(deletedAt: new \DateTimeImmutable())
+            ;
+
+            $this->noteService->update(entity: $note);
+        }
+
+        return $this->json(data: new DeleteResponseModelAction(message: 'Запись успешно перенесена в корзину'));
     }
 }
