@@ -35,8 +35,8 @@ readonly class NoteResponseModelEntity
             description: 'Корзина',
             type: 'boolean',
         )]
-        #[SerializedName(serializedName: 'is_trash')]
-        private bool $isTrash,
+        #[SerializedName(serializedName: 'is_trashed')]
+        private bool $isTrashed,
         #[Groups([Group::PUBLIC->value])]
         #[OA\Property(
             description: 'Пользователь (владелец заметки)',
@@ -59,9 +59,9 @@ readonly class NoteResponseModelEntity
         return $this->description;
     }
 
-    public function getIsTrash(): bool
+    public function getIsTrashed(): bool
     {
-        return $this->isTrash;
+        return $this->isTrashed;
     }
 
     public function getUser(): UserResponseModelEntity

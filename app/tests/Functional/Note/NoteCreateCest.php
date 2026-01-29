@@ -76,7 +76,7 @@ final class NoteCreateCest extends AbstractCest
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
-                    'is_trash' => false,
+                    'is_trashed' => false,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
             ],

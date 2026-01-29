@@ -104,6 +104,7 @@ final class NoteUpdateCest extends AbstractCest
                 'response' => [
                     'name' => 'Заметка_1',
                     'description' => 'Описание заметки_1',
+                    'is_trashed' => false,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
             ],

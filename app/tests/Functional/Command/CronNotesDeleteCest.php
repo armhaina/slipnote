@@ -23,7 +23,7 @@ final class CronNotesDeleteCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Удалить заметки из корзины');
+        $I->wantTo('COMMAND/200: Удалить заметки из корзины');
 
         foreach ($example['fixtures'] as $fixture) {
             NoteFixtures::load(I: $I, data: $fixture);
@@ -66,7 +66,7 @@ final class CronNotesDeleteCest extends AbstractCest
                     [
                         'name' => 'Заметка_2',
                         'description' => 'Описание заметки_2',
-                        'is_trash' => true,
+                        'is_trashed' => true,
                         'deleted_at' => new \DateTimeImmutable()->modify(modifier: '-15 days'),
                         'user' => ['email' => 'test_2@mail.ru'],
                     ], // НЕ удаляем потому что deleted_at меньше 30 дней
@@ -79,13 +79,13 @@ final class CronNotesDeleteCest extends AbstractCest
                     [
                         'name' => 'Заметка_4',
                         'description' => 'Описание заметки_4',
-                        'is_trash' => true,
+                        'is_trashed' => true,
                         'user' => ['email' => 'test_4@mail.ru'],
                     ], // НЕ удаляем потому что deleted_at не заполнено
                     [
                         'name' => 'Заметка_5',
                         'description' => 'Описание заметки_5',
-                        'is_trash' => true,
+                        'is_trashed' => true,
                         'deleted_at' => new \DateTimeImmutable()->modify(modifier: '-31 days'),
                         'user' => ['email' => 'test_5@mail.ru'],
                     ], // УДАЛЯЕМ

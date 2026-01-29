@@ -454,7 +454,7 @@ class NoteController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_DELETE]
     )]
-    #[OA\Delete(operationId: 'trashNote', summary: 'Переместить заметку в корзину по ID')]
+    #[OA\Delete(operationId: 'deleteInTrashNote', summary: 'Удалить заметку в корзину по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -489,7 +489,7 @@ class NoteController extends AbstractController
             )
         )
     )]
-    public function trash(Note $note): JsonResponse
+    public function deleteInTrash(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
             throw new ForbiddenException();

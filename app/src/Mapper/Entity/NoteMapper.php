@@ -30,7 +30,7 @@ readonly class NoteMapper
             id: $note->getId(),
             name: $note->getName(),
             description: $note->getDescription(),
-            isTrash: $note->getIsTrashed(),
+            isTrashed: $note->getIsTrashed(),
             user: $this->user(user: $user, context: $context)
         );
     }

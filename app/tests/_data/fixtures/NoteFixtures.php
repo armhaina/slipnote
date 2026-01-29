@@ -16,7 +16,7 @@ class NoteFixtures
 
         $name = $data['name'] ?? $faker->name;
         $description = $data['description'] ?? $faker->text();
-        $isTrash = $data['is_trash'] ?? false;
+        $isTrashed = $data['is_trashed'] ?? false;
         $user = UserFixtures::load(I: $I, data: $data['user'] ?? []);
         $deletedAt = $data['deleted_at'] ?? null;
         $createdAt = $data['created_at'] ?? $dateTimeImmutable;
@@ -25,7 +25,7 @@ class NoteFixtures
         $id = $I->haveInRepository(classNameOrInstance: Note::class, data: [
             'name' => $name,
             'description' => $description,
-            'isTrash' => $isTrash,
+            'isTrashed' => $isTrashed,
             'user' => $user,
             'deletedAt' => $deletedAt,
             'createdAt' => $createdAt,

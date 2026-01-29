@@ -9,10 +9,8 @@ use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
-use Codeception\Attribute\Skip;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
-use Faker\Factory;
 
 final class NoteTrashCest extends AbstractCest
 {
@@ -21,12 +19,12 @@ final class NoteTrashCest extends AbstractCest
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT/200: Переместить заметку в корзину');
+        $I->wantTo('PUT/200: Удалить заметку в корзину');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
+        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -37,14 +35,13 @@ final class NoteTrashCest extends AbstractCest
     }
 
     #[DataProvider('failedAuthorizationProvider')]
-    #[Skip]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT/401: Ошибка авторизации');
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
+        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -55,7 +52,6 @@ final class NoteTrashCest extends AbstractCest
     }
 
     #[DataProvider('forbiddenProvider')]
-    #[Skip]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT/403: Доступ запрещен');
@@ -63,27 +59,8 @@ final class NoteTrashCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
+        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedValidationProvider')]
-    #[Skip]
-    public function failedValidation(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/422: Ошибка валидации');
-
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -104,41 +81,8 @@ final class NoteTrashCest extends AbstractCest
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'is_trash' => true,
+                    'is_trashed' => true,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
-            ],
-        ];
-    }
-
-    protected function failedValidationProvider(): array
-    {
-        $faker = Factory::create();
-
-        return [
-            [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
-                'request' => [
-                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
-                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Ошибка валидации',
-                    'errors' => [
-                        [
-                            'property' => 'name',
-                            'message' => 'Название должно содержать максимум 100 символов',
-                        ],
-                        [
-                            'property' => 'description',
-                            'message' => 'Описание должно содержать максимум 10000 символов',
-                        ],
-                    ],
                 ],
             ],
         ];
@@ -152,10 +96,6 @@ final class NoteTrashCest extends AbstractCest
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
-                'request' => [
-                    'name' => 'Заметка_1',
-                    'description' => 'Описание заметки_1',
                 ],
                 'response' => [
                     'code' => 401,
