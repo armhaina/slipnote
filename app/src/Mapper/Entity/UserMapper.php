@@ -7,7 +7,7 @@ namespace App\Mapper\Entity;
 use App\Entity\User;
 use App\Model\Response\Entity\UserPaginationResponseModelEntity;
 use App\Model\Response\Entity\UserResponseModelEntity;
-use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
+use App\Service\PaginationService;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 
 readonly class UserMapper
@@ -43,17 +43,11 @@ readonly class UserMapper
      */
     public function pagination(PaginationInterface $pagination, array $context = []): UserPaginationResponseModelEntity
     {
-        if ($pagination instanceof SlidingPagination) {
-            $pages = $pagination->getPageCount();
-        } else {
-            $pages = (int) ceil($pagination->getTotalItemCount() / $pagination->getItemNumberPerPage());
-        }
-
         return new UserPaginationResponseModelEntity(
             count: $pagination->count(),
             page: $pagination->getCurrentPageNumber(),
             total: $pagination->getTotalItemCount(),
-            pages: $pages,
+            pages: PaginationService::getPages(pagination: $pagination),
             items: $this->collection(users: $pagination->getItems())
         );
     }

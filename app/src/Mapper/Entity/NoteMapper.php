@@ -9,7 +9,7 @@ use App\Entity\User;
 use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Entity\UserResponseModelEntity;
-use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
+use App\Service\PaginationService;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 
 readonly class NoteMapper
@@ -54,17 +54,11 @@ readonly class NoteMapper
      */
     public function pagination(PaginationInterface $pagination, array $context = []): NotePaginationResponseModelEntity
     {
-        if ($pagination instanceof SlidingPagination) {
-            $pages = $pagination->getPageCount();
-        } else {
-            $pages = (int) ceil($pagination->getTotalItemCount() / $pagination->getItemNumberPerPage());
-        }
-
         return new NotePaginationResponseModelEntity(
             count: $pagination->count(),
             page: $pagination->getCurrentPageNumber(),
             total: $pagination->getTotalItemCount(),
-            pages: $pages,
+            pages: PaginationService::getPages(pagination: $pagination),
             items: $this->collection(notes: $pagination->getItems())
         );
     }
