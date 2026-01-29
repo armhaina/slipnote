@@ -123,8 +123,8 @@ class NoteRepository extends AbstractRepository
         if ($queryModel->getSearch()) {
             $query->andWhere(
                 $query->expr()->orX(
-                    $query->expr()->like('LOWER('.Note::shortName().'.name)', ':search'),
-                    $query->expr()->like('LOWER('.Note::shortName().'.description)', ':search')
+                    $query->expr()->like('LOWER('.Note::shortName().'.name)', 'LOWER(:search)'),
+                    $query->expr()->like('LOWER('.Note::shortName().'.description)', 'LOWER(:search)')
                 )
             )->setParameter('search', '%'.$queryModel->getSearch().'%');
         }
