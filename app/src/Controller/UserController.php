@@ -20,6 +20,7 @@ use App\Model\Payload\UserUpdatePayloadModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
+use App\Model\Response\Exception\ExpiredJWTTokenModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\Entity\UserService;
@@ -80,6 +81,15 @@ class UserController extends AbstractController
         content: new OA\JsonContent(
             ref: new Model(
                 type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
             )
         )
     )]
@@ -231,6 +241,15 @@ class UserController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function update(
         User $user,
         #[MapRequestPayload]
@@ -305,6 +324,15 @@ class UserController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function updatePassword(
         User $user,
         #[MapRequestPayload]
@@ -365,6 +393,15 @@ class UserController extends AbstractController
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
             )
         )
     )]
