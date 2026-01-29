@@ -34,10 +34,28 @@ final class UserUpdatePasswordCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('failedInvalidCurrentPasswordProvider')]
+    public function failedInvalidCurrentPassword(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('PUT/400: Неверный текущий пароль пользователя');
+
+        $user = $this->authorized(I: $I);
+
+        $I->sendPut(url: self::URL.'/'.$user->getId().'/password', params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::BAD_REQUEST);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT/401: Ошибка авторизации');
+
         $user = UserFixtures::load(I: $I);
 
         $I->sendPut(url: self::URL.'/'.$user->getId().'/password');
@@ -112,6 +130,22 @@ final class UserUpdatePasswordCest extends AbstractCest
                 ],
                 'response' => [
                     'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
+                ],
+            ],
+        ];
+    }
+
+    protected function failedInvalidCurrentPasswordProvider(): array
+    {
+        return [
+            [
+                'request' => [
+                    'current_password' => 'invalidate_password',
+                    'new_password' => 'password123',
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Неверный текущий пароль пользователя',
                 ],
             ],
         ];

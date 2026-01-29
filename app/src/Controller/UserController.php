@@ -333,6 +333,15 @@ class UserController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_BAD_REQUEST],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
     public function updatePassword(
         User $user,
         #[MapRequestPayload]
