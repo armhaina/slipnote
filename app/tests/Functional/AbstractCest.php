@@ -61,6 +61,7 @@ abstract class AbstractCest
         return $data;
     }
 
+    #[\Deprecated]
     protected static function setWantTo(Scenario $scenario, string $wantTo): void
     {
         $result = preg_replace('/^.*?\s+\|\s+/', $wantTo.' | ', $scenario->getFeature());
