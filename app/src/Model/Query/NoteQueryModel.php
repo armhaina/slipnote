@@ -27,6 +27,8 @@ class NoteQueryModel
     private array $orderBy = [];
     #[SerializedName(serializedName: 'updated_at_less')]
     private ?\DateTimeImmutable $updatedAtLess = null;
+    #[SerializedName(serializedName: 'deleted_at_less')]
+    private ?\DateTimeImmutable $deletedAtLess = null;
 
     public function getLimit(): int
     {
@@ -126,6 +128,18 @@ class NoteQueryModel
     public function setUpdatedAtLess(\DateTimeImmutable $updatedAtLess): self
     {
         $this->updatedAtLess = $updatedAtLess;
+
+        return $this;
+    }
+
+    public function getDeletedAtLess(): ?\DateTimeImmutable
+    {
+        return $this->deletedAtLess;
+    }
+
+    public function setDeletedAtLess(\DateTimeImmutable $deletedAtLess): self
+    {
+        $this->deletedAtLess = $deletedAtLess;
 
         return $this;
     }

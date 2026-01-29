@@ -106,6 +106,13 @@ class NoteRepository extends AbstractRepository
             ;
         }
 
+        if ($queryModel->getDeletedAtLess()) {
+            $query
+                ->setParameter('deletedAtLess', $queryModel->getDeletedAtLess())
+                ->andWhere(Note::shortName().'.deletedAt < :deletedAtLess')
+            ;
+        }
+
         if (is_bool($queryModel->getIsTrash())) {
             $query
                 ->setParameter('isTrash', $queryModel->getIsTrash())
