@@ -9,30 +9,32 @@ use App\Enum\Group;
 use App\Enum\Role;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
-use App\Exception\Entity\User\UserFoundException;
+use App\Exception\Entity\User\EmailAlreadyExistsException;
+use App\Exception\Entity\User\ForbiddenException;
+use App\Exception\Entity\User\InvalidCurrentPasswordException;
 use App\Mapper\Entity\UserMapper;
 use App\Message\HttpStatusMessage;
-use App\Model\Payload\UserPayloadModel;
+use App\Model\Payload\UserCreatePayloadModel;
+use App\Model\Payload\UserUpdatePasswordPayloadModel;
+use App\Model\Payload\UserUpdatePayloadModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
+use App\Model\Response\Exception\ExpiredJWTTokenModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
-use App\Service\UserService;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use App\Service\Entity\UserService;
+use App\Service\SecurityService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security as DocSecurity;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/v1/users')]
@@ -42,7 +44,8 @@ class UserController extends AbstractController
     public function __construct(
         private readonly UserService $userService,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly UserMapper $userMapper
+        private readonly UserMapper $userMapper,
+        private readonly SecurityService $securityService
     ) {}
 
     #[Route(
@@ -81,10 +84,19 @@ class UserController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function get(User $user): JsonResponse
     {
         if ($user !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         $responseModel = $this->userMapper->one(user: $user);
@@ -93,12 +105,12 @@ class UserController extends AbstractController
     }
 
     /**
-     * @throws UserFoundException
+     * @throws EmailAlreadyExistsException
      */
     #[Route(methods: [Request::METHOD_POST])]
     #[DocSecurity]
     #[OA\Post(operationId: 'createUser', summary: 'Создать пользователя')]
-    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: UserCreatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -138,26 +150,17 @@ class UserController extends AbstractController
     )]
     public function create(
         #[MapRequestPayload]
-        UserPayloadModel $model,
-        TokenStorageInterface $tokenStorage,
-        JWTTokenManagerInterface $jwtManager
+        UserCreatePayloadModel $model,
+        Request $request
     ): JsonResponse {
-        //        // Проверяем, есть ли уже валидный токен
-        //        $token = $tokenStorage->getToken();
-        //
-        //        if ($token && $token->getUser()) {
-        //            // Проверяем, что это именно JWT токен (не анонимный или другой тип)
-        //            if ($token->hasAttribute('jwt') || $token->getCredentials()) {
-        //                throw new AccessDeniedHttpException(
-        //                    'Вы уже авторизованы. Пожалуйста, сначала выполните logout.'
-        //                );
-        //            }
-        //        }
-        //
-        //        $test = $this->security->getUser();
+        $token = $this->securityService->getBearerToken(request: $request);
+
+        if ($token && $this->securityService->isValidJwtToken(token: $token)) {
+            throw new ForbiddenException();
+        }
 
         if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
-            throw new UserFoundException(email: $model->getEmail());
+            throw new EmailAlreadyExistsException(email: $model->getEmail());
         }
 
         $dateTimeImmutable = new \DateTimeImmutable();
@@ -191,7 +194,7 @@ class UserController extends AbstractController
     #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[DocSecurity(name: 'Bearer')]
     #[OA\Put(operationId: 'updateUser', summary: 'Изменить пользователя (только текущий пользователь)')]
-    #[OA\RequestBody(content: new Model(type: UserPayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: UserUpdatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -238,23 +241,123 @@ class UserController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function update(
         User $user,
         #[MapRequestPayload]
-        UserPayloadModel $model
+        UserUpdatePayloadModel $model
     ): JsonResponse {
         if ($user !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         if ($this->userService->checkExistsEmail(email: $model->getEmail())) {
-            throw new UserFoundException(email: $model->getEmail());
+            throw new EmailAlreadyExistsException(email: $model->getEmail());
         }
-
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $model->getPassword());
 
         $user
             ->setEmail(email: $model->getEmail())
+            ->setUpdatedAt(dateTimeImmutable: new \DateTimeImmutable())
+        ;
+
+        $entity = $this->userService->update(entity: $user);
+
+        $responseModel = $this->userMapper->one(user: $entity);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+    }
+
+    /**
+     * @throws EntityNotFoundWhenUpdateException
+     */
+    #[Route(
+        path: '/{id}/password',
+        requirements: ['id' => '\d+'],
+        methods: [Request::METHOD_PUT]
+    )]
+    #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
+    #[DocSecurity(name: 'Bearer')]
+    #[OA\Put(operationId: 'updatePasswordUser', summary: 'Изменить пароль пользователя (только текущий пользователь)')]
+    #[OA\RequestBody(content: new Model(type: UserUpdatePasswordPayloadModel::class))]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: UserResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNPROCESSABLE_ENTITY,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ValidationResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_BAD_REQUEST],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    public function updatePassword(
+        User $user,
+        #[MapRequestPayload]
+        UserUpdatePasswordPayloadModel $model
+    ): JsonResponse {
+        if ($user !== $this->getUser()) {
+            throw new ForbiddenException();
+        }
+
+        if (!$this->passwordHasher->isPasswordValid(user: $user, plainPassword: $model->getCurrentPassword())) {
+            throw new InvalidCurrentPasswordException();
+        }
+
+        $hashedPassword = $this->passwordHasher->hashPassword(user: $user, plainPassword: $model->getNewPassword());
+
+        $user
             ->setPassword(password: $hashedPassword)
             ->setUpdatedAt(dateTimeImmutable: new \DateTimeImmutable())
         ;
@@ -302,10 +405,19 @@ class UserController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function delete(User $user): JsonResponse
     {
         if ($user !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         $this->userService->delete(entity: $user);

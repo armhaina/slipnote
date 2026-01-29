@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\RepositoryInterface;
 use App\Entity\Note;
 use App\Model\Query\NoteQueryModel;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,7 +13,7 @@ use Ds\Vector;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 
-class NoteRepository extends AbstractRepository implements RepositoryInterface
+class NoteRepository extends AbstractRepository
 {
     public function __construct(
         ManagerRegistry $registry,
@@ -55,7 +54,7 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
 
         return $this->paginator->paginate(
             target: $queryBuilder->getQuery(),
-            page: $queryModel->getOffset(),
+            page: (0 === $queryModel->getOffset() ? 1 : $queryModel->getOffset()),
             limit: $queryModel->getLimit()
         );
     }
@@ -78,17 +77,12 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
     {
         $query = $this->createQueryBuilder(Note::shortName());
 
+        $query->setFirstResult($queryModel->getOffset());
+        $query->setMaxResults($queryModel->getLimit());
+
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
             $query->addOrderBy(sort: Note::shortName().'.'.$column, order: $order);
-        }
-
-        if (!empty($queryModel->getOffset())) {
-            $query->setFirstResult($queryModel->getOffset());
-        }
-
-        if (!empty($queryModel->getLimit())) {
-            $query->setMaxResults($queryModel->getLimit());
         }
 
         if ($queryModel->getIds()) {
@@ -110,6 +104,29 @@ class NoteRepository extends AbstractRepository implements RepositoryInterface
                 ->setParameter('updatedAtLess', $queryModel->getUpdatedAtLess())
                 ->andWhere(Note::shortName().'.updatedAt < :updatedAtLess')
             ;
+        }
+
+        if ($queryModel->getDeletedAtLess()) {
+            $query
+                ->setParameter('deletedAtLess', $queryModel->getDeletedAtLess())
+                ->andWhere(Note::shortName().'.deletedAt < :deletedAtLess')
+            ;
+        }
+
+        if (is_bool($queryModel->getIsTrashed())) {
+            $query
+                ->setParameter('isTrashed', $queryModel->getIsTrashed())
+                ->andWhere(Note::shortName().'.isTrashed = :isTrashed')
+            ;
+        }
+
+        if ($queryModel->getSearch()) {
+            $query->andWhere(
+                $query->expr()->orX(
+                    $query->expr()->like('LOWER('.Note::shortName().'.name)', 'LOWER(:search)'),
+                    $query->expr()->like('LOWER('.Note::shortName().'.description)', 'LOWER(:search)')
+                )
+            )->setParameter('search', '%'.$queryModel->getSearch().'%');
         }
 
         return $query;

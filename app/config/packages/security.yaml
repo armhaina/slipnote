@@ -10,6 +10,9 @@ security:
         class: App\Entity\User
         property: email
   firewalls:
+    register:
+      pattern: ^/api/v1/users$ # точный маршрут (для запроса со слэшом на конце: ^/api/v1/users/?$)
+      methods: [POST]
     login:
       pattern: ^/api/login
       stateless: true

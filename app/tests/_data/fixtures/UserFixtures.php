@@ -17,10 +17,14 @@ class UserFixtures
     {
         $faker = Factory::create();
 
+        $dateTimeImmutable = new \DateTimeImmutable();
+
         $passwordHasher = $I->grabService(serviceId: UserPasswordHasherInterface::class);
 
         $roles = $data['roles'] ?? [Role::ROLE_USER->value];
         $email = $data['email'] ?? $faker->email();
+        $createdAt = $data['created_at'] ?? $dateTimeImmutable;
+        $updatedAt = $data['updated_at'] ?? $dateTimeImmutable;
 
         if (self::USER_AUTHORIZED_EMAIL === $email) {
             $password = self::USER_AUTHORIZED_PASSWORD;
@@ -37,6 +41,8 @@ class UserFixtures
                 'email' => $email,
                 'password' => $password,
                 'roles' => $roles,
+                'createdAt' => $createdAt,
+                'updatedAt' => $updatedAt,
             ]);
 
             $entity = $I->grabEntityFromRepository(entity: User::class, params: ['id' => $id]);

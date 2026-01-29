@@ -11,7 +11,10 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
 class NoteQueryModel
 {
     private int $limit = 20;
-    private int $offset = 1;
+    private int $offset = 0;
+    #[SerializedName(serializedName: 'is_trashed')]
+    private ?bool $isTrashed = null;
+    private ?string $search = null;
     /** @var array<int> */
     #[Ignore]
     private ?array $ids = null;
@@ -26,6 +29,8 @@ class NoteQueryModel
     private array $orderBy = [];
     #[SerializedName(serializedName: 'updated_at_less')]
     private ?\DateTimeImmutable $updatedAtLess = null;
+    #[SerializedName(serializedName: 'deleted_at_less')]
+    private ?\DateTimeImmutable $deletedAtLess = null;
 
     public function getLimit(): int
     {
@@ -47,6 +52,30 @@ class NoteQueryModel
     public function setOffset(int $offset): self
     {
         $this->offset = $offset;
+
+        return $this;
+    }
+
+    public function getIsTrashed(): ?bool
+    {
+        return $this->isTrashed;
+    }
+
+    public function setIsTrashed(bool $isTrashed): self
+    {
+        $this->isTrashed = $isTrashed;
+
+        return $this;
+    }
+
+    public function getSearch(): ?string
+    {
+        return $this->search;
+    }
+
+    public function setSearch(string $search): self
+    {
+        $this->search = $search;
 
         return $this;
     }
@@ -113,6 +142,18 @@ class NoteQueryModel
     public function setUpdatedAtLess(\DateTimeImmutable $updatedAtLess): self
     {
         $this->updatedAtLess = $updatedAtLess;
+
+        return $this;
+    }
+
+    public function getDeletedAtLess(): ?\DateTimeImmutable
+    {
+        return $this->deletedAtLess;
+    }
+
+    public function setDeletedAtLess(\DateTimeImmutable $deletedAtLess): self
+    {
+        $this->deletedAtLess = $deletedAtLess;
 
         return $this;
     }

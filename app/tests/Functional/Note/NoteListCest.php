@@ -14,10 +14,12 @@ use Codeception\Util\HttpCode;
 
 final class NoteListCest extends AbstractCest
 {
+    private const string URL = '/api/v1/notes';
+
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок');
+        $I->wantTo('GET/200: Получить список заметок');
 
         $this->authorized(I: $I);
 
@@ -25,7 +27,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture);
         }
 
-        $I->sendGet(url: '/api/v1/notes');
+        $I->sendGet(url: self::URL);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -35,17 +37,40 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    #[DataProvider('searchProvider')]
+    public function paramSearch(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Ошибка авторизации');
+        $I->wantTo('GET/200: Получить список заметок с параметром [search]');
+
+        $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes');
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->sendGet(url: self::URL, params: ['search' => 'мА']);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('isTrashedProvider')]
+    public function paramIsTrashed(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET/200: Получить список заметок с параметром [is_trashed]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: self::URL, params: ['is_trashed' => true]);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -57,7 +82,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('idsProvider')]
     public function paramIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [ids]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [ids]');
 
         $this->authorized(I: $I);
 
@@ -67,7 +92,7 @@ final class NoteListCest extends AbstractCest
             $noteIds[] = NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['ids' => $noteIds]);
+        $I->sendGet(url: self::URL, params: ['ids' => $noteIds]);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -80,7 +105,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('userIdsProvider')]
     public function paramUserIds(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [user_ids]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [user_ids]');
 
         $this->authorized(I: $I);
 
@@ -91,7 +116,7 @@ final class NoteListCest extends AbstractCest
             $users[] = $note->getUser()->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['user_ids' => $users]);
+        $I->sendGet(url: self::URL, params: ['user_ids' => $users]);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -104,7 +129,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('updatedAtLessProvider')]
     public function paramUpdatedAtLess(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [updated_at_less]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [updated_at_less]');
 
         $this->authorized(I: $I);
 
@@ -112,7 +137,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture);
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['updated_at_less' => $example['query']['updated_at_less']]);
+        $I->sendGet(url: self::URL, params: ['updated_at_less' => $example['query']['updated_at_less']]);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -125,7 +150,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByNameAscProvider')]
     public function paramOrderByNameAsc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[name]=asc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[name]=asc]');
 
         $this->authorized(I: $I);
 
@@ -133,7 +158,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[name]' => 'asc']);
+        $I->sendGet(url: self::URL, params: ['order_by[name]' => 'asc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -146,7 +171,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByNameDescProvider')]
     public function paramOrderByNameDesc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[name]=desc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[name]=desc]');
 
         $this->authorized(I: $I);
 
@@ -154,7 +179,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[name]' => 'desc']);
+        $I->sendGet(url: self::URL, params: ['order_by[name]' => 'desc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -167,7 +192,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByCreatedAtAscProvider')]
     public function paramOrderByCreatedAtAsc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[created_at]=asc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[created_at]=asc]');
 
         $this->authorized(I: $I);
 
@@ -175,7 +200,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[created_at]' => 'asc']);
+        $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'asc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -188,7 +213,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByCreatedAtDescProvider')]
     public function paramOrderByCreatedAtDesc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[created_at]=desc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[created_at]=desc]');
 
         $this->authorized(I: $I);
 
@@ -196,7 +221,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[created_at]' => 'desc']);
+        $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'desc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -209,7 +234,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByUpdatedAtAscProvider')]
     public function paramOrderByUpdatedAtAsc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[updated_at]=asc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[updated_at]=asc]');
 
         $this->authorized(I: $I);
 
@@ -217,7 +242,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[updated_at]' => 'asc']);
+        $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'asc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -230,7 +255,7 @@ final class NoteListCest extends AbstractCest
     #[DataProvider('orderByUpdatedAtDescProvider')]
     public function paramOrderByUpdatedAtDesc(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET: Получить список заметок с параметром [order_by[updated_at]=desc]');
+        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[updated_at]=desc]');
 
         $this->authorized(I: $I);
 
@@ -238,8 +263,27 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: '/api/v1/notes', params: ['order_by[updated_at]' => 'desc']);
+        $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'desc']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET/401: Ошибка авторизации');
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture);
+        }
+
+        $I->sendGet(url: self::URL);
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -273,6 +317,7 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -305,6 +350,107 @@ final class NoteListCest extends AbstractCest
         ];
     }
 
+    protected function isTrashedProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'is_trashed' => true,
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    'count' => 1,
+                    'page' => 1,
+                    'total' => 1,
+                    'pages' => 1,
+                    'items' => [
+                        [
+                            'name' => 'Заметка_1',
+                            'description' => 'Описание заметки_1',
+                            'is_trashed' => true,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function searchProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Родитель',
+                        'description' => 'Описание: мама',
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Мат',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Машина',
+                        'description' => 'Описание_10',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Лодка',
+                        'description' => 'Описание: марка',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Комар',
+                        'description' => 'Описание_100',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Смерть',
+                        'description' => 'Описание_1000',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    'count' => 3,
+                    'page' => 1,
+                    'total' => 3,
+                    'pages' => 1,
+                    'items' => [
+                        [
+                            'name' => 'Машина',
+                            'description' => 'Описание_10',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                        [
+                            'name' => 'Лодка',
+                            'description' => 'Описание: марка',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                        [
+                            'name' => 'Комар',
+                            'description' => 'Описание_100',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     protected function userIdsProvider(): array
     {
         return [
@@ -330,6 +476,7 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -368,6 +515,7 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -401,6 +549,7 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -434,11 +583,13 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -472,11 +623,13 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -510,11 +663,13 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -548,11 +703,13 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -588,11 +745,13 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
@@ -628,11 +787,13 @@ final class NoteListCest extends AbstractCest
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
+                            'is_trashed' => false,
                             'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                         ],
                     ],

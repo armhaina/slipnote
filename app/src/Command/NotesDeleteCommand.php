@@ -6,8 +6,9 @@ namespace App\Command;
 
 use App\Entity\Note;
 use App\Model\Query\NoteQueryModel;
-use App\Service\NoteService;
-use Ds\Sequence;
+use App\Service\Entity\NoteService;
+use App\Service\PaginationService;
+use Knp\Component\Pager\Pagination\PaginationInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,37 +25,26 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 #[AsCronTask(expression: '0 0 * * *')]
 class NotesDeleteCommand extends Command
 {
-    private const LIMIT = 20;
-
     public function __construct(private readonly NoteService $noteService)
     {
         parent::__construct();
     }
 
-    /**
-     * @throws \DateMalformedStringException
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $offset = 1;
+        $this->noteService->transaction(func: function () {
+            do {
+                $pagination = $this->getNotes();
 
-        while (true) {
-            $notes = $this->getNotes(
-                offset: ($offset - 1) * 20,
-            );
+                $page = $pagination->getCurrentPageNumber();
+                $pages = PaginationService::getPages(pagination: $pagination);
 
-            if (0 === $notes->count()) {
-                break;
-            }
-
-            $notes->map(function (Note $note) {
-                $this->noteService->transaction(func: function () use ($note) {
-                    $this->noteService->delete(entity: $note);
-                });
-            });
-
-            ++$offset;
-        }
+                array_map(
+                    fn (Note $note) => $this->noteService->delete(entity: $note),
+                    $pagination->getItems()
+                );
+            } while ($page <= $pages);
+        });
 
         return Command::SUCCESS;
     }
@@ -62,15 +52,14 @@ class NotesDeleteCommand extends Command
     /**
      * @throws \DateMalformedStringException
      *
-     * @return Sequence<Note>
+     * @return PaginationInterface<int, Note>
      */
-    private function getNotes(int $offset): Sequence
+    private function getNotes(): PaginationInterface
     {
-        return $this->noteService->list(
+        return $this->noteService->pagination(
             queryModel: new NoteQueryModel()
-                ->setUpdatedAtLess(updatedAtLess: new \DateTimeImmutable()->modify(modifier: '-30 days'))
-                ->setOffset(offset: $offset)
-                ->setLimit(limit: self::LIMIT)
+                ->setIsTrashed(isTrashed: true)
+                ->setDeletedAtLess(deletedAtLess: new \DateTimeImmutable()->modify(modifier: '-30 days'))
                 ->setOrderBy(orderBy: ['id' => 'ASC']),
         );
     }

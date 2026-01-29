@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Note;
+namespace App\Tests\Functional\User;
 
-use App\Tests\_data\fixtures\NoteFixtures;
+use App\Entity\User;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
@@ -12,24 +12,25 @@ use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
 
-final class NoteGetCest extends AbstractCest
+final class UserDeleteCest extends AbstractCest
 {
-    private const string URL = '/api/v1/notes';
+    private const string URL = '/api/v1/users';
 
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/200: Получить заметку');
+        $I->wantTo('DELETE/200: Удалить пользователя');
 
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $user = $this->authorized(I: $I);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
         $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->dontSeeInRepository(entity: User::class, params: ['email' => $user->getEmail()]);
 
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
@@ -37,11 +38,10 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/401: Ошибка авторизации');
+        $I->wantTo('DELETE/401: Ошибка авторизации');
+        $user = UserFixtures::load(I: $I);
 
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -54,12 +54,12 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/403: Доступ запрещен');
+        $I->wantTo('DELETE/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $user = UserFixtures::load(I: $I);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -73,16 +73,9 @@ final class NoteGetCest extends AbstractCest
     {
         return [
             [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
                 'response' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'is_trashed' => false,
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'success' => true,
+                    'message' => 'Запись успешно удалена',
                 ],
             ],
         ];
@@ -92,11 +85,6 @@ final class NoteGetCest extends AbstractCest
     {
         return [
             [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
                 'response' => [
                     'code' => 401,
                     'message' => 'JWT Token not found',
@@ -109,10 +97,8 @@ final class NoteGetCest extends AbstractCest
     {
         return [
             [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => 'test_0@mail.ru'],
+                'request' => [
+                    'email' => 'update@mail.ru',
                 ],
                 'response' => [
                     'success' => false,

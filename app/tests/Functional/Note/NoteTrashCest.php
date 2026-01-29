@@ -12,19 +12,19 @@ use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
 
-final class NoteGetCest extends AbstractCest
+final class NoteTrashCest extends AbstractCest
 {
     private const string URL = '/api/v1/notes';
 
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/200: Получить заметку');
+        $I->wantTo('PUT/200: Удалить заметку в корзину');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -37,11 +37,11 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/401: Ошибка авторизации');
+        $I->wantTo('PUT/401: Ошибка авторизации');
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -54,12 +54,12 @@ final class NoteGetCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('GET/403: Доступ запрещен');
+        $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendGet(url: self::URL.'/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -81,7 +81,7 @@ final class NoteGetCest extends AbstractCest
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'is_trashed' => false,
+                    'is_trashed' => true,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
             ],

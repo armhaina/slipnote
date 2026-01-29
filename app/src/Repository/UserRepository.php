@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Contract\RepositoryInterface;
 use App\Entity\User;
 use App\Model\Query\UserQueryModel;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Ds\Vector;
 use Knp\Component\Pager\PaginatorInterface;
 
-class UserRepository extends AbstractRepository implements RepositoryInterface
+class UserRepository extends AbstractRepository
 {
     public function __construct(
         ManagerRegistry $registry,
@@ -63,17 +62,12 @@ class UserRepository extends AbstractRepository implements RepositoryInterface
     {
         $query = $this->createQueryBuilder(User::shortName());
 
+        $query->setFirstResult($queryModel->getOffset());
+        $query->setMaxResults($queryModel->getLimit());
+
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
             $query->addOrderBy(sort: User::shortName().'.'.$column, order: $order);
-        }
-
-        if (!empty($queryModel->getOffset())) {
-            $query->setFirstResult($queryModel->getOffset());
-        }
-
-        if (!empty($queryModel->getLimit())) {
-            $query->setMaxResults($queryModel->getLimit());
         }
 
         if ($queryModel->getIds()) {

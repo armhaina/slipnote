@@ -14,32 +14,17 @@ use Faker\Factory;
 
 final class NoteCreateCest extends AbstractCest
 {
+    private const string URL = '/api/v1/notes';
+
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST: Создать заметку');
+        $I->wantTo('POST/200: Создать заметку');
 
         $this->authorized(I: $I);
 
-        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
+        $I->sendPost(url: self::URL, params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('POST: Ошибка валидации');
-
-        $this->authorized(I: $I);
-
-        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -51,10 +36,27 @@ final class NoteCreateCest extends AbstractCest
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST: Ошибка авторизации');
+        $I->wantTo('POST/401: Ошибка авторизации');
 
-        $I->sendPost(url: '/api/v1/notes', params: $example['request']);
+        $I->sendPost(url: self::URL, params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedValidationProvider')]
+    public function failedValidation(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('POST/422: Ошибка валидации');
+
+        $this->authorized(I: $I);
+
+        $I->sendPost(url: self::URL, params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -74,6 +76,7 @@ final class NoteCreateCest extends AbstractCest
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
+                    'is_trashed' => false,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
             ],

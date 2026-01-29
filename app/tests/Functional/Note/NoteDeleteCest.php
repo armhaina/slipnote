@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
+use App\Entity\Note;
 use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
@@ -14,16 +15,37 @@ use Codeception\Util\HttpCode;
 
 final class NoteDeleteCest extends AbstractCest
 {
+    private const string URL = '/api/v1/notes';
+
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('DELETE: Удалить заметку');
+        $I->wantTo('DELETE/200: Удалить заметку');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->dontSeeInRepository(entity: Note::class, params: ['name' => $note->getName()]);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedAuthorizationProvider')]
+    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('DELETE/401: Ошибка авторизации');
+
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendDelete(url: self::URL.'/'.$note->getId());
+        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -35,30 +57,13 @@ final class NoteDeleteCest extends AbstractCest
     #[DataProvider('forbiddenProvider')]
     public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('DELETE: Доступ запрещен');
+        $I->wantTo('DELETE/403: Доступ запрещен');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('DELETE: Ошибка авторизации');
-
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendDelete(url: '/api/v1/notes/'.$note->getId());
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);

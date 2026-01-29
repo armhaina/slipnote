@@ -6,16 +6,17 @@ namespace App\Model\Payload;
 
 use Doctrine\DBAL\Types\Types;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
-readonly class UserPayloadModel
+readonly class UserUpdatePasswordPayloadModel
 {
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
-        #[Assert\Email(message: 'Email не соответствует формату электронной почты')]
-        #[OA\Property(description: 'Email')]
-        private string $email,
+        #[OA\Property(description: 'Текущий пароль')]
+        #[SerializedName(serializedName: 'current_password')]
+        private string $currentPassword,
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
         #[Assert\Length(
@@ -24,17 +25,18 @@ readonly class UserPayloadModel
             minMessage: 'Пароль должен содержать минимум {{ limit }} символов',
             maxMessage: 'Пароль должен содержать максимум {{ limit }} символов'
         )]
-        #[OA\Property(description: 'Пароль')]
-        private string $password,
+        #[OA\Property(description: 'Новый пароль')]
+        #[SerializedName(serializedName: 'new_password')]
+        private string $newPassword,
     ) {}
 
-    public function getEmail(): string
+    public function getCurrentPassword(): string
     {
-        return $this->email;
+        return $this->currentPassword;
     }
 
-    public function getPassword(): string
+    public function getNewPassword(): string
     {
-        return $this->password;
+        return $this->newPassword;
     }
 }

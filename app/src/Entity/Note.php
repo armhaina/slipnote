@@ -9,6 +9,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
+#[ORM\Index(name: 'idx_notes_name', columns: ['name'])]
+#[ORM\Index(name: 'idx_notes_description', columns: ['description'])]
 class Note
 {
     #[ORM\Id]
@@ -36,6 +38,27 @@ class Note
         ],
     )]
     private string $description;
+
+    #[ORM\Column(
+        name: 'is_trashed',
+        type: Types::BOOLEAN,
+        nullable: false,
+        options: [
+            'default' => false,
+            'comment' => 'Удалено',
+        ],
+    )]
+    private bool $isTrashed;
+
+    #[ORM\Column(
+        name: 'deleted_at',
+        type: Types::DATETIME_IMMUTABLE,
+        nullable: true,
+        options: [
+            'comment' => 'Дата удаления',
+        ],
+    )]
+    private ?\DateTimeImmutable $deletedAt = null;
 
     #[ORM\ManyToOne(
         targetEntity: User::class,
@@ -103,6 +126,18 @@ class Note
         return $this;
     }
 
+    public function getIsTrashed(): bool
+    {
+        return $this->isTrashed;
+    }
+
+    public function setIsTrashed(bool $isTrashed): self
+    {
+        $this->isTrashed = $isTrashed;
+
+        return $this;
+    }
+
     public function getUser(): User|UserInterface
     {
         return $this->user;
@@ -111,6 +146,18 @@ class Note
     public function setUser(User|UserInterface $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }

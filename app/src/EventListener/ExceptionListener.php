@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
@@ -26,7 +27,8 @@ readonly class ExceptionListener
 {
     public function __construct(
         private SerializerInterface $serializer,
-        private Security $security
+        private Security $security,
+        private ClassMetadataFactoryInterface $classMetadataFactory
     ) {}
 
     /**
@@ -99,8 +101,12 @@ readonly class ExceptionListener
 
         if ($previous instanceof ValidationFailedException) {
             foreach ($previous->getViolations() as $violation) {
+                $attributes = $this->classMetadataFactory->getMetadataFor(value: $previous->getValue()::class);
+                $serializedName = $attributes->getAttributesMetadata()[$violation->getPropertyPath(
+                )]->getSerializedName();
+
                 $errors[] = new ViolationResponseModelException(
-                    property: $violation->getPropertyPath(),
+                    property: $serializedName ?? $violation->getPropertyPath(),
                     message: $violation->getMessage(),
                     code: $violation->getCode()
                 );

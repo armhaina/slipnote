@@ -8,6 +8,8 @@ use App\Entity\User;
 use App\Enum\Role;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Support\FunctionalTester;
+use Codeception\Scenario;
+use Codeception\Util\HttpCode;
 
 abstract class AbstractCest
 {
@@ -31,7 +33,7 @@ abstract class AbstractCest
                 'password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
             ]
         );
-        $I->seeResponseCodeIs(code: 200);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
         $I->haveHttpHeader(
@@ -57,5 +59,12 @@ abstract class AbstractCest
         }
 
         return $data;
+    }
+
+    #[\Deprecated]
+    protected static function setWantTo(Scenario $scenario, string $wantTo): void
+    {
+        $result = preg_replace('/^.*?\s+\|\s+/', $wantTo.' | ', $scenario->getFeature());
+        $scenario->setFeature($result);
     }
 }

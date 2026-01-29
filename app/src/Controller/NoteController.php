@@ -8,18 +8,22 @@ use App\Entity\Note;
 use App\Entity\User;
 use App\Enum\Group;
 use App\Enum\Role;
+use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
+use App\Exception\Entity\User\ForbiddenException;
 use App\Mapper\Entity\NoteMapper;
 use App\Message\HttpStatusMessage;
-use App\Model\Payload\NotePayloadModel;
+use App\Model\Payload\NoteCreatePayloadModel;
+use App\Model\Payload\NoteUpdatePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
+use App\Model\Response\Exception\ExpiredJWTTokenModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
-use App\Service\NoteService;
+use App\Service\Entity\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use OpenApi\Attributes as OA;
@@ -80,10 +84,19 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function get(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         $responseModel = $this->noteMapper->one(note: $note);
@@ -126,6 +139,37 @@ class NoteController extends AbstractController
                 type: DefaultResponseModelException::class
             )
         )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
+    #[OA\Parameter(
+        name: 'search',
+        description: 'Поиск',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'string',
+            default: null,
+            example: 'Местонахождение'
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'is_trashed',
+        description: 'Заметки из корзины',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'boolean',
+            default: false,
+            example: true
+        ),
     )]
     #[OA\Parameter(
         name: 'ids[]',
@@ -191,6 +235,19 @@ class NoteController extends AbstractController
         ),
     )]
     #[OA\Parameter(
+        name: 'deleted_at_less',
+        description: 'Дата удаления меньше указанной даты',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'string',
+            format: 'date-time',
+            default: null,
+            example: '2030-01-01',
+            nullable: true
+        ),
+    )]
+    #[OA\Parameter(
         name: 'order_by[name]',
         description: 'Сортировка по имени',
         in: 'query',
@@ -219,7 +276,11 @@ class NoteController extends AbstractController
         $user = $this->getUser();
 
         if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
+        }
+
+        if (!is_bool($model->getIsTrashed())) {
+            $model->setIsTrashed(isTrashed: false);
         }
 
         $model->setUserIds(userIds: [$user->getId()]);
@@ -232,7 +293,7 @@ class NoteController extends AbstractController
 
     #[Route(methods: [Request::METHOD_POST])]
     #[OA\Post(operationId: 'createNote', summary: 'Создать заметку')]
-    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: NoteCreatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -261,7 +322,16 @@ class NoteController extends AbstractController
             )
         )
     )]
-    public function create(#[MapRequestPayload] NotePayloadModel $model): JsonResponse
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
+    public function create(#[MapRequestPayload] NoteCreatePayloadModel $model): JsonResponse
     {
         $dateTimeImmutable = new \DateTimeImmutable();
 
@@ -271,6 +341,7 @@ class NoteController extends AbstractController
             ->setUser(user: $this->getUser())
             ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
+            ->setIsTrashed(isTrashed: false)
         ;
 
         $note = $this->noteService->create(entity: $note);
@@ -289,7 +360,7 @@ class NoteController extends AbstractController
         methods: [Request::METHOD_PUT]
     )]
     #[OA\Put(operationId: 'updateNote', summary: 'Изменить заметку по ID')]
-    #[OA\RequestBody(content: new Model(type: NotePayloadModel::class))]
+    #[OA\RequestBody(content: new Model(type: NoteUpdatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
@@ -327,13 +398,22 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function update(
         Note $note,
         #[MapRequestPayload]
-        NotePayloadModel $model,
+        NoteUpdatePayloadModel $model,
     ): JsonResponse {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
         $dateTimeImmutable = new \DateTimeImmutable();
@@ -351,6 +431,9 @@ class NoteController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 
+    /**
+     * @throws EntityNotFoundWhenDeleteException
+     */
     #[Route(
         path: '/{id}',
         requirements: ['id' => '\d+'],
@@ -382,12 +465,155 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function delete(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            throw new ForbiddenException();
         }
 
+        $this->noteService->delete(entity: $note);
+
         return $this->json(data: new DeleteResponseModelAction());
+    }
+
+    /**
+     * @throws EntityNotFoundWhenUpdateException
+     */
+    #[Route(
+        path: '/{id}/trash',
+        requirements: ['id' => '\d+'],
+        methods: [Request::METHOD_DELETE]
+    )]
+    #[OA\Delete(operationId: 'deleteInTrashNote', summary: 'Удалить заметку в корзину по ID')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: NoteResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
+    public function deleteInTrash(Note $note): JsonResponse
+    {
+        if ($note->getUser() !== $this->getUser()) {
+            throw new ForbiddenException();
+        }
+
+        if (!$note->getIsTrashed()) {
+            $note
+                ->setIsTrashed(isTrashed: true)
+                ->setDeletedAt(deletedAt: new \DateTimeImmutable())
+            ;
+
+            $this->noteService->update(entity: $note);
+        }
+
+        $responseModel = $this->noteMapper->one(note: $note);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+    }
+
+    /**
+     * @throws EntityNotFoundWhenUpdateException
+     */
+    #[Route(
+        path: '/{id}/trash/restore',
+        requirements: ['id' => '\d+'],
+        methods: [Request::METHOD_PUT]
+    )]
+    #[OA\Put(operationId: 'restoreFromTrashNote', summary: 'Восстановить заметку из корзины по ID')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: NoteResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
+    public function restoreFromTrash(Note $note): JsonResponse
+    {
+        if ($note->getUser() !== $this->getUser()) {
+            throw new ForbiddenException();
+        }
+
+        if ($note->getIsTrashed()) {
+            $note
+                ->setIsTrashed(isTrashed: false)
+                ->setDeletedAt(deletedAt: null)
+            ;
+
+            $this->noteService->update(entity: $note);
+        }
+
+        $responseModel = $this->noteMapper->one(note: $note);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 }
