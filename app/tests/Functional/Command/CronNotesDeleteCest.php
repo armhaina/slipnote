@@ -9,7 +9,6 @@ use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
-use Codeception\Attribute\Skip;
 use Codeception\Example;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -22,10 +21,9 @@ final class CronNotesDeleteCest extends AbstractCest
      * @throws \Exception
      */
     #[DataProvider('mainProvider')]
-    #[Skip]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('Выполнить команду удаления старых заметок');
+        $I->wantTo('Удалить заметки из корзины');
 
         foreach ($example['fixtures'] as $fixture) {
             NoteFixtures::load(I: $I, data: $fixture);
@@ -43,9 +41,18 @@ final class CronNotesDeleteCest extends AbstractCest
         $exitCode = $application->run(input: $input, output: $output);
 
         $I->assertEquals(expected: 0, actual: $exitCode);
-        $I->dontSeeInRepository(entity: Note::class, params: ['name' => 'Старая заметка']);
+
+        $I->seeInRepository(entity: Note::class, params: ['name' => 'Заметка_1']);
+        $I->seeInRepository(entity: Note::class, params: ['name' => 'Заметка_2']);
+        $I->seeInRepository(entity: Note::class, params: ['name' => 'Заметка_3']);
+        $I->seeInRepository(entity: Note::class, params: ['name' => 'Заметка_4']);
+
+        $I->dontSeeInRepository(entity: Note::class, params: ['name' => 'Заметка_5']);
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     protected function mainProvider(): array
     {
         return [
@@ -55,22 +62,33 @@ final class CronNotesDeleteCest extends AbstractCest
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'user' => ['email' => 'test_1@mail.ru'],
-                    ],
+                    ], // НЕ удаляем
                     [
                         'name' => 'Заметка_2',
                         'description' => 'Описание заметки_2',
+                        'is_trash' => true,
+                        'deleted_at' => new \DateTimeImmutable()->modify(modifier: '-15 days'),
                         'user' => ['email' => 'test_2@mail.ru'],
-                    ],
+                    ], // НЕ удаляем потому что deleted_at меньше 30 дней
                     [
                         'name' => 'Заметка_3',
                         'description' => 'Описание заметки_3',
+                        'deleted_at' => new \DateTimeImmutable()->modify(modifier: '-15 days'),
                         'user' => ['email' => 'test_3@mail.ru'],
-                    ],
+                    ], // НЕ удаляем потому что is_trash = false
                     [
                         'name' => 'Заметка_4',
                         'description' => 'Описание заметки_4',
+                        'is_trash' => true,
                         'user' => ['email' => 'test_4@mail.ru'],
-                    ],
+                    ], // НЕ удаляем потому что deleted_at не заполнено
+                    [
+                        'name' => 'Заметка_5',
+                        'description' => 'Описание заметки_5',
+                        'is_trash' => true,
+                        'deleted_at' => new \DateTimeImmutable()->modify(modifier: '-31 days'),
+                        'user' => ['email' => 'test_5@mail.ru'],
+                    ], // УДАЛЯЕМ
                 ],
             ],
         ];
