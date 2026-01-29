@@ -12,19 +12,19 @@ use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
 
-final class NoteTrashCest extends AbstractCest
+final class NoteTrashRestoreCest extends AbstractCest
 {
     private const string URL = '/api/v1/notes';
 
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('PUT/200: Удалить заметку в корзину');
+        $I->wantTo('PUT/200: Восстановить заметку из корзины');
 
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
+        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash/restore');
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -41,7 +41,7 @@ final class NoteTrashCest extends AbstractCest
 
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
+        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash/restore');
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -59,7 +59,7 @@ final class NoteTrashCest extends AbstractCest
         $this->authorized(I: $I);
         $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash');
+        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash/restore');
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
 
@@ -76,12 +76,13 @@ final class NoteTrashCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
+                    'is_trashed' => true,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'is_trashed' => true,
+                    'is_trashed' => false,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
             ],
@@ -95,6 +96,7 @@ final class NoteTrashCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
+                    'is_trashed' => true,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
                 'response' => [
@@ -112,6 +114,7 @@ final class NoteTrashCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
+                    'is_trashed' => true,
                     'user' => ['email' => 'test_0@mail.ru'],
                 ],
                 'response' => [
