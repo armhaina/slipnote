@@ -12,6 +12,7 @@ class NoteQueryModel
 {
     private int $limit = 20;
     private int $offset = 0;
+    private ?bool $isTrash = null;
     /** @var array<int> */
     #[Ignore]
     private ?array $ids = null;
@@ -47,6 +48,18 @@ class NoteQueryModel
     public function setOffset(int $offset): self
     {
         $this->offset = $offset;
+
+        return $this;
+    }
+
+    public function getIsTrash(): ?bool
+    {
+        return $this->isTrash;
+    }
+
+    public function setIsTrash(bool $isTrash): self
+    {
+        $this->isTrash = $isTrash;
 
         return $this;
     }

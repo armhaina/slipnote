@@ -301,6 +301,7 @@ class NoteController extends AbstractController
             ->setUser(user: $this->getUser())
             ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
+            ->setIsTrash(isTrash: false)
         ;
 
         $note = $this->noteService->create(entity: $note);

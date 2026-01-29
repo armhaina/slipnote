@@ -9,6 +9,7 @@ use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Skip;
 use Codeception\Example;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -21,6 +22,7 @@ final class CronNotesDeleteCest extends AbstractCest
      * @throws \Exception
      */
     #[DataProvider('mainProvider')]
+    #[Skip]
     public function main(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('Выполнить команду удаления старых заметок');

@@ -106,6 +106,13 @@ class NoteRepository extends AbstractRepository
             ;
         }
 
+        if (is_bool($queryModel->getIsTrash())) {
+            $query
+                ->setParameter('isTrash', $queryModel->getIsTrash())
+                ->andWhere(Note::shortName().'.isTrash = :isTrash')
+            ;
+        }
+
         return $query;
     }
 }
