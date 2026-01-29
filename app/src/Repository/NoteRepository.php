@@ -54,7 +54,7 @@ class NoteRepository extends AbstractRepository
 
         return $this->paginator->paginate(
             target: $queryBuilder->getQuery(),
-            page: $queryModel->getOffset(),
+            page: (0 === $queryModel->getOffset() ? 1 : $queryModel->getOffset()),
             limit: $queryModel->getLimit()
         );
     }
