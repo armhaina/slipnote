@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
+#[ORM\Index(name: 'idx_notes_name_description', columns: ['name', 'description'])]
 class Note
 {
     #[ORM\Id]
