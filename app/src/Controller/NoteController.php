@@ -150,6 +150,28 @@ class NoteController extends AbstractController
         )
     )]
     #[OA\Parameter(
+        name: 'search',
+        description: 'Поиск',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'string',
+            default: null,
+            example: 'Местонахождение'
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'is_trashed',
+        description: 'Заметки из корзины',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'boolean',
+            default: false,
+            example: true
+        ),
+    )]
+    #[OA\Parameter(
         name: 'ids[]',
         description: 'Массив ID заметок',
         in: 'query',
@@ -202,6 +224,19 @@ class NoteController extends AbstractController
     #[OA\Parameter(
         name: 'updated_at_less',
         description: 'Дата изменения меньше указанной даты',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(
+            type: 'string',
+            format: 'date-time',
+            default: null,
+            example: '2030-01-01',
+            nullable: true
+        ),
+    )]
+    #[OA\Parameter(
+        name: 'deleted_at_less',
+        description: 'Дата удаления меньше указанной даты',
         in: 'query',
         required: false,
         schema: new OA\Schema(

@@ -12,6 +12,7 @@ class NoteQueryModel
 {
     private int $limit = 20;
     private int $offset = 0;
+    #[SerializedName(serializedName: 'is_trashed')]
     private ?bool $isTrashed = null;
     private ?string $search = null;
     /** @var array<int> */
