@@ -49,10 +49,25 @@ final class UserCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example, Scenario $scenario): void
+    #[DataProvider('failedValidationPasswordMinProvider')]
+    public function failedValidationPasswordMin(FunctionalTester $I, Example $example, Scenario $scenario): void
     {
-        self::setWantTo(scenario: $scenario, wantTo: $example['want']);
+        $I->wantTo('POST/422: Ошибка валидации (пароль минимум)');
+
+        $I->sendPost(url: self::URL, params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedValidationPasswordMaxProvider')]
+    public function failedValidationPasswordMax(FunctionalTester $I, Example $example, Scenario $scenario): void
+    {
+        $I->wantTo('POST/422: Ошибка валидации (пароль максимум)');
 
         $I->sendPost(url: self::URL, params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
@@ -79,13 +94,12 @@ final class UserCreateCest extends AbstractCest
         ];
     }
 
-    protected function failedValidationProvider(): array
+    protected function failedValidationPasswordMinProvider(): array
     {
         $faker = Factory::create();
 
         return [
             [
-                'want' => 'POST/422: Ошибка валидации (пароль минимум)',
                 'request' => [
                     'email' => 'test',
                     'password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(5, 5).'}'),
@@ -105,8 +119,15 @@ final class UserCreateCest extends AbstractCest
                     ],
                 ],
             ],
+        ];
+    }
+
+    protected function failedValidationPasswordMaxProvider(): array
+    {
+        $faker = Factory::create();
+
+        return [
             [
-                'want' => 'POST/422: Ошибка валидации (пароль максимум)',
                 'request' => [
                     'email' => 'test',
                     'password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(19, 19).'}'),
