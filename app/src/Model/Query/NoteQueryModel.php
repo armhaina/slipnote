@@ -13,6 +13,7 @@ class NoteQueryModel
     private int $limit = 20;
     private int $offset = 0;
     private ?bool $isTrashed = null;
+    private ?string $search = null;
     /** @var array<int> */
     #[Ignore]
     private ?array $ids = null;
@@ -62,6 +63,18 @@ class NoteQueryModel
     public function setIsTrashed(bool $isTrashed): self
     {
         $this->isTrashed = $isTrashed;
+
+        return $this;
+    }
+
+    public function getSearch(): ?string
+    {
+        return $this->search;
+    }
+
+    public function setSearch(string $search): self
+    {
+        $this->search = $search;
 
         return $this;
     }
