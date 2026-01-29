@@ -37,6 +37,27 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('searchProvider')]
+    public function paramSearch(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET/200: Получить список заметок с параметром [search]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: self::URL, params: ['search' => 'ма']);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     #[DataProvider('idsProvider')]
     public function paramIds(FunctionalTester $I, Example $example): void
     {
@@ -303,6 +324,72 @@ final class NoteListCest extends AbstractCest
                 'response' => [
                     'code' => 401,
                     'message' => 'JWT Token not found',
+                ],
+            ],
+        ];
+    }
+
+    protected function searchProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Родитель',
+                        'description' => 'Описание: мама',
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Мат',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => 'test_0@mail.ru'],
+                    ],
+                    [
+                        'name' => 'Машина',
+                        'description' => 'Описание_10',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Лодка',
+                        'description' => 'Описание: марка',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Комар',
+                        'description' => 'Описание_100',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Смерть',
+                        'description' => 'Описание_1000',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    'count' => 3,
+                    'page' => 1,
+                    'total' => 3,
+                    'pages' => 1,
+                    'items' => [
+                        [
+                            'name' => 'Машина',
+                            'description' => 'Описание_10',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                        [
+                            'name' => 'Лодка',
+                            'description' => 'Описание: марка',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                        [
+                            'name' => 'Комар',
+                            'description' => 'Описание_100',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                    ],
                 ],
             ],
         ];
