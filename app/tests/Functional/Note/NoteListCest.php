@@ -48,7 +48,7 @@ final class NoteListCest extends AbstractCest
             NoteFixtures::load(I: $I, data: $fixture)->getId();
         }
 
-        $I->sendGet(url: self::URL, params: ['search' => 'ма']);
+        $I->sendGet(url: self::URL, params: ['search' => 'мА']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
