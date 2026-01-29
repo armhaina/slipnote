@@ -58,6 +58,27 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
+    #[DataProvider('isTrashedProvider')]
+    public function paramIsTrashed(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('GET/200: Получить список заметок с параметром [is_trashed]');
+
+        $this->authorized(I: $I);
+
+        foreach ($example['fixtures'] as $fixture) {
+            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        }
+
+        $I->sendGet(url: self::URL, params: ['is_trashed' => true]);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
     #[DataProvider('idsProvider')]
     public function paramIds(FunctionalTester $I, Example $example): void
     {
@@ -324,6 +345,41 @@ final class NoteListCest extends AbstractCest
                 'response' => [
                     'code' => 401,
                     'message' => 'JWT Token not found',
+                ],
+            ],
+        ];
+    }
+
+    protected function isTrashedProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                    [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                        'is_trashed' => true,
+                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    ],
+                ],
+                'response' => [
+                    'count' => 1,
+                    'page' => 1,
+                    'total' => 1,
+                    'pages' => 1,
+                    'items' => [
+                        [
+                            'name' => 'Заметка_1',
+                            'description' => 'Описание заметки_1',
+                            'is_trashed' => true,
+                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        ],
+                    ],
                 ],
             ],
         ];

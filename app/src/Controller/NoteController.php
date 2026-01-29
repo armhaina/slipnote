@@ -279,6 +279,10 @@ class NoteController extends AbstractController
             throw new ForbiddenException();
         }
 
+        if (!is_bool($model->getIsTrashed())) {
+            $model->setIsTrashed(isTrashed: false);
+        }
+
         $model->setUserIds(userIds: [$user->getId()]);
         $pagination = $this->noteService->pagination(queryModel: $model);
 
