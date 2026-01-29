@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Note;
-use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Model\Query\NoteQueryModel;
-use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Service\Entity\NoteService;
 use App\Service\PaginationService;
 use Knp\Component\Pager\Pagination\PaginationInterface;
@@ -32,53 +30,21 @@ class NotesDeleteCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * @throws EntityNotFoundWhenDeleteException
-     * @throws \DateMalformedStringException
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //        $pagination = $this->getNotes();
-        //
-        //        $page = $pagination->getCurrentPageNumber();
-        //        $pages = PaginationService::getPages(pagination: $pagination);
-        //
-        //        for ($i = $page; $i <= $pages; ++$i) {
-        //            $people[$i]['salt'] = mt_rand(000000, 999999);
-        //        }
+        $this->noteService->transaction(func: function () {
+            do {
+                $pagination = $this->getNotes();
 
-        do {
-            $pagination = $this->getNotes(offset: $page ?? 0);
+                $page = $pagination->getCurrentPageNumber();
+                $pages = PaginationService::getPages(pagination: $pagination);
 
-            $page = $pagination->getCurrentPageNumber();
-            $pages = PaginationService::getPages(pagination: $pagination);
-        } while ($page <= $pages);
-
-        //        return new NotePaginationResponseModelEntity(
-        //            count: $pagination->count(),
-        //            page: $pagination->getCurrentPageNumber(),
-        //            total: $pagination->getTotalItemCount(),
-        //            pages: PaginationService::getPages(pagination: $pagination),
-        //            items: $this->collection(notes: $pagination->getItems())
-        //        );
-
-        //        $offset = 1;
-        //
-        //        while (true) {
-        //            $notes = $this->getNotes();
-        //
-        //            if (0 === $notes->count()) {
-        //                break;
-        //            }
-        //
-        //            $notes->map(function (Note $note) {
-        //                $this->noteService->transaction(func: function () use ($note) {
-        //                    $this->noteService->delete(entity: $note);
-        //                });
-        //            });
-        //
-        //            ++$offset;
-        //        }
+                array_map(
+                    fn (Note $note) => $this->noteService->delete(entity: $note),
+                    $pagination->getItems()
+                );
+            } while ($page <= $pages);
+        });
 
         return Command::SUCCESS;
     }
@@ -88,11 +54,10 @@ class NotesDeleteCommand extends Command
      *
      * @return PaginationInterface<int, Note>
      */
-    private function getNotes(int $offset): PaginationInterface
+    private function getNotes(): PaginationInterface
     {
         return $this->noteService->pagination(
             queryModel: new NoteQueryModel()
-                ->setOffset(offset: $offset)
                 ->setUpdatedAtLess(updatedAtLess: new \DateTimeImmutable()->modify(modifier: '-30 days'))
                 ->setOrderBy(orderBy: ['id' => 'ASC']),
         );

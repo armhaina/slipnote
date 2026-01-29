@@ -77,17 +77,12 @@ class NoteRepository extends AbstractRepository
     {
         $query = $this->createQueryBuilder(Note::shortName());
 
+        $query->setFirstResult($queryModel->getOffset());
+        $query->setMaxResults($queryModel->getLimit());
+
         foreach ($queryModel->getOrderBy() as $column => $order) {
             $column = $this->convertSnakeCaseToCamelCase(value: $column);
             $query->addOrderBy(sort: Note::shortName().'.'.$column, order: $order);
-        }
-
-        if (!empty($queryModel->getOffset())) {
-            $query->setFirstResult($queryModel->getOffset());
-        }
-
-        if (!empty($queryModel->getLimit())) {
-            $query->setMaxResults($queryModel->getLimit());
         }
 
         if ($queryModel->getIds()) {
