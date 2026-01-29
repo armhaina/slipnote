@@ -37,6 +37,27 @@ class Note
     )]
     private string $description;
 
+    #[ORM\Column(
+        name: 'is_trash',
+        type: Types::BOOLEAN,
+        nullable: false,
+        options: [
+            'default' => false,
+            'comment' => 'Корзина',
+        ],
+    )]
+    private bool $isTrash;
+
+    #[ORM\Column(
+        name: 'deleted_at',
+        type: Types::DATETIME_IMMUTABLE,
+        nullable: true,
+        options: [
+            'comment' => 'Дата удаления',
+        ],
+    )]
+    private \DateTimeImmutable $deletedAt;
+
     #[ORM\ManyToOne(
         targetEntity: User::class,
         cascade: ['persist'],
@@ -103,6 +124,18 @@ class Note
         return $this;
     }
 
+    public function getIsTrash(): bool
+    {
+        return $this->isTrash;
+    }
+
+    public function setIsTrash(bool $isTrash): self
+    {
+        $this->isTrash = $isTrash;
+
+        return $this;
+    }
+
     public function getUser(): User|UserInterface
     {
         return $this->user;
@@ -111,6 +144,18 @@ class Note
     public function setUser(User|UserInterface $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): \DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(\DateTimeImmutable $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
