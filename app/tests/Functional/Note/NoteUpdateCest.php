@@ -35,24 +35,6 @@ final class NoteUpdateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/422: Ошибка валидации');
-
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
@@ -80,6 +62,24 @@ final class NoteUpdateCest extends AbstractCest
 
         $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedValidationProvider')]
+    public function failedValidation(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('PUT/422: Ошибка валидации');
+
+        $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
