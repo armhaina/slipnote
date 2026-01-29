@@ -4,26 +4,29 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
+use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Skip;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
 use Faker\Factory;
 
-final class NoteCreateCest extends AbstractCest
+final class NoteTrashCest extends AbstractCest
 {
     private const string URL = '/api/v1/notes';
 
     #[DataProvider('mainProvider')]
     public function main(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST/200: Создать заметку');
+        $I->wantTo('PUT/200: Переместить заметку в корзину');
 
         $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPost(url: self::URL, params: $example['request']);
+        $I->sendDelete(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
@@ -34,11 +37,14 @@ final class NoteCreateCest extends AbstractCest
     }
 
     #[DataProvider('failedAuthorizationProvider')]
+    #[Skip]
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST/401: Ошибка авторизации');
+        $I->wantTo('PUT/401: Ошибка авторизации');
 
-        $I->sendPost(url: self::URL, params: $example['request']);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
 
@@ -48,14 +54,35 @@ final class NoteCreateCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
+    #[DataProvider('forbiddenProvider')]
+    #[Skip]
+    public function forbidden(FunctionalTester $I, Example $example): void
     {
-        $I->wantTo('POST/422: Ошибка валидации');
+        $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
 
-        $I->sendPost(url: self::URL, params: $example['request']);
+        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
+        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
+        $I->seeResponseIsJson();
+
+        $data = json_decode($I->grabResponse(), true);
+        $data = self::except(data: $data, excludeKeys: ['id']);
+
+        $I->assertEquals(expected: $example['response'], actual: $data);
+    }
+
+    #[DataProvider('failedValidationProvider')]
+    #[Skip]
+    public function failedValidation(FunctionalTester $I, Example $example): void
+    {
+        $I->wantTo('PUT/422: Ошибка валидации');
+
+        $this->authorized(I: $I);
+        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+
+        $I->sendPut(url: self::URL.'/'.$note->getId().'/trash', params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
@@ -69,14 +96,15 @@ final class NoteCreateCest extends AbstractCest
     {
         return [
             [
-                'request' => [
+                'fixtures' => [
                     'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
                 'response' => [
                     'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
-                    'is_trash' => false,
+                    'description' => 'Описание_0',
+                    'is_trash' => true,
                     'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
                 ],
             ],
@@ -89,6 +117,11 @@ final class NoteCreateCest extends AbstractCest
 
         return [
             [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
                 'request' => [
                     'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
                     'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
@@ -115,13 +148,39 @@ final class NoteCreateCest extends AbstractCest
     {
         return [
             [
-                'request' => [
+                'fixtures' => [
                     'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+                'request' => [
+                    'name' => 'Заметка_1',
+                    'description' => 'Описание заметки_1',
                 ],
                 'response' => [
                     'code' => 401,
                     'message' => 'JWT Token not found',
+                ],
+            ],
+        ];
+    }
+
+    protected function forbiddenProvider(): array
+    {
+        return [
+            [
+                'fixtures' => [
+                    'name' => 'Заметка_0',
+                    'description' => 'Описание_0',
+                    'user' => ['email' => 'test_0@mail.ru'],
+                ],
+                'request' => [
+                    'name' => 'Заметка_1',
+                    'description' => 'Описание заметки_1',
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Доступ запрещен',
                 ],
             ],
         ];

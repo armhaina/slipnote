@@ -504,6 +504,8 @@ class NoteController extends AbstractController
             $this->noteService->update(entity: $note);
         }
 
-        return $this->json(data: new DeleteResponseModelAction(message: 'Запись успешно перенесена в корзину'));
+        $responseModel = $this->noteMapper->one(note: $note);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
     }
 }
