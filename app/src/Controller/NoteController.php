@@ -459,7 +459,10 @@ class NoteController extends AbstractController
         response: Response::HTTP_OK,
         description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
         content: new OA\JsonContent(
-            ref: new Model(type: DeleteResponseModelAction::class)
+            ref: new Model(
+                type: NoteResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
         )
     )]
     #[OA\Response(
@@ -499,6 +502,72 @@ class NoteController extends AbstractController
             $note
                 ->setIsTrashed(isTrashed: true)
                 ->setDeletedAt(deletedAt: new \DateTimeImmutable())
+            ;
+
+            $this->noteService->update(entity: $note);
+        }
+
+        $responseModel = $this->noteMapper->one(note: $note);
+
+        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+    }
+
+    /**
+     * @throws EntityNotFoundWhenUpdateException
+     */
+    #[Route(
+        path: '/{id}/trash/restore',
+        requirements: ['id' => '\d+'],
+        methods: [Request::METHOD_PUT]
+    )]
+    #[OA\Put(operationId: 'restoreFromTrashNote', summary: 'Восстановить заметку из корзины по ID')]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: NoteResponseModelEntity::class,
+                groups: [Group::PUBLIC->value]
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_FORBIDDEN,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ForbiddenResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_INTERNAL_SERVER_ERROR,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
+    public function restoreFromTrash(Note $note): JsonResponse
+    {
+        if ($note->getUser() !== $this->getUser()) {
+            throw new ForbiddenException();
+        }
+
+        if ($note->getIsTrashed()) {
+            $note
+                ->setIsTrashed(isTrashed: false)
+                ->setDeletedAt(deletedAt: null)
             ;
 
             $this->noteService->update(entity: $note);

@@ -56,7 +56,7 @@ class Note
             'comment' => 'Дата удаления',
         ],
     )]
-    private \DateTimeImmutable $deletedAt;
+    private ?\DateTimeImmutable $deletedAt = null;
 
     #[ORM\ManyToOne(
         targetEntity: User::class,
@@ -148,12 +148,12 @@ class Note
         return $this;
     }
 
-    public function getDeletedAt(): \DateTimeImmutable
+    public function getDeletedAt(): ?\DateTimeImmutable
     {
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(\DateTimeImmutable $deletedAt): self
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
 
