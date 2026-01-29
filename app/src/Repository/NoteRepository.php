@@ -113,10 +113,10 @@ class NoteRepository extends AbstractRepository
             ;
         }
 
-        if (is_bool($queryModel->getIsTrash())) {
+        if (is_bool($queryModel->getIsTrashed())) {
             $query
-                ->setParameter('isTrash', $queryModel->getIsTrash())
-                ->andWhere(Note::shortName().'.isTrash = :isTrash')
+                ->setParameter('isTrashed', $queryModel->getIsTrashed())
+                ->andWhere(Note::shortName().'.isTrashed = :isTrashed')
             ;
         }
 

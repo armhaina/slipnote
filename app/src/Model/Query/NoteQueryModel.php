@@ -12,7 +12,7 @@ class NoteQueryModel
 {
     private int $limit = 20;
     private int $offset = 0;
-    private ?bool $isTrash = null;
+    private ?bool $isTrashed = null;
     /** @var array<int> */
     #[Ignore]
     private ?array $ids = null;
@@ -54,14 +54,14 @@ class NoteQueryModel
         return $this;
     }
 
-    public function getIsTrash(): ?bool
+    public function getIsTrashed(): ?bool
     {
-        return $this->isTrash;
+        return $this->isTrashed;
     }
 
-    public function setIsTrash(bool $isTrash): self
+    public function setIsTrashed(bool $isTrashed): self
     {
-        $this->isTrash = $isTrash;
+        $this->isTrashed = $isTrashed;
 
         return $this;
     }

@@ -38,15 +38,15 @@ class Note
     private string $description;
 
     #[ORM\Column(
-        name: 'is_trash',
+        name: 'is_trashed',
         type: Types::BOOLEAN,
         nullable: false,
         options: [
             'default' => false,
-            'comment' => 'Корзина',
+            'comment' => 'Удалено',
         ],
     )]
-    private bool $isTrash;
+    private bool $isTrashed;
 
     #[ORM\Column(
         name: 'deleted_at',
@@ -124,14 +124,14 @@ class Note
         return $this;
     }
 
-    public function getIsTrash(): bool
+    public function getIsTrashed(): bool
     {
-        return $this->isTrash;
+        return $this->isTrashed;
     }
 
-    public function setIsTrash(bool $isTrash): self
+    public function setIsTrashed(bool $isTrashed): self
     {
-        $this->isTrash = $isTrash;
+        $this->isTrashed = $isTrashed;
 
         return $this;
     }

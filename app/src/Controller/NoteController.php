@@ -302,7 +302,7 @@ class NoteController extends AbstractController
             ->setUser(user: $this->getUser())
             ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
-            ->setIsTrash(isTrash: false)
+            ->setIsTrashed(isTrashed: false)
         ;
 
         $note = $this->noteService->create(entity: $note);
@@ -495,9 +495,9 @@ class NoteController extends AbstractController
             throw new ForbiddenException();
         }
 
-        if (!$note->getIsTrash()) {
+        if (!$note->getIsTrashed()) {
             $note
-                ->setIsTrash(isTrash: true)
+                ->setIsTrashed(isTrashed: true)
                 ->setDeletedAt(deletedAt: new \DateTimeImmutable())
             ;
 

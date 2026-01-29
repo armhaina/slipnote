@@ -58,7 +58,7 @@ class NotesDeleteCommand extends Command
     {
         return $this->noteService->pagination(
             queryModel: new NoteQueryModel()
-                ->setIsTrash(isTrash: true)
+                ->setIsTrashed(isTrashed: true)
                 ->setDeletedAtLess(deletedAtLess: new \DateTimeImmutable()->modify(modifier: '-30 days'))
                 ->setOrderBy(orderBy: ['id' => 'ASC']),
         );
