@@ -19,6 +19,7 @@ use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
+use App\Model\Response\Exception\ExpiredJWTTokenModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\Entity\NoteService;
@@ -82,6 +83,15 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function get(Note $note): JsonResponse
     {
         if ($note->getUser() !== $this->getUser()) {
@@ -126,6 +136,15 @@ class NoteController extends AbstractController
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
             )
         )
     )]
@@ -263,6 +282,15 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function create(#[MapRequestPayload] NoteCreatePayloadModel $model): JsonResponse
     {
         $dateTimeImmutable = new \DateTimeImmutable();
@@ -329,6 +357,15 @@ class NoteController extends AbstractController
             )
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
+            )
+        )
+    )]
     public function update(
         Note $note,
         #[MapRequestPayload]
@@ -381,6 +418,15 @@ class NoteController extends AbstractController
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
+            )
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_UNAUTHORIZED,
+        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: ExpiredJWTTokenModelException::class
             )
         )
     )]
