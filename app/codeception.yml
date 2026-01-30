@@ -12,6 +12,8 @@ extensions:
         - Codeception\Extension\RunFailed
 params:
     - .env.test
+
+# Добавить подключение c3.php в index.php
 coverage:
     enabled: true
     remote: true
