@@ -7,30 +7,42 @@ namespace App\Model\Query;
 use App\Validator\OrderBy;
 use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class NoteQueryModel
 {
+    #[Assert\Positive]
+    #[Assert\Range(min: 0, max: 100)]
     private int $limit = 20;
+    #[Assert\PositiveOrZero]
+    #[Assert\Range(min: 0)]
     private int $offset = 0;
     #[SerializedName(serializedName: 'is_trashed')]
+    #[Assert\Type(type: 'boolean')]
     private ?bool $isTrashed = null;
+    #[Assert\Type(type: 'string')]
     private ?string $search = null;
     /** @var array<int> */
     #[Ignore]
+    #[Assert\All([new Assert\Type(type: 'numeric'), new Assert\Positive()])]
     private ?array $ids = null;
     /** @var array<int> */
     #[Ignore]
     #[SerializedName(serializedName: 'user_ids')]
+    #[Assert\All([new Assert\Type(type: 'numeric'), new Assert\Positive()])]
     private ?array $userIds = null;
     /** @var array<string> */
     #[Ignore]
     #[SerializedName(serializedName: 'order_by')]
     #[OrderBy(fields: ['name', 'created_at', 'updated_at'])]
+    #[Assert\All([new Assert\Type(type: 'string')])]
     private array $orderBy = [];
     #[SerializedName(serializedName: 'updated_at_less')]
-    private ?\DateTimeImmutable $updatedAtLess = null;
+    #[Assert\DateTime(format: DATE_ATOM)]
+    private ?string $updatedAtLess = null;
     #[SerializedName(serializedName: 'deleted_at_less')]
-    private ?\DateTimeImmutable $deletedAtLess = null;
+    #[Assert\DateTime(format: DATE_ATOM)]
+    private ?string $deletedAtLess = null;
 
     public function getLimit(): int
     {
@@ -134,26 +146,40 @@ class NoteQueryModel
         return $this;
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     public function getUpdatedAtLess(): ?\DateTimeImmutable
     {
-        return $this->updatedAtLess;
+        if (is_string(value: $this->updatedAtLess)) {
+            return new \DateTimeImmutable(datetime: $this->updatedAtLess);
+        }
+
+        return null;
     }
 
     public function setUpdatedAtLess(\DateTimeImmutable $updatedAtLess): self
     {
-        $this->updatedAtLess = $updatedAtLess;
+        $this->updatedAtLess = $updatedAtLess->format(format: DATE_ATOM);
 
         return $this;
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     public function getDeletedAtLess(): ?\DateTimeImmutable
     {
-        return $this->deletedAtLess;
+        if (is_string(value: $this->deletedAtLess)) {
+            return new \DateTimeImmutable(datetime: $this->deletedAtLess);
+        }
+
+        return null;
     }
 
     public function setDeletedAtLess(\DateTimeImmutable $deletedAtLess): self
     {
-        $this->deletedAtLess = $deletedAtLess;
+        $this->deletedAtLess = $deletedAtLess->format(format: DATE_ATOM);
 
         return $this;
     }
