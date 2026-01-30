@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
+use App\Enum\ValidationError;
 use App\Validator\OrderBy;
 use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
@@ -11,16 +12,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class NoteQueryModel
 {
-    #[Assert\Positive]
-    #[Assert\Range(min: 0, max: 100)]
+    #[Assert\Type(type: 'numeric')]
+    #[Assert\Range(notInRangeMessage: ValidationError::RANGE->value, min: 1, max: 100)]
     private int $limit = 20;
-    #[Assert\PositiveOrZero]
-    #[Assert\Range(min: 0)]
+    #[Assert\Type(type: 'numeric')]
+    #[Assert\Range(minMessage: ValidationError::RANGE_MIN->value, min: 0)]
     private int $offset = 0;
-    #[SerializedName(serializedName: 'is_trashed')]
     #[Assert\Type(type: 'boolean')]
+    #[SerializedName(serializedName: 'is_trashed')]
     private ?bool $isTrashed = null;
     #[Assert\Type(type: 'string')]
+    #[Assert\Length(
+        max: 100,
+        maxMessage: ValidationError::LENGTH_MAX->value
+    )]
     private ?string $search = null;
     /** @var array<int> */
     #[Ignore]
