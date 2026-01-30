@@ -45,6 +45,12 @@ schedule-debug: ## Просмотреть все команды scheduler
 test-run: ## Запустить тесты
 	docker compose exec -it application php vendor/bin/codecept run
 
+test-coverage-xml-run: ## Запустить тесты (coverage-xml)
+	docker compose exec -it application php vendor/bin/codecept run --coverage --coverage-xml
+
+test-coverage-html-run: ## Запустить тесты (coverage-html)
+	docker compose exec -it application php vendor/bin/codecept run --coverage --coverage-html
+
 test-init: ## Инициализация тестовой базы
 	docker compose exec -it application php bin/console doctrine:database:drop --if-exists --force --env=test || true
 	docker compose exec -it application php bin/console doctrine:database:create --env=test
