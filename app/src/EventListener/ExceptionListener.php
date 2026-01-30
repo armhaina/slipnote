@@ -101,12 +101,22 @@ readonly class ExceptionListener
 
         if ($previous instanceof ValidationFailedException) {
             foreach ($previous->getViolations() as $violation) {
+                // region Получить сериализованное имя (если оно есть)
                 $attributes = $this->classMetadataFactory->getMetadataFor(value: $previous->getValue()::class);
-                $serializedName = $attributes->getAttributesMetadata()[$violation->getPropertyPath(
-                )]->getSerializedName();
+
+                // Убрать квадратные скобки с цифрами внутри: userIds[0] => userIds
+                $propertyPath = preg_replace(
+                    pattern: '/\[\d+\]$/',
+                    replacement: '',
+                    subject: $violation->getPropertyPath()
+                );
+
+                $serializedName = $attributes->getAttributesMetadata()[$propertyPath]->getSerializedName(
+                ) ?? $violation->getPropertyPath();
+                // endregion
 
                 $errors[] = new ViolationResponseModelException(
-                    property: $serializedName ?? $violation->getPropertyPath(),
+                    property: $serializedName,
                     message: $violation->getMessage(),
                     code: $violation->getCode()
                 );
