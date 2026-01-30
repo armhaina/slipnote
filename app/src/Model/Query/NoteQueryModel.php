@@ -29,12 +29,18 @@ class NoteQueryModel
     private ?string $search = null;
     /** @var array<int> */
     #[Ignore]
-    #[Assert\All([new Assert\Type(type: 'numeric'), new Assert\Positive()])]
+    #[Assert\All([
+        new Assert\Type(type: 'numeric', message: ValidationError::TYPE_NUMERIC->value),
+        new Assert\Positive(message: ValidationError::POSITIVE->value),
+    ])]
     private ?array $ids = null;
     /** @var array<int> */
     #[Ignore]
     #[SerializedName(serializedName: 'user_ids')]
-    #[Assert\All([new Assert\Type(type: 'numeric'), new Assert\Positive()])]
+    #[Assert\All([
+        new Assert\Type(type: 'numeric', message: ValidationError::TYPE_NUMERIC->value),
+        new Assert\Positive(message: ValidationError::POSITIVE->value),
+    ])]
     private ?array $userIds = null;
     /** @var array<string> */
     #[Ignore]
