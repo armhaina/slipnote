@@ -15,3 +15,5 @@ params:
 coverage:
     enabled: true
     remote: true
+    include:
+        - src/*
