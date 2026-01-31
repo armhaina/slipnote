@@ -23,7 +23,7 @@ trait TestFailedForbiddenTrait
     #[DataProvider('failedForbiddenProvider')]
     public function failedForbidden(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
-        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/403: Доступ запрещен');
+        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/403 ДОСТУП: Доступ запрещен');
 
         $this->authorized(I: $I);
 

@@ -13,9 +13,6 @@ use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
 use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
 use Symfony\Component\HttpFoundation\Request;
 
 final class UserUpdateCest extends AbstractCest
@@ -48,23 +45,6 @@ final class UserUpdateCest extends AbstractCest
             }
         }
     }
-
-    //    #[DataProvider('failedValidationProvider')]
-    //    public function failedValidation(FunctionalTester $I, Example $example): void
-    //    {
-    //        $I->wantTo('PUT/422: Ошибка валидации');
-    //
-    //        $user = $this->authorized(I: $I);
-    //
-    //        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
-    //        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-    //        $I->seeResponseIsJson();
-    //
-    //        $data = json_decode($I->grabResponse(), true);
-    //        $data = self::except(data: $data, excludeKeys: ['id']);
-    //
-    //        $I->assertEquals(expected: $example['response'], actual: $data);
-    //    }
 
     protected function successProvider(): array
     {

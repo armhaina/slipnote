@@ -21,7 +21,7 @@ trait TestFailedAuthorizationTrait
     #[DataProvider('failedAuthorizationProvider')]
     public function failedAuthorization(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
-        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/401: Ошибка авторизации');
+        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/401 АВТОРИЗАЦИЯ: Ошибка авторизации');
 
         $context = $example['context'] ?? [];
 
