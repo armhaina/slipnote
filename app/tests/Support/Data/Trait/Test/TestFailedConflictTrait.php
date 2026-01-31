@@ -12,7 +12,7 @@ use Codeception\Example;
 use Codeception\Scenario;
 use Codeception\Util\HttpCode;
 
-trait TestFailedValidationTrait
+trait TestFailedConflictTrait
 {
     use AbstractTrait;
     use HandleAuthorizedTrait;
@@ -20,12 +20,14 @@ trait TestFailedValidationTrait
     /**
      * @throws \Exception
      */
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Scenario $scenario, Example $example): void
+    #[DataProvider('failedConflictProvider')]
+    public function failedConflict(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
-        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/422 ВАЛИДАЦИЯ: '.$example['want_to']);
+        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/409 КОНФЛИКТ: '.$example['want_to']);
 
-        $this->authorized(I: $I);
+        if (!empty($example['is_authorize']) && true === $example['is_authorize']) {
+            $this->authorized(I: $I);
+        }
 
         $context = $example['context'] ?? [];
 
@@ -35,7 +37,7 @@ trait TestFailedValidationTrait
 
         $this->request(I: $I, url: self::getUrl(I: $I, context: $context), params: $params);
 
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
+        $I->seeResponseCodeIs(code: HttpCode::CONFLICT);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -44,5 +46,5 @@ trait TestFailedValidationTrait
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    abstract protected function failedValidationProvider(): array;
+    abstract protected function failedConflictProvider(): array;
 }
