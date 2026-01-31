@@ -29,9 +29,14 @@ final class NoteTrashCest extends AbstractCest
 
     protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $id = self::getEntity(I: $I, fixtures: $context['fixtures'] ?? [])->getId();
+        $id = self::getEntity(I: $I, fixtures: $context['fixtures']['major'] ?? [])->getId();
 
         return self::URL.'/'.$id.'/trash';
+    }
+
+    protected static function getEntity(FunctionalTester $I, array $fixtures = []): Note
+    {
+        return NoteFixture::load(I: $I, data: $fixtures);
     }
 
     protected function successProvider(): array
@@ -42,9 +47,11 @@ final class NoteTrashCest extends AbstractCest
                 'is_authorize' => true,
                 'context' => [
                     'fixtures' => [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание_0',
-                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                        'major' => [
+                            'name' => 'Заметка_0',
+                            'description' => 'Описание_0',
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -55,10 +62,5 @@ final class NoteTrashCest extends AbstractCest
                 ],
             ],
         ];
-    }
-
-    private static function getEntity(FunctionalTester $I, array $fixtures = []): Note
-    {
-        return NoteFixture::load(I: $I, data: $fixtures);
     }
 }
