@@ -59,11 +59,6 @@ final class NoteListCest extends AbstractCest
         }
     }
 
-    protected static function getEntity(FunctionalTester $I, array $fixture = []): Note
-    {
-        return NoteFixture::load(I: $I, data: $fixture);
-    }
-
     protected function successProvider(): array
     {
         return [
@@ -565,5 +560,10 @@ final class NoteListCest extends AbstractCest
                 ],
             ],
         ];
+    }
+
+    private static function getEntity(FunctionalTester $I, array $fixture = []): Note
+    {
+        return NoteFixture::load(I: $I, data: $fixture);
     }
 }

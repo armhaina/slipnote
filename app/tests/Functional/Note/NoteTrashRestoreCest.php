@@ -34,11 +34,6 @@ final class NoteTrashRestoreCest extends AbstractCest
         return self::URL.'/'.$id.'/trash/restore';
     }
 
-    protected static function getEntity(FunctionalTester $I, array $fixtures = []): Note
-    {
-        return NoteFixture::load(I: $I, data: $fixtures);
-    }
-
     protected function successProvider(): array
     {
         return [
@@ -63,5 +58,10 @@ final class NoteTrashRestoreCest extends AbstractCest
                 ],
             ],
         ];
+    }
+
+    private static function getEntity(FunctionalTester $I, array $fixtures = []): Note
+    {
+        return NoteFixture::load(I: $I, data: $fixtures);
     }
 }

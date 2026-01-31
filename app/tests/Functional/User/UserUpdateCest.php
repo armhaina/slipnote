@@ -37,11 +37,6 @@ final class UserUpdateCest extends AbstractCest
         return self::URL.'/'.$id;
     }
 
-    protected static function getEntity(FunctionalTester $I, array $fixtures = []): User
-    {
-        return UserFixture::load(I: $I, data: $fixtures);
-    }
-
     protected static function contextHandle(FunctionalTester $I, array &$context): void
     {
         if (!empty($context['fixtures']['minor'])) {
@@ -144,5 +139,10 @@ final class UserUpdateCest extends AbstractCest
                 ],
             ],
         ];
+    }
+
+    private static function getEntity(FunctionalTester $I, array $fixtures = []): User
+    {
+        return UserFixture::load(I: $I, data: $fixtures);
     }
 }
