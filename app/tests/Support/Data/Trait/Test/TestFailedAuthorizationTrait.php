@@ -23,11 +23,13 @@ trait TestFailedAuthorizationTrait
     {
         self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/401: Ошибка авторизации');
 
-        $this->request(
-            I: $I,
-            params: $example['params'] ?? [],
-            context: $example['context'] ?? []
-        );
+        $context = $example['context'] ?? [];
+
+        self::contextHandle(I: $I, context: $context);
+
+        $params = $context['params'] ?? [];
+
+        $this->request(I: $I, url: self::getUrl(I: $I, context: $context), params: $params);
 
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();

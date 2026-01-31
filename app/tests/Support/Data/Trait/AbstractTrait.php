@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 trait AbstractTrait
 {
-    abstract protected static function getUrl(FunctionalTester $I, array $context = []): string;
-
     abstract protected static function getMethod(): string;
+
+    abstract protected static function getUrl(FunctionalTester $I, array $context = []): string;
 
     protected static function setWantTo(Scenario $scenario, string $wantTo): void
     {
@@ -41,15 +41,19 @@ trait AbstractTrait
         return $data;
     }
 
-    protected function request(FunctionalTester $I, array $params = [], array $context = []): void
+    protected function request(FunctionalTester $I, string $url, array $params): void
     {
         // TODO: переделать exception
         match (self::getMethod()) {
-            Request::METHOD_GET => $I->sendGet(url: self::getUrl(I: $I, context: $context), params: $params),
-            Request::METHOD_POST => $I->sendPost(url: self::getUrl(I: $I, context: $context), params: $params),
-            Request::METHOD_PUT => $I->sendPut(url: self::getUrl(I: $I, context: $context), params: $params),
-            Request::METHOD_DELETE => $I->sendDelete(url: self::getUrl(I: $I, context: $context)),
+            Request::METHOD_GET => $I->sendGet(url: $url, params: $params),
+            Request::METHOD_POST => $I->sendPost(url: $url, params: $params),
+            Request::METHOD_PUT => $I->sendPut(url: $url, params: $params),
+            Request::METHOD_DELETE => $I->sendDelete(url: $url),
             default => throw new \Exception()
         };
     }
+
+    protected static function paramsHandle(FunctionalTester $I, array &$params): void {}
+
+    protected static function contextHandle(FunctionalTester $I, array &$context): void {}
 }
