@@ -38,6 +38,11 @@ final class UserUpdatePasswordCest extends AbstractCest
         return self::URL.'/'.$id.'/password';
     }
 
+    protected static function getEntity(FunctionalTester $I, array $fixtures = []): User
+    {
+        return UserFixture::load(I: $I, data: $fixtures);
+    }
+
     protected function successProvider(): array
     {
         return [
@@ -152,10 +157,5 @@ final class UserUpdatePasswordCest extends AbstractCest
                 ],
             ],
         ];
-    }
-
-    protected static function getEntity(FunctionalTester $I, array $fixtures = []): User
-    {
-        return UserFixture::load(I: $I, data: $fixtures);
     }
 }
