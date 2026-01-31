@@ -273,11 +273,8 @@ class NoteController extends AbstractController
     )]
     public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
     {
+        /** @var User $user */
         $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            throw new ForbiddenException();
-        }
 
         if (!is_bool($model->getIsTrashed())) {
             $model->setIsTrashed(isTrashed: false);
