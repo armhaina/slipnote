@@ -23,7 +23,7 @@ trait TestFailedValidationTrait
     #[DataProvider('failedValidationProvider')]
     public function failedValidation(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
-        self::setWantTo(scenario: $scenario, wantTo: $example['want']);
+        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/422: '.$example['want_to']);
 
         $this->authorized(I: $I);
         $this->request(

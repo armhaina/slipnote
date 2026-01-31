@@ -23,7 +23,7 @@ trait TestSuccessTrait
     #[DataProvider('successProvider')]
     public function success(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
-        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/200: Успех');
+        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/200: '.$example['want_to']);
 
         $this->authorized(I: $I);
         $this->request(

@@ -35,6 +35,7 @@ final class NoteCreateCest extends AbstractCest
     {
         return [
             [
+                'want_to' => 'Создать заметку',
                 'params' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
@@ -55,7 +56,7 @@ final class NoteCreateCest extends AbstractCest
 
         return [
             [
-                'want' => 'POST/422: Название (мин.)',
+                'want_to' => 'Название (мин.)',
                 'params' => [
                     'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(0, 0).'}'),
                 ],
@@ -75,7 +76,7 @@ final class NoteCreateCest extends AbstractCest
                 ],
             ],
             [
-                'want' => 'POST/422: Название (макс.)',
+                'want_to' => 'Название (макс.)',
                 'params' => [
                     'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
                 ],
@@ -91,7 +92,7 @@ final class NoteCreateCest extends AbstractCest
                 ],
             ],
             [
-                'want' => 'POST/422: Описание (макс.)',
+                'want_to' => 'Описание (макс.)',
                 'params' => [
                     'name' => 'Название',
                     'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),

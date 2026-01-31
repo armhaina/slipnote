@@ -36,6 +36,7 @@ final class NoteDeleteCest extends AbstractCest
     {
         return [
             [
+                'want_to' => 'Удалить заметку',
                 'context' => [
                     'fixture' => [
                         'name' => 'Заметка_0',

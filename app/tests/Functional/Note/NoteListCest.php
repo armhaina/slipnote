@@ -7,13 +7,19 @@ namespace App\Tests\Functional\Note;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\Data\Fixture\NoteFixture;
 use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
+use Symfony\Component\HttpFoundation\Request;
 
 final class NoteListCest extends AbstractCest
 {
+    use TestSuccessTrait;
+    use TestFailedAuthorizationTrait;
+
     private const string URL = '/api/v1/notes';
 
     #[DataProvider('mainProvider')]
@@ -273,39 +279,33 @@ final class NoteListCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('GET/401: Ошибка авторизации');
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixture::load(I: $I, data: $fixture);
-        }
-
-        $I->sendGet(url: self::URL);
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL;
     }
 
-    protected function mainProvider(): array
+    protected static function getMethod(): string
+    {
+        return Request::METHOD_GET;
+    }
+
+    protected function successProvider(): array
     {
         return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок',
+                'context' => [
+                    'fixtures' => [
+                        [
+                            'name' => 'Заметка_0',
+                            'description' => 'Описание заметки_0',
+                            'user' => ['email' => 'test_0@mail.ru'],
+                        ],
+                        [
+                            'name' => 'Заметка_1',
+                            'description' => 'Описание заметки_1',
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -321,30 +321,6 @@ final class NoteListCest extends AbstractCest
                             'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
-                ],
-            ],
-        ];
-    }
-
-    protected function failedAuthorizationProvider(): array
-    {
-        return [
-            [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
-                    ],
-                ],
-                'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
                 ],
             ],
         ];

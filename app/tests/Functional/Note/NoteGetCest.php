@@ -36,6 +36,7 @@ final class NoteGetCest extends AbstractCest
     {
         return [
             [
+                'want_to' => 'Получить заметку',
                 'context' => [
                     'fixture' => [
                         'name' => 'Заметка_0',
