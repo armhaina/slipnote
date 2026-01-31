@@ -37,7 +37,7 @@ final class UserDeleteCest extends AbstractCest
     {
         return [
             [
-                'want_to' => 'Удалить пользователя',
+                'want_to' => 'Удалить пользователя (только текущий пользователь)',
                 'is_authorize' => true,
                 'context' => [
                     'fixtures' => [
