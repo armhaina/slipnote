@@ -10,9 +10,6 @@ use App\Tests\Support\Data\Trait\Test\TestFailedConflictTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
 use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
 use Faker\Factory;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,23 +37,6 @@ final class UserCreateCest extends AbstractCest
             UserFixture::load(I: $I, data: $context['fixtures']);
         }
     }
-
-    //    #[DataProvider('failedEmailAlreadyExistsProvider')]
-    //    public function failedEmailAlreadyExists(FunctionalTester $I, Example $example): void
-    //    {
-    //        $I->wantTo('POST/409: Почта уже существует');
-    //
-    //        UserFixture::load(I: $I, data: $example['fixtures']);
-    //
-    //        $I->sendPost(url: self::URL, params: $example['request']);
-    //        $I->seeResponseCodeIs(code: HttpCode::CONFLICT);
-    //        $I->seeResponseIsJson();
-    //
-    //        $data = json_decode($I->grabResponse(), true);
-    //        $data = self::except(data: $data, excludeKeys: ['id']);
-    //
-    //        $I->assertEquals(expected: $example['response'], actual: $data);
-    //    }
 
     protected function successProvider(): array
     {
