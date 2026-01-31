@@ -46,7 +46,7 @@ trait TestFailedAuthorizationTrait
         );
     }
 
-    private function failedAuthorizationProvider(): array
+    protected function failedAuthorizationProvider(): array
     {
         return [['plug']];
     }
