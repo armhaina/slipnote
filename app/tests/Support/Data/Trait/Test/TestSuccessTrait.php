@@ -25,7 +25,7 @@ trait TestSuccessTrait
     {
         self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/200: '.$example['want_to']);
 
-        if (true === $example['is_authorize']) {
+        if (!empty($example['is_authorize']) && true === $example['is_authorize']) {
             $this->authorized(I: $I);
         }
 

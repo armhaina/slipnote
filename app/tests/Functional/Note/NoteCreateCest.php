@@ -36,9 +36,12 @@ final class NoteCreateCest extends AbstractCest
         return [
             [
                 'want_to' => 'Создать заметку',
-                'params' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                    ],
                 ],
                 'response' => [
                     'name' => 'Заметка_0',
@@ -57,8 +60,11 @@ final class NoteCreateCest extends AbstractCest
         return [
             [
                 'want_to' => 'Название (мин.)',
-                'params' => [
-                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(0, 0).'}'),
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(0, 0).'}'),
+                    ],
                 ],
                 'response' => [
                     'success' => false,
@@ -77,9 +83,13 @@ final class NoteCreateCest extends AbstractCest
             ],
             [
                 'want_to' => 'Название (макс.)',
-                'params' => [
-                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
+                    ],
                 ],
+
                 'response' => [
                     'success' => false,
                     'message' => 'Ошибка валидации',
@@ -93,9 +103,12 @@ final class NoteCreateCest extends AbstractCest
             ],
             [
                 'want_to' => 'Описание (макс.)',
-                'params' => [
-                    'name' => 'Название',
-                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => 'Название',
+                        'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
+                    ],
                 ],
                 'response' => [
                     'success' => false,

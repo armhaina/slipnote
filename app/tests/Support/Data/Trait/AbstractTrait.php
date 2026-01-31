@@ -12,7 +12,7 @@ trait AbstractTrait
 {
     abstract protected static function getMethod(): string;
 
-    abstract protected static function getUrl(FunctionalTester $I, array $context = []): string;
+    abstract protected static function getUrl(FunctionalTester $I, array $context): string;
 
     protected static function setWantTo(Scenario $scenario, string $wantTo): void
     {
@@ -52,8 +52,6 @@ trait AbstractTrait
             default => throw new \Exception()
         };
     }
-
-    protected static function paramsHandle(FunctionalTester $I, array &$params): void {}
 
     protected static function contextHandle(FunctionalTester $I, array &$context): void {}
 }

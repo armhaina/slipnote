@@ -29,7 +29,9 @@ final class NoteGetCest extends AbstractCest
 
     protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        return self::URL.'/'.self::getEntity(I: $I, fixtures: $context['fixture'] ?? [])->getId();
+        $id = self::getEntity(I: $I, fixtures: $context['fixtures'] ?? [])->getId();
+
+        return self::URL.'/'.$id;
     }
 
     protected function successProvider(): array
@@ -37,8 +39,9 @@ final class NoteGetCest extends AbstractCest
         return [
             [
                 'want_to' => 'Получить заметку',
+                'is_authorize' => true,
                 'context' => [
-                    'fixture' => [
+                    'fixtures' => [
                         'name' => 'Заметка_0',
                         'description' => 'Описание_0',
                         'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
