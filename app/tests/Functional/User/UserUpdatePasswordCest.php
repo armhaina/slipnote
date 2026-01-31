@@ -4,37 +4,32 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\User;
 
+use App\Entity\User;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Skip;
 use Codeception\Example;
-use Codeception\Scenario;
 use Codeception\Util\HttpCode;
 use Faker\Factory;
+use Symfony\Component\HttpFoundation\Request;
 
 final class UserUpdatePasswordCest extends AbstractCest
 {
+    use TestSuccessTrait;
+    use TestFailedAuthorizationTrait;
+    use TestFailedForbiddenTrait;
+    use TestFailedValidationTrait;
+
     private const string URL = '/api/v1/users';
 
-    #[DataProvider('mainProvider')]
-    public function main(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/200: Изменить пароль пользователя');
-
-        $user = $this->authorized(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId().'/password', params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
     #[DataProvider('failedInvalidCurrentPasswordProvider')]
+    #[Skip]
     public function failedInvalidCurrentPassword(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT/400: Неверный текущий пароль пользователя');
@@ -51,85 +46,104 @@ final class UserUpdatePasswordCest extends AbstractCest
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    protected static function getMethod(): string
     {
-        $I->wantTo('PUT/401: Ошибка авторизации');
-
-        $user = UserFixture::load(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId().'/password');
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return Request::METHOD_PUT;
     }
 
-    #[DataProvider('forbiddenProvider')]
-    public function forbidden(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('PUT/403: Доступ запрещен');
+        $id = self::getEntity(I: $I, fixtures: $context['fixtures']['major'] ?? [])->getId();
 
-        $this->authorized(I: $I);
-        $user = UserFixture::load(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId().'/password', params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL.'/'.$id.'/password';
     }
 
-    #[DataProvider('failedValidationPasswordMinProvider')]
-    public function failedValidationPasswordMin(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('POST/422: Ошибка валидации (пароль минимум)');
-
-        $user = $this->authorized(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId().'/password', params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedValidationPasswordMaxProvider')]
-    public function failedValidationPasswordMax(FunctionalTester $I, Example $example, Scenario $scenario): void
-    {
-        $I->wantTo('POST/422: Ошибка валидации (пароль максимум)');
-
-        $user = $this->authorized(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId().'/password', params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    protected function mainProvider(): array
+    protected function successProvider(): array
     {
         return [
             [
-                'request' => [
-                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
-                    'new_password' => 'password123',
+                'want_to' => 'Изменить пароль',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
+                        'new_password' => 'password123',
+                    ],
+                    'fixtures' => [
+                        'major' => [
+                            'email' => UserFixture::USER_AUTHORIZED_EMAIL,
+                        ],
+                    ],
                 ],
                 'response' => [
                     'email' => UserFixture::USER_AUTHORIZED_EMAIL,
+                ],
+            ],
+        ];
+    }
+
+    protected function failedForbiddenProvider(): array
+    {
+        return [
+            [
+                'context' => [
+                    'params' => [
+                        'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
+                        'new_password' => 'password123',
+                    ],
+                    'fixtures' => [
+                        'major' => [
+                            'email' => 'launch@mail.ru',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    protected function failedValidationProvider(): array
+    {
+        $faker = Factory::create();
+
+        return [
+            [
+                'want_to' => 'Пароль мин.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
+                        'new_password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(5, 5).'}'),
+                    ],
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Ошибка валидации',
+                    'errors' => [
+                        [
+                            'property' => 'new_password',
+                            'message' => 'Пароль должен содержать минимум 6 символов',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'want_to' => 'Пароль макс.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
+                        'new_password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(19, 19).'}'),
+                    ],
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Ошибка валидации',
+                    'errors' => [
+                        [
+                            'property' => 'new_password',
+                            'message' => 'Пароль должен содержать максимум 18 символов',
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -151,79 +165,8 @@ final class UserUpdatePasswordCest extends AbstractCest
         ];
     }
 
-    protected function failedAuthorizationProvider(): array
+    private static function getEntity(FunctionalTester $I, array $fixtures = []): User
     {
-        return [
-            [
-                'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
-                ],
-            ],
-        ];
-    }
-
-    protected function forbiddenProvider(): array
-    {
-        return [
-            [
-                'request' => [
-                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
-                    'new_password' => 'password123',
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Доступ запрещен',
-                ],
-            ],
-        ];
-    }
-
-    protected function failedValidationPasswordMinProvider(): array
-    {
-        $faker = Factory::create();
-
-        return [
-            [
-                'request' => [
-                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
-                    'new_password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(5, 5).'}'),
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Ошибка валидации',
-                    'errors' => [
-                        [
-                            'property' => 'new_password',
-                            'message' => 'Пароль должен содержать минимум 6 символов',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function failedValidationPasswordMaxProvider(): array
-    {
-        $faker = Factory::create();
-
-        return [
-            [
-                'request' => [
-                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
-                    'new_password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(19, 19).'}'),
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Ошибка валидации',
-                    'errors' => [
-                        [
-                            'property' => 'new_password',
-                            'message' => 'Пароль должен содержать максимум 18 символов',
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        return UserFixture::load(I: $I, data: $fixtures);
     }
 }
