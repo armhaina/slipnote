@@ -47,7 +47,7 @@ final class UserUpdatePasswordCest extends AbstractCest
     {
         return [
             [
-                'want_to' => 'Изменить пароль',
+                'want_to' => 'Изменить пароль пользователя (только текущий пользователь)',
                 'is_authorize' => true,
                 'context' => [
                     'params' => [

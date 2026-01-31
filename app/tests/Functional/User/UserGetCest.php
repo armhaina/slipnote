@@ -28,9 +28,14 @@ final class UserGetCest extends AbstractCest
 
     protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $id = self::getEntity(I: $I, fixtures: $context['fixtures'] ?? [])->getId();
+        $id = self::getEntity(I: $I, fixtures: $context['fixtures']['major'] ?? [])->getId();
 
         return self::URL.'/'.$id;
+    }
+
+    protected static function getEntity(FunctionalTester $I, array $fixtures = []): User
+    {
+        return UserFixture::load(I: $I, data: $fixtures);
     }
 
     protected function successProvider(): array
@@ -41,7 +46,9 @@ final class UserGetCest extends AbstractCest
                 'is_authorize' => true,
                 'context' => [
                     'fixtures' => [
-                        'email' => UserFixture::USER_AUTHORIZED_EMAIL,
+                        'major' => [
+                            'email' => UserFixture::USER_AUTHORIZED_EMAIL,
+                        ],
                     ],
                 ],
                 'response' => [
@@ -49,10 +56,5 @@ final class UserGetCest extends AbstractCest
                 ],
             ],
         ];
-    }
-
-    private static function getEntity(FunctionalTester $I, array $fixtures = []): User
-    {
-        return UserFixture::load(I: $I, data: $fixtures);
     }
 }
