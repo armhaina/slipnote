@@ -8,43 +8,23 @@ use App\Entity\User;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedBadRequestTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
 use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Attribute\Skip;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
 use Faker\Factory;
 use Symfony\Component\HttpFoundation\Request;
 
 final class UserUpdatePasswordCest extends AbstractCest
 {
     use TestSuccessTrait;
+    use TestFailedBadRequestTrait;
     use TestFailedAuthorizationTrait;
     use TestFailedForbiddenTrait;
     use TestFailedValidationTrait;
 
     private const string URL = '/api/v1/users';
-
-    #[DataProvider('failedInvalidCurrentPasswordProvider')]
-    #[Skip]
-    public function failedInvalidCurrentPassword(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/400: Неверный текущий пароль пользователя');
-
-        $user = $this->authorized(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId().'/password', params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::BAD_REQUEST);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
 
     protected static function getMethod(): string
     {
@@ -149,13 +129,22 @@ final class UserUpdatePasswordCest extends AbstractCest
         ];
     }
 
-    protected function failedInvalidCurrentPasswordProvider(): array
+    protected function failedBadRequestProvider(): array
     {
         return [
             [
-                'request' => [
-                    'current_password' => 'invalidate_password',
-                    'new_password' => 'password123',
+                'want_to' => 'Неверный текущий пароль пользователя',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'current_password' => 'invalidate_password',
+                        'new_password' => 'password123',
+                    ],
+                    'fixtures' => [
+                        'major' => [
+                            'email' => UserFixture::USER_AUTHORIZED_EMAIL,
+                        ],
+                    ],
                 ],
                 'response' => [
                     'success' => false,
