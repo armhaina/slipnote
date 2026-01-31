@@ -7,6 +7,7 @@ namespace App\Tests\Functional\User;
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\Data\Trait\Test\TestFailedConflictTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
 use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class UserCreateCest extends AbstractCest
 {
     use TestSuccessTrait;
+    use TestFailedForbiddenTrait;
     use TestFailedConflictTrait;
     use TestFailedValidationTrait;
 
@@ -41,6 +43,24 @@ final class UserCreateCest extends AbstractCest
     }
 
     protected function successProvider(): array
+    {
+        return [
+            [
+                'want_to' => 'Создать пользователя',
+                'context' => [
+                    'params' => [
+                        'email' => 'create@mail.ru',
+                        'password' => 'createPassword',
+                    ],
+                ],
+                'response' => [
+                    'email' => 'create@mail.ru',
+                ],
+            ],
+        ];
+    }
+
+    protected function failedForbiddenProvider(): array
     {
         return [
             [
