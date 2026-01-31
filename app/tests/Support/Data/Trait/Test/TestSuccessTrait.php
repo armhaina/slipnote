@@ -12,7 +12,7 @@ use Codeception\Example;
 use Codeception\Scenario;
 use Codeception\Util\HttpCode;
 
-trait TestFailedValidationTrait
+trait TestSuccessTrait
 {
     use AbstractTrait;
     use HandleAuthorizedTrait;
@@ -20,10 +20,10 @@ trait TestFailedValidationTrait
     /**
      * @throws \Exception
      */
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Scenario $scenario, Example $example): void
+    #[DataProvider('successProvider')]
+    public function success(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
-        self::setWantTo(scenario: $scenario, wantTo: $example['want']);
+        self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/200: Успех');
 
         $this->authorized(I: $I);
         $this->request(
@@ -32,7 +32,7 @@ trait TestFailedValidationTrait
             context: $example['context'] ?? []
         );
 
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
+        $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -41,5 +41,5 @@ trait TestFailedValidationTrait
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    abstract protected function failedValidationProvider(): array;
+    abstract protected function successProvider(): array;
 }

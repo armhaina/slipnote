@@ -26,7 +26,11 @@ trait TestFailedForbiddenTrait
         self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $this->request(I: $I);
+        $this->request(
+            I: $I,
+            params: $example['params'] ?? [],
+            context: $example['context'] ?? []
+        );
 
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
@@ -37,7 +41,7 @@ trait TestFailedForbiddenTrait
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    protected function forbiddenProvider(): array
+    private function forbiddenProvider(): array
     {
         return [
             [

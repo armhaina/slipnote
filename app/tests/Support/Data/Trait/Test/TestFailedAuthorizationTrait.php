@@ -23,7 +23,11 @@ trait TestFailedAuthorizationTrait
     {
         self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/401: Ошибка авторизации');
 
-        $this->request(I: $I);
+        $this->request(
+            I: $I,
+            params: $example['params'] ?? [],
+            context: $example['context'] ?? []
+        );
 
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
         $I->seeResponseIsJson();
@@ -34,7 +38,7 @@ trait TestFailedAuthorizationTrait
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    protected function failedAuthorizationProvider(): array
+    private function failedAuthorizationProvider(): array
     {
         return [
             [

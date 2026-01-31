@@ -6,42 +6,20 @@ namespace App\Tests\Functional\Note;
 
 use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\Data\Fixture\UserFixture;
-use App\Tests\Support\Data\Trait\AbstractTrait;
-use App\Tests\Support\Data\Trait\Handle\HandleAuthorizedTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
 use Faker\Factory;
 use Symfony\Component\HttpFoundation\Request;
 
 final class NoteCreateCest extends AbstractCest
 {
-    use AbstractTrait;
-    use HandleAuthorizedTrait;
+    use TestSuccessTrait;
     use TestFailedAuthorizationTrait;
     use TestFailedValidationTrait;
 
     private const string URL = '/api/v1/notes';
-
-    #[DataProvider('mainProvider')]
-    public function main(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('POST/200: Создать заметку');
-
-        $this->authorized(I: $I);
-
-        $I->sendPost(url: self::URL, params: $example['params']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
 
     protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
@@ -53,7 +31,7 @@ final class NoteCreateCest extends AbstractCest
         return Request::METHOD_POST;
     }
 
-    protected function mainProvider(): array
+    protected function successProvider(): array
     {
         return [
             [
