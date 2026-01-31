@@ -13,6 +13,7 @@ enum ValidationError: string
     case LENGTH_MIN = 'Минимально допустимое значение символов: {{ limit }}. Ваше кол-во символов: {{ value_length }}';
     case LENGTH_MAX = 'Максимально допустимое значение символов: {{ limit }}. Ваше кол-во символов: {{ value_length }}';
     case TYPE_NUMERIC = 'Переданное значение должно содержать число. Вы передали: {{ value }}';
+    case NOT_BLANK = 'Поле не может быть пустым';
 
     case REQUIRED = 'Поле обязательно для заполнения';
     case INVALID_EMAIL = 'Неверный формат email';

@@ -105,7 +105,11 @@ final class NoteCreateCest extends AbstractCest
                     'errors' => [
                         [
                             'property' => 'name',
-                            'message' => 'Название должно содержать минимум 1 символ',
+                            'message' => 'Поле не может быть пустым',
+                        ],
+                        [
+                            'property' => 'name',
+                            'message' => 'Минимально допустимое значение символов: 1. Ваше кол-во символов: 0',
                         ],
                     ],
                 ],
@@ -121,7 +125,7 @@ final class NoteCreateCest extends AbstractCest
                     'errors' => [
                         [
                             'property' => 'name',
-                            'message' => 'Название должно содержать максимум 100 символов',
+                            'message' => 'Максимально допустимое значение символов: 100. Ваше кол-во символов: 101',
                         ],
                     ],
                 ],
@@ -129,6 +133,7 @@ final class NoteCreateCest extends AbstractCest
             [
                 'want' => 'POST/422: Описание (макс.)',
                 'request' => [
+                    'name' => 'Название',
                     'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
                 ],
                 'response' => [
@@ -137,7 +142,7 @@ final class NoteCreateCest extends AbstractCest
                     'errors' => [
                         [
                             'property' => 'description',
-                            'message' => 'Описание должно содержать максимум 10000 символов',
+                            'message' => 'Максимально допустимое значение символов: 10000. Ваше кол-во символов: 10001',
                         ],
                     ],
                 ],
