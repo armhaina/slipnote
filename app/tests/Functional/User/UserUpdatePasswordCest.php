@@ -154,7 +154,7 @@ final class UserUpdatePasswordCest extends AbstractCest
         ];
     }
 
-    private static function getEntity(FunctionalTester $I, array $fixtures = []): User
+    protected static function getEntity(FunctionalTester $I, array $fixtures = []): User
     {
         return UserFixture::load(I: $I, data: $fixtures);
     }
