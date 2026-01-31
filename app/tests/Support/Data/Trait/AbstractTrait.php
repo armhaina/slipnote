@@ -41,14 +41,14 @@ trait AbstractTrait
         return $data;
     }
 
-    protected function request(FunctionalTester $I): void
+    protected function request(FunctionalTester $I, array $params = []): void
     {
         // TODO: переделать exception
         match (self::getMethod()) {
-            Request::METHOD_GET => $I->sendGet(url: self::getUrl(I: $I)),
-            Request::METHOD_POST => $I->sendPost(url: self::getUrl(I: $I)),
-            Request::METHOD_PUT => $I->sendPut(url: self::getUrl(I: $I)),
-            Request::METHOD_DELETE => $I->sendDelete(url: self::getUrl(I: $I)),
+            Request::METHOD_GET => $I->sendGet(url: self::getUrl(I: $I), params: $params),
+            Request::METHOD_POST => $I->sendPost(url: self::getUrl(I: $I), params: $params),
+            Request::METHOD_PUT => $I->sendPut(url: self::getUrl(I: $I), params: $params),
+            Request::METHOD_DELETE => $I->sendDelete(url: self::getUrl(I: $I), params: $params),
             default => throw new \Exception()
         };
     }

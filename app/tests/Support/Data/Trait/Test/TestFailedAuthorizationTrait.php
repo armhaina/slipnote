@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Support\Data\Trait\Test;
 
 use App\Tests\Support\Data\Trait\AbstractTrait;
-use App\Tests\Support\Data\Trait\Handle\HandleAuthorizedTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -15,7 +14,6 @@ use Codeception\Util\HttpCode;
 trait TestFailedAuthorizationTrait
 {
     use AbstractTrait;
-    use HandleAuthorizedTrait;
 
     /**
      * @throws \Exception

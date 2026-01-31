@@ -9,11 +9,10 @@ use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\Data\Trait\AbstractTrait;
 use App\Tests\Support\Data\Trait\Handle\HandleAuthorizedTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
-use Codeception\Attribute\Depends;
 use Codeception\Example;
-use Codeception\Scenario;
 use Codeception\Util\HttpCode;
 use Faker\Factory;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +22,7 @@ final class NoteCreateCest extends AbstractCest
     use AbstractTrait;
     use HandleAuthorizedTrait;
     use TestFailedAuthorizationTrait;
+    use TestFailedValidationTrait;
 
     private const string URL = '/api/v1/notes';
 
@@ -33,26 +33,8 @@ final class NoteCreateCest extends AbstractCest
 
         $this->authorized(I: $I);
 
-        $I->sendPost(url: self::URL, params: $example['request']);
+        $I->sendPost(url: self::URL, params: $example['params']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedValidationProvider')]
-    #[Depends('failedAuthorization')]
-    public function failedValidation(FunctionalTester $I, Example $example, Scenario $scenario): void
-    {
-        self::setWantTo(scenario: $scenario, wantTo: $example['want']);
-
-        $this->authorized(I: $I);
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
@@ -75,7 +57,7 @@ final class NoteCreateCest extends AbstractCest
     {
         return [
             [
-                'request' => [
+                'params' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
                 ],
@@ -96,7 +78,7 @@ final class NoteCreateCest extends AbstractCest
         return [
             [
                 'want' => 'POST/422: Название (мин.)',
-                'request' => [
+                'params' => [
                     'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(0, 0).'}'),
                 ],
                 'response' => [
@@ -116,7 +98,7 @@ final class NoteCreateCest extends AbstractCest
             ],
             [
                 'want' => 'POST/422: Название (макс.)',
-                'request' => [
+                'params' => [
                     'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
                 ],
                 'response' => [
@@ -132,7 +114,7 @@ final class NoteCreateCest extends AbstractCest
             ],
             [
                 'want' => 'POST/422: Описание (макс.)',
-                'request' => [
+                'params' => [
                     'name' => 'Название',
                     'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
                 ],
