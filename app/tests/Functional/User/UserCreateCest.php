@@ -33,8 +33,10 @@ final class UserCreateCest extends AbstractCest
 
     protected static function contextHandle(FunctionalTester $I, array &$context): void
     {
-        if (!empty($context['fixtures'])) {
-            UserFixture::load(I: $I, data: $context['fixtures']);
+        if (!empty($context['fixtures']['minor'])) {
+            foreach ($context['fixtures']['minor'] as $fixture) {
+                UserFixture::load(I: $I, data: $fixture);
+            }
         }
     }
 
@@ -132,7 +134,11 @@ final class UserCreateCest extends AbstractCest
                         'password' => 'createPassword',
                     ],
                     'fixtures' => [
-                        'email' => 'create@mail.ru',
+                        'minor' => [
+                            [
+                                'email' => 'create@mail.ru',
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
