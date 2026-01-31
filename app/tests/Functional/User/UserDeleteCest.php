@@ -6,7 +6,7 @@ namespace App\Tests\Functional\User;
 
 use App\Entity\User;
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -39,7 +39,7 @@ final class UserDeleteCest extends AbstractCest
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('DELETE/401: Ошибка авторизации');
-        $user = UserFixtures::load(I: $I);
+        $user = UserFixture::load(I: $I);
 
         $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
@@ -57,7 +57,7 @@ final class UserDeleteCest extends AbstractCest
         $I->wantTo('DELETE/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $user = UserFixtures::load(I: $I);
+        $user = UserFixture::load(I: $I);
 
         $I->sendDelete(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);

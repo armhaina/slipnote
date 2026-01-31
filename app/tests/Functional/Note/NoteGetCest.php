@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Note;
 
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\NoteFixtures;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\NoteFixture;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -22,7 +22,7 @@ final class NoteGetCest extends AbstractCest
         $I->wantTo('GET/200: Получить заметку');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $note = NoteFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendGet(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
@@ -39,7 +39,7 @@ final class NoteGetCest extends AbstractCest
     {
         $I->wantTo('GET/401: Ошибка авторизации');
 
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $note = NoteFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendGet(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
@@ -57,7 +57,7 @@ final class NoteGetCest extends AbstractCest
         $I->wantTo('GET/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $note = NoteFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendGet(url: self::URL.'/'.$note->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
@@ -76,13 +76,13 @@ final class NoteGetCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
                     'is_trashed' => false,
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
             ],
         ];
@@ -95,7 +95,7 @@ final class NoteGetCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
                 'response' => [
                     'code' => 401,

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Note;
 
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\NoteFixtures;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\NoteFixture;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -24,7 +24,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
+            NoteFixture::load(I: $I, data: $fixture);
         }
 
         $I->sendGet(url: self::URL);
@@ -45,7 +45,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['search' => 'мА']);
@@ -66,7 +66,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['is_trashed' => true]);
@@ -89,7 +89,7 @@ final class NoteListCest extends AbstractCest
         $noteIds = [];
 
         foreach ($example['fixtures'] as $fixture) {
-            $noteIds[] = NoteFixtures::load(I: $I, data: $fixture)->getId();
+            $noteIds[] = NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['ids' => $noteIds]);
@@ -112,7 +112,7 @@ final class NoteListCest extends AbstractCest
         $users = [];
 
         foreach ($example['fixtures'] as $fixture) {
-            $note = NoteFixtures::load(I: $I, data: $fixture);
+            $note = NoteFixture::load(I: $I, data: $fixture);
             $users[] = $note->getUser()->getId();
         }
 
@@ -134,7 +134,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
+            NoteFixture::load(I: $I, data: $fixture);
         }
 
         $I->sendGet(url: self::URL, params: ['updated_at_less' => $example['query']['updated_at_less']]);
@@ -155,7 +155,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['order_by[name]' => 'asc']);
@@ -176,7 +176,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['order_by[name]' => 'desc']);
@@ -197,7 +197,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'asc']);
@@ -218,7 +218,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'desc']);
@@ -239,7 +239,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'asc']);
@@ -260,7 +260,7 @@ final class NoteListCest extends AbstractCest
         $this->authorized(I: $I);
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+            NoteFixture::load(I: $I, data: $fixture)->getId();
         }
 
         $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'desc']);
@@ -279,7 +279,7 @@ final class NoteListCest extends AbstractCest
         $I->wantTo('GET/401: Ошибка авторизации');
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
+            NoteFixture::load(I: $I, data: $fixture);
         }
 
         $I->sendGet(url: self::URL);
@@ -305,7 +305,7 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -318,7 +318,7 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -339,7 +339,7 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -358,13 +358,13 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
                         'is_trashed' => true,
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -377,7 +377,7 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => true,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -403,22 +403,22 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Машина',
                         'description' => 'Описание_10',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Лодка',
                         'description' => 'Описание: марка',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Комар',
                         'description' => 'Описание_100',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Смерть',
                         'description' => 'Описание_1000',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -431,19 +431,19 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Машина',
                             'description' => 'Описание_10',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Лодка',
                             'description' => 'Описание: марка',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Комар',
                             'description' => 'Описание_100',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -464,7 +464,7 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -477,7 +477,7 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -496,13 +496,13 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         'updated_at' => new \DateTimeImmutable('01.03.2025'),
                     ],
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         'updated_at' => new \DateTimeImmutable('01.01.2025'),
                     ],
                 ],
@@ -516,7 +516,7 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -537,7 +537,7 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -550,7 +550,7 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -566,12 +566,12 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -584,13 +584,13 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -606,12 +606,12 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -624,13 +624,13 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -646,12 +646,12 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -664,13 +664,13 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -686,12 +686,12 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                     ],
                 ],
                 'response' => [
@@ -704,13 +704,13 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -726,13 +726,13 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         'updated_at' => new \DateTimeImmutable('01.01.2025'),
                     ],
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         'updated_at' => new \DateTimeImmutable('01.01.2030'),
                     ],
                 ],
@@ -746,13 +746,13 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -768,13 +768,13 @@ final class NoteListCest extends AbstractCest
                     [
                         'name' => 'Заметка_1',
                         'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         'updated_at' => new \DateTimeImmutable('01.01.2030'),
                     ],
                     [
                         'name' => 'Заметка_0',
                         'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                        'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         'updated_at' => new \DateTimeImmutable('01.01.2025'),
                     ],
                 ],
@@ -788,13 +788,13 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],

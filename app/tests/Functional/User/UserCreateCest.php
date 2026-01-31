@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\User;
 
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -37,7 +37,7 @@ final class UserCreateCest extends AbstractCest
     {
         $I->wantTo('POST/409: Почта уже существует');
 
-        UserFixtures::load(I: $I, data: $example['fixtures']);
+        UserFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendPost(url: self::URL, params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::CONFLICT);

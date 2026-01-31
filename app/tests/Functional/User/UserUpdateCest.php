@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\User;
 
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -36,7 +36,7 @@ final class UserUpdateCest extends AbstractCest
     public function failedAuthorization(FunctionalTester $I, Example $example): void
     {
         $I->wantTo('PUT/401: Ошибка авторизации');
-        $user = UserFixtures::load(I: $I);
+        $user = UserFixture::load(I: $I);
 
         $I->sendPut(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
@@ -54,7 +54,7 @@ final class UserUpdateCest extends AbstractCest
         $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $user = UserFixtures::load(I: $I);
+        $user = UserFixture::load(I: $I);
 
         $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
@@ -72,7 +72,7 @@ final class UserUpdateCest extends AbstractCest
         $I->wantTo('PUT/409: Почта уже существует');
 
         $user = $this->authorized(I: $I);
-        UserFixtures::load(I: $I, data: $example['fixtures']);
+        UserFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::CONFLICT);

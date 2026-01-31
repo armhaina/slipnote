@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\User;
 
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -37,7 +37,7 @@ final class UserGetCest extends AbstractCest
     {
         $I->wantTo('GET/401: Ошибка авторизации');
 
-        $user = UserFixtures::load(I: $I, data: $example['fixtures']);
+        $user = UserFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendGet(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
@@ -55,7 +55,7 @@ final class UserGetCest extends AbstractCest
         $I->wantTo('GET/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $user = UserFixtures::load(I: $I, data: $example['fixtures']);
+        $user = UserFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendGet(url: self::URL.'/'.$user->getId());
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
@@ -72,7 +72,7 @@ final class UserGetCest extends AbstractCest
         return [
             [
                 'response' => [
-                    'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
+                    'email' => UserFixture::USER_AUTHORIZED_EMAIL,
                 ],
             ],
         ];

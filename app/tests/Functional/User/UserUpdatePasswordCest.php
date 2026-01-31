@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\User;
 
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -56,7 +56,7 @@ final class UserUpdatePasswordCest extends AbstractCest
     {
         $I->wantTo('PUT/401: Ошибка авторизации');
 
-        $user = UserFixtures::load(I: $I);
+        $user = UserFixture::load(I: $I);
 
         $I->sendPut(url: self::URL.'/'.$user->getId().'/password');
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
@@ -74,7 +74,7 @@ final class UserUpdatePasswordCest extends AbstractCest
         $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $user = UserFixtures::load(I: $I);
+        $user = UserFixture::load(I: $I);
 
         $I->sendPut(url: self::URL.'/'.$user->getId().'/password', params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
@@ -125,11 +125,11 @@ final class UserUpdatePasswordCest extends AbstractCest
         return [
             [
                 'request' => [
-                    'current_password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
+                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
                     'new_password' => 'password123',
                 ],
                 'response' => [
-                    'email' => UserFixtures::USER_AUTHORIZED_EMAIL,
+                    'email' => UserFixture::USER_AUTHORIZED_EMAIL,
                 ],
             ],
         ];
@@ -168,7 +168,7 @@ final class UserUpdatePasswordCest extends AbstractCest
         return [
             [
                 'request' => [
-                    'current_password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
+                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
                     'new_password' => 'password123',
                 ],
                 'response' => [
@@ -186,7 +186,7 @@ final class UserUpdatePasswordCest extends AbstractCest
         return [
             [
                 'request' => [
-                    'current_password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
+                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
                     'new_password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(5, 5).'}'),
                 ],
                 'response' => [
@@ -210,7 +210,7 @@ final class UserUpdatePasswordCest extends AbstractCest
         return [
             [
                 'request' => [
-                    'current_password' => UserFixtures::USER_AUTHORIZED_PASSWORD,
+                    'current_password' => UserFixture::USER_AUTHORIZED_PASSWORD,
                     'new_password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(19, 19).'}'),
                 ],
                 'response' => [

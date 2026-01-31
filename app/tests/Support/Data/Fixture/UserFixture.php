@@ -8,7 +8,7 @@ use App\Tests\Support\FunctionalTester;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixtures
+class UserFixture
 {
     public const string USER_AUTHORIZED_EMAIL = 'userAuthorized@mail.ru';
     public const string USER_AUTHORIZED_PASSWORD = 'userAuthorizedPassword';

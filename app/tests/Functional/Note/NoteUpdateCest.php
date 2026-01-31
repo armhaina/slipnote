@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Note;
 
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\NoteFixtures;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\NoteFixture;
+use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -23,7 +23,7 @@ final class NoteUpdateCest extends AbstractCest
         $I->wantTo('PUT/200: Изменить заметку');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $note = NoteFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::OK);
@@ -40,7 +40,7 @@ final class NoteUpdateCest extends AbstractCest
     {
         $I->wantTo('PUT/401: Ошибка авторизации');
 
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $note = NoteFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
@@ -58,7 +58,7 @@ final class NoteUpdateCest extends AbstractCest
         $I->wantTo('PUT/403: Доступ запрещен');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $note = NoteFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
@@ -76,7 +76,7 @@ final class NoteUpdateCest extends AbstractCest
         $I->wantTo('PUT/422: Ошибка валидации');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $note = NoteFixture::load(I: $I, data: $example['fixtures']);
 
         $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
         $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
@@ -95,7 +95,7 @@ final class NoteUpdateCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
                 'request' => [
                     'name' => 'Заметка_1',
@@ -105,7 +105,7 @@ final class NoteUpdateCest extends AbstractCest
                     'name' => 'Заметка_1',
                     'description' => 'Описание заметки_1',
                     'is_trashed' => false,
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
             ],
         ];
@@ -120,7 +120,7 @@ final class NoteUpdateCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
                 'request' => [
                     'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
@@ -151,7 +151,7 @@ final class NoteUpdateCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
                 'request' => [
                     'name' => 'Заметка_1',

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Command;
 
 use App\Entity\Note;
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\NoteFixtures;
+use App\Tests\Support\Data\Fixture\NoteFixture;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
@@ -26,7 +26,7 @@ final class CronNotesDeleteCest extends AbstractCest
         $I->wantTo('COMMAND/200: Удалить заметки из корзины');
 
         foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
+            NoteFixture::load(I: $I, data: $fixture);
         }
 
         /** @var KernelInterface $kernel */

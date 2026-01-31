@@ -6,15 +6,23 @@ namespace App\Tests\Functional\Note;
 
 use App\Entity\Note;
 use App\Tests\Functional\AbstractCest;
-use App\Tests\Support\Data\Fixture\NoteFixtures;
-use App\Tests\Support\Data\Fixture\UserFixtures;
+use App\Tests\Support\Data\Fixture\NoteFixture;
+use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Handle\HandleAuthorizedTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;
 use Codeception\Util\HttpCode;
+use Symfony\Component\HttpFoundation\Request;
 
 final class NoteDeleteCest extends AbstractCest
 {
+    use TestFailedAuthorizationTrait;
+    use TestFailedForbiddenTrait;
+    use HandleAuthorizedTrait;
+
     private const string URL = '/api/v1/notes';
 
     #[DataProvider('mainProvider')]
@@ -23,53 +31,32 @@ final class NoteDeleteCest extends AbstractCest
         $I->wantTo('DELETE/200: Удалить заметку');
 
         $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
+        $entity = self::getEntity(I: $I, fixtures: $example['fixtures']);
 
-        $I->sendDelete(url: self::URL.'/'.$note->getId());
+        $I->sendDelete(url: self::URL.'/'.$entity->getId());
         $I->seeResponseCodeIs(code: HttpCode::OK);
         $I->seeResponseIsJson();
 
         $data = json_decode($I->grabResponse(), true);
         $data = self::except(data: $data, excludeKeys: ['id']);
 
-        $I->dontSeeInRepository(entity: Note::class, params: ['name' => $note->getName()]);
+        $I->dontSeeInRepository(entity: Note::class, params: ['name' => $entity->getName()]);
 
         $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    protected static function getMethod(): string
     {
-        $I->wantTo('DELETE/401: Ошибка авторизации');
-
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendDelete(url: self::URL.'/'.$note->getId());
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return Request::METHOD_DELETE;
     }
 
-    #[DataProvider('forbiddenProvider')]
-    public function forbidden(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('DELETE/403: Доступ запрещен');
+        if (!empty($context['entity'])) {
+            return self::URL.'/'.$context['entity']->getId();
+        }
 
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendDelete(url: self::URL.'/'.$note->getId());
-        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL.'/'.self::getEntity(I: $I)->getId();
     }
 
     protected function mainProvider(): array
@@ -79,7 +66,7 @@ final class NoteDeleteCest extends AbstractCest
                 'fixtures' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
                 'response' => [
                     'success' => true,
@@ -89,37 +76,8 @@ final class NoteDeleteCest extends AbstractCest
         ];
     }
 
-    protected function forbiddenProvider(): array
+    private static function getEntity(FunctionalTester $I, array $fixtures = []): Note
     {
-        return [
-            [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
-                    'user' => ['email' => 'test_0@mail.ru'],
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Доступ запрещен',
-                ],
-            ],
-        ];
-    }
-
-    protected function failedAuthorizationProvider(): array
-    {
-        return [
-            [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
-                    'user' => ['email' => 'test_0@mail.ru'],
-                ],
-                'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
-                ],
-            ],
-        ];
+        return NoteFixture::load(I: $I, data: $fixtures);
     }
 }
