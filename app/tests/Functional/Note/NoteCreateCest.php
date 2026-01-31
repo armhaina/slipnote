@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
+use App\Tests\Support\Data\Fixture\UserFixtures;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;

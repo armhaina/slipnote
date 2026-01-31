@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Command;
 
 use App\Entity\Note;
-use App\Tests\_data\fixtures\NoteFixtures;
 use App\Tests\Functional\AbstractCest;
+use App\Tests\Support\Data\Fixture\NoteFixtures;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Example;

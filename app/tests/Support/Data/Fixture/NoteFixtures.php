@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\_data\fixtures;
+namespace App\Tests\Support\Data\Fixture;
 
 use App\Entity\Note;
 use App\Tests\Support\FunctionalTester;

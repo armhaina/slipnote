@@ -6,7 +6,7 @@ namespace App\Tests\Functional;
 
 use App\Entity\User;
 use App\Enum\Role;
-use App\Tests\_data\fixtures\UserFixtures;
+use App\Tests\Support\Data\Fixture\UserFixtures;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Scenario;
 use Codeception\Util\HttpCode;

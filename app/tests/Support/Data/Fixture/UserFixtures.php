@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\_data\fixtures;
+namespace App\Tests\Support\Data\Fixture;
 
 use App\Entity\User;
 use App\Enum\Role;
