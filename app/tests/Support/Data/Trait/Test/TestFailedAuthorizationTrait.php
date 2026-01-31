@@ -37,18 +37,17 @@ trait TestFailedAuthorizationTrait
         $data = json_decode($I->grabResponse(), true);
         $data = self::except(data: $data, excludeKeys: ['id']);
 
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        $I->assertEquals(
+            expected: [
+                'code' => 401,
+                'message' => 'JWT Token not found',
+            ],
+            actual: $data
+        );
     }
 
     private function failedAuthorizationProvider(): array
     {
-        return [
-            [
-                'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
-                ],
-            ],
-        ];
+        return [['plug']];
     }
 }

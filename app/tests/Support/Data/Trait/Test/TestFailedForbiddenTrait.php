@@ -20,8 +20,8 @@ trait TestFailedForbiddenTrait
     /**
      * @throws \Exception
      */
-    #[DataProvider('forbiddenProvider')]
-    public function forbidden(FunctionalTester $I, Scenario $scenario, Example $example): void
+    #[DataProvider('failedForbiddenProvider')]
+    public function failedForbidden(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
         self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/403: Доступ запрещен');
 
@@ -41,18 +41,17 @@ trait TestFailedForbiddenTrait
         $data = json_decode($I->grabResponse(), true);
         $data = self::except(data: $data, excludeKeys: ['id']);
 
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        $I->assertEquals(
+            expected: [
+                'success' => false,
+                'message' => 'Доступ запрещен',
+            ],
+            actual: $data
+        );
     }
 
-    private function forbiddenProvider(): array
+    protected function failedForbiddenProvider(): array
     {
-        return [
-            [
-                'response' => [
-                    'success' => false,
-                    'message' => 'Доступ запрещен',
-                ],
-            ],
-        ];
+        return [['plug']];
     }
 }
