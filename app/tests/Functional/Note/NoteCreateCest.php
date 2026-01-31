@@ -13,6 +13,7 @@ use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
 use Codeception\Attribute\Depends;
 use Codeception\Example;
+use Codeception\Scenario;
 use Codeception\Util\HttpCode;
 use Faker\Factory;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,9 +45,9 @@ final class NoteCreateCest extends AbstractCest
 
     #[DataProvider('failedValidationProvider')]
     #[Depends('failedAuthorization')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
+    public function failedValidation(FunctionalTester $I, Example $example, Scenario $scenario): void
     {
-        $I->wantTo('POST/422: Ошибка валидации');
+        self::setWantTo(scenario: $scenario, wantTo: $example['want']);
 
         $this->authorized(I: $I);
 
@@ -94,9 +95,25 @@ final class NoteCreateCest extends AbstractCest
 
         return [
             [
+                'want' => 'POST/422: Название (мин.)',
+                'request' => [
+                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(0, 0).'}'),
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Ошибка валидации',
+                    'errors' => [
+                        [
+                            'property' => 'name',
+                            'message' => 'Название должно содержать минимум 1 символ',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'want' => 'POST/422: Название (макс.)',
                 'request' => [
                     'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
-                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
                 ],
                 'response' => [
                     'success' => false,
@@ -106,6 +123,18 @@ final class NoteCreateCest extends AbstractCest
                             'property' => 'name',
                             'message' => 'Название должно содержать максимум 100 символов',
                         ],
+                    ],
+                ],
+            ],
+            [
+                'want' => 'POST/422: Описание (макс.)',
+                'request' => [
+                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
+                ],
+                'response' => [
+                    'success' => false,
+                    'message' => 'Ошибка валидации',
+                    'errors' => [
                         [
                             'property' => 'description',
                             'message' => 'Описание должно содержать максимум 10000 символов',

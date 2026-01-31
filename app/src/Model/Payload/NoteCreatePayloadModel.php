@@ -14,9 +14,9 @@ readonly class NoteCreatePayloadModel
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
         #[Assert\Length(
-            min: 2,
+            min: 1,
             max: 100,
-            minMessage: 'Название должно содержать минимум {{ limit }} символа',
+            minMessage: 'Название должно содержать минимум {{ limit }} символ',
             maxMessage: 'Название должно содержать максимум {{ limit }} символов'
         )]
         #[OA\Property(description: 'Наименование')]
@@ -24,7 +24,7 @@ readonly class NoteCreatePayloadModel
         #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
         #[Assert\Length(
-            min: 2,
+            min: 0,
             max: 10000,
             minMessage: 'Описание должно содержать минимум {{ limit }} символа',
             maxMessage: 'Описание должно содержать максимум {{ limit }} символов'
