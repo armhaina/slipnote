@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Payload;
 
+use App\Enum\ValidationError;
 use Doctrine\DBAL\Types\Types;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -11,26 +12,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 readonly class NoteUpdatePayloadModel
 {
     public function __construct(
-        #[Assert\NotBlank]
+        #[Assert\NotBlank(message: ValidationError::NOT_BLANK->value)]
         #[Assert\Type(type: Types::STRING)]
         #[Assert\Length(
-            min: 2,
+            min: 1,
             max: 100,
-            minMessage: 'Название должно содержать минимум {{ limit }} символа',
-            maxMessage: 'Название должно содержать максимум {{ limit }} символов'
+            minMessage: ValidationError::LENGTH_MIN->value,
+            maxMessage: ValidationError::LENGTH_MAX->value
         )]
         #[OA\Property(description: 'Наименование')]
         private string $name,
-        #[Assert\NotBlank]
         #[Assert\Type(type: Types::STRING)]
         #[Assert\Length(
-            min: 2,
+            min: 0,
             max: 10000,
-            minMessage: 'Описание должно содержать минимум {{ limit }} символа',
-            maxMessage: 'Описание должно содержать максимум {{ limit }} символов'
+            minMessage: ValidationError::LENGTH_MIN->value,
+            maxMessage: ValidationError::LENGTH_MAX->value
         )]
         #[OA\Property(description: 'Описание')]
-        private string $description,
+        private ?string $description = null,
     ) {}
 
     public function getName(): string
@@ -38,7 +38,7 @@ readonly class NoteUpdatePayloadModel
         return $this->name;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }

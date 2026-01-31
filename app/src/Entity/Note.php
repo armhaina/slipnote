@@ -32,12 +32,12 @@ class Note
     #[ORM\Column(
         name: 'description',
         type: Types::TEXT,
-        nullable: false,
+        nullable: true,
         options: [
             'comment' => 'Текст',
         ],
     )]
-    private string $description;
+    private ?string $description = null;
 
     #[ORM\Column(
         name: 'is_trashed',
@@ -114,12 +114,12 @@ class Note
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
