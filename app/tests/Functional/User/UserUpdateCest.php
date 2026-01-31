@@ -10,6 +10,7 @@ use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedConflictTrait;
 use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
 use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
@@ -23,6 +24,7 @@ final class UserUpdateCest extends AbstractCest
     use TestFailedAuthorizationTrait;
     use TestFailedForbiddenTrait;
     use TestFailedConflictTrait;
+    use TestFailedValidationTrait;
 
     private const string URL = '/api/v1/users';
 
@@ -47,24 +49,6 @@ final class UserUpdateCest extends AbstractCest
         }
     }
 
-    //    #[DataProvider('failedEmailAlreadyExistsProvider')]
-    //    public function failedEmailAlreadyExists(FunctionalTester $I, Example $example): void
-    //    {
-    //        $I->wantTo('PUT/409: Почта уже существует');
-    //
-    //        $user = $this->authorized(I: $I);
-    //        UserFixture::load(I: $I, data: $example['fixtures']);
-    //
-    //        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
-    //        $I->seeResponseCodeIs(code: HttpCode::CONFLICT);
-    //        $I->seeResponseIsJson();
-    //
-    //        $data = json_decode($I->grabResponse(), true);
-    //        $data = self::except(data: $data, excludeKeys: ['id']);
-    //
-    //        $I->assertEquals(expected: $example['response'], actual: $data);
-    //    }
-    //
     //    #[DataProvider('failedValidationProvider')]
     //    public function failedValidation(FunctionalTester $I, Example $example): void
     //    {
@@ -127,8 +111,12 @@ final class UserUpdateCest extends AbstractCest
     {
         return [
             [
-                'request' => [
-                    'email' => 'test',
+                'want_to' => 'Неверный формат Email',
+                'context' => [
+                    'params' => [
+                        'email' => 'test',
+                        'password' => 'Password123',
+                    ],
                 ],
                 'response' => [
                     'success' => false,
