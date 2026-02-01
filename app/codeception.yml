@@ -13,6 +13,8 @@ extensions:
 params:
     - .env.test
 
+# bootstrap: bootstrap.php
+
 # Добавить подключение c3.php в index.php
 coverage:
     enabled: true

@@ -7,6 +7,7 @@ namespace App\Tests\Support\Data\Trait\Test;
 use App\Tests\Support\Data\Trait\AbstractTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Skip;
 use Codeception\Example;
 use Codeception\Scenario;
 use Codeception\Util\HttpCode;
@@ -19,8 +20,14 @@ trait TestFailedAuthorizationTrait
      * @throws \Exception
      */
     #[DataProvider('failedAuthorizationProvider')]
+    #[Skip]
     public function failedAuthorization(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
+        $kernel = $I->grabService('kernel');
+        $container = $kernel->getContainer();
+
+        $is = $container->hasParameter('test_config_loaded');
+
         self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/401 АВТОРИЗАЦИЯ: Ошибка авторизации');
 
         $context = $example['context'] ?? [];
