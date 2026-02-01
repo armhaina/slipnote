@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Support\Data\Trait;
 
+use App\Exception\Http\MethodNotAllowedException;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Scenario;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,13 +44,12 @@ trait AbstractTrait
 
     protected function request(FunctionalTester $I, string $url, array $params): void
     {
-        // TODO: переделать exception
         match (self::getMethod()) {
             Request::METHOD_GET => $I->sendGet(url: $url, params: $params),
             Request::METHOD_POST => $I->sendPost(url: $url, params: $params),
             Request::METHOD_PUT => $I->sendPut(url: $url, params: $params),
             Request::METHOD_DELETE => $I->sendDelete(url: $url),
-            default => throw new \Exception()
+            default => throw new MethodNotAllowedException()
         };
     }
 
