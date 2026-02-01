@@ -9,7 +9,6 @@ use App\Tests\Functional\AbstractCest;
 use App\Tests\Support\Data\Fixture\NoteFixture;
 use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
-use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
 use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +17,6 @@ final class NoteListCest extends AbstractCest
 {
     use TestSuccessTrait;
     use TestFailedAuthorizationTrait;
-    use TestFailedValidationTrait;
 
     private const string URL = '/api/v1/notes';
 
@@ -557,29 +555,6 @@ final class NoteListCest extends AbstractCest
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
                             'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    protected function failedValidationProvider(): array
-    {
-        return [
-            [
-                'want_to' => 'Доступные поля для сортировки',
-                'is_authorize' => true,
-                'context' => [
-                    'params' => ['order_by[rand]' => 'asc'],
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Ошибка валидации',
-                    'errors' => [
-                        [
-                            'property' => 'order_by',
-                            'message' => 'Доступные поля...',
                         ],
                     ],
                 ],

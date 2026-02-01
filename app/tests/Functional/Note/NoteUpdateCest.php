@@ -86,7 +86,7 @@ final class NoteUpdateCest extends AbstractCest
 
         return [
             [
-                'want_to' => 'Ошибка валидации (Название мин.)',
+                'want_to' => 'Название мин.',
                 'is_authorize' => true,
                 'context' => [
                     'params' => [
@@ -109,7 +109,7 @@ final class NoteUpdateCest extends AbstractCest
                 ],
             ],
             [
-                'want_to' => 'Ошибка валидации (Название макс.)',
+                'want_to' => 'Название макс.',
                 'is_authorize' => true,
                 'context' => [
                     'params' => [
@@ -129,7 +129,7 @@ final class NoteUpdateCest extends AbstractCest
                 ],
             ],
             [
-                'want_to' => 'Ошибка валидации (Описание макс.)',
+                'want_to' => 'Описание макс.',
                 'is_authorize' => true,
                 'context' => [
                     'params' => [
