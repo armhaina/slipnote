@@ -73,4 +73,10 @@ phpcs:
 phpstan:
 	docker compose exec -it application php vendor/bin/phpstan analyse src
 
+rector:
+	docker compose exec -it application php vendor/bin/rector process
+
+rector-dry:
+	docker compose exec -it application php vendor/bin/rector process --dry-run || true
+
 .PHONY: test-init
