@@ -20,7 +20,6 @@ use App\Model\Payload\UserUpdatePayloadModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
-use App\Model\Response\Exception\ExpiredJWTTokenModelException;
 use App\Service\Entity\UserService;
 use App\Service\SecurityService;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -87,7 +86,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -244,7 +243,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -327,7 +326,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -408,7 +407,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]

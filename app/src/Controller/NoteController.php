@@ -20,7 +20,6 @@ use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
-use App\Model\Response\Exception\ExpiredJWTTokenModelException;
 use App\Service\Entity\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -87,7 +86,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -143,7 +142,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -324,7 +323,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -403,7 +402,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -470,7 +469,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -527,7 +526,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
@@ -593,7 +592,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
