@@ -9,8 +9,6 @@ use App\Enum\Entity\User\GroupUser;
 use App\Enum\Entity\User\RoleUser;
 use App\Enum\Message\HttpStatusMessage;
 use App\Exception\Auth\ForbiddenException;
-use App\Exception\Entity\EntityNotFoundWhenDeleteException;
-use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\EmailAlreadyExistsException;
 use App\Exception\Entity\User\InvalidCurrentPasswordException;
 use App\Mapper\Entity\UserMapper;
@@ -180,9 +178,6 @@ class UserController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
-    /**
-     * @throws EntityNotFoundWhenUpdateException
-     */
     #[Route(
         path: '/{id}',
         requirements: ['id' => '\d+'],
@@ -272,9 +267,6 @@ class UserController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
-    /**
-     * @throws EntityNotFoundWhenUpdateException
-     */
     #[Route(
         path: '/{id}/password',
         requirements: ['id' => '\d+'],
@@ -366,9 +358,6 @@ class UserController extends AbstractController
         return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
-    /**
-     * @throws EntityNotFoundWhenDeleteException
-     */
     #[Route(
         path: '/{id}',
         requirements: ['id' => '\d+'],
