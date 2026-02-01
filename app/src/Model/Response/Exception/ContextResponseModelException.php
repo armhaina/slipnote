@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model\Response\Exception;
 
 use App\Contract\Exception\ExceptionResponseInterface;
-use App\Enum\Group;
+use App\Enum\Entity\User\Group;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 

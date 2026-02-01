@@ -6,8 +6,8 @@ namespace App\Controller;
 
 use App\Entity\Note;
 use App\Entity\User;
-use App\Enum\Group;
-use App\Enum\Role;
+use App\Enum\Entity\User\Group;
+use App\Enum\Entity\User\Role;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\ForbiddenException;

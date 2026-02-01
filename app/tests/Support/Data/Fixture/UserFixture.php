@@ -3,7 +3,7 @@
 namespace App\Tests\Support\Data\Fixture;
 
 use App\Entity\User;
-use App\Enum\Role;
+use App\Enum\Entity\User\Role;
 use App\Tests\Support\FunctionalTester;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;

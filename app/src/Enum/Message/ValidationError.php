@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Enum;
+namespace App\Enum\Message;
 
 enum ValidationError: string
 {
@@ -15,6 +15,6 @@ enum ValidationError: string
     case TYPE_NUMERIC = 'Переданное значение должно содержать число. Вы передали: {{ value }}';
     case NOT_BLANK = 'Поле не может быть пустым';
     case EMAIL = 'Email не соответствует формату электронной почты';
-    case CUSTOM_ORDER_BY_ALLOWED_FIELDS = 'Поле "{{ field }}" не разрешено для сортировки. Разрешены поля: {{ allowed }}';
-    case CUSTOM_ORDER_BY_ALLOWED_DIRECTIONS = 'Направление "{{ direction }}" недопустимо. Используйте: asc или desc';
+    case CUSTOM_ORDER_BY_ALLOWED_FIELDS = 'Поле {{ field }} не разрешено для сортировки. Разрешены поля: {{ allowed }}';
+    case CUSTOM_ORDER_BY_ALLOWED_DIRECTIONS = 'Направление {{ direction }} недопустимо. Используйте: asc или desc';
 }

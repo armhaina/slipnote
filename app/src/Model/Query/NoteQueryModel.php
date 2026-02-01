@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
-use App\Enum\ValidationError;
+use App\Enum\Message\ValidationError;
 use App\Validator\OrderBy;
 use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;

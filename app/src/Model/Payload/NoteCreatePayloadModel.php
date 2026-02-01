@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Payload;
 
-use App\Enum\ValidationError;
+use App\Enum\Message\ValidationError;
 use Doctrine\DBAL\Types\Types;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints as Assert;

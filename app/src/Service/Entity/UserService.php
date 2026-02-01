@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Service\Entity;
 
 use App\Entity\User;
-use App\Enum\Group;
-use App\Enum\Role;
+use App\Enum\Entity\User\Group;
+use App\Enum\Entity\User\Role;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;

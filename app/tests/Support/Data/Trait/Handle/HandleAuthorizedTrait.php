@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Support\Data\Trait\Handle;
 
 use App\Entity\User;
-use App\Enum\Role;
+use App\Enum\Entity\User\Role;
 use App\Tests\Support\Data\Fixture\UserFixture;
 use App\Tests\Support\Data\Trait\AbstractTrait;
 use App\Tests\Support\FunctionalTester;

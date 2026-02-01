@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Entity;
 
-use App\Enum\Group;
+use App\Enum\Entity\User\Group;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedName;
