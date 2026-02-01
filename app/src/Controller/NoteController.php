@@ -330,12 +330,15 @@ class NoteController extends AbstractController
     )]
     public function create(#[MapRequestPayload] NoteCreatePayloadModel $model): JsonResponse
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         $dateTimeImmutable = new \DateTimeImmutable();
 
         $note = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
-            ->setUser(user: $this->getUser())
+            ->setUser(user: $user)
             ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setIsTrashed(isTrashed: false)

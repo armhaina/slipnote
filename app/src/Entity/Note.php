@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\NoteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
@@ -74,7 +73,7 @@ class Note
             'comment' => 'ID пользователя',
         ]
     )]
-    private UserInterface $user;
+    private User $user;
 
     #[ORM\Column(
         name: 'created_at',
@@ -138,12 +137,12 @@ class Note
         return $this;
     }
 
-    public function getUser(): User|UserInterface
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(User|UserInterface $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
