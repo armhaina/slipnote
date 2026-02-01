@@ -1,6 +1,8 @@
 # Slipnote
 
-<img src="logo.png" alt="Slipnote Logo" style="border-radius: 10px;">
+[//]: # (<img src="logo.png" alt="Slipnote Logo" style="border-radius: 10px;">)
+
+![Slipnote Logo](logo.png){: style="border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" }
 
 **Slipnote** — это небольшой PET-проект для работы с заметками, который позволяет создавать, редактировать и организовывать
 заметки с возможностью полнотекстового поиска. Проект включает REST API на Symfony с JWT-аутентификацией.
