@@ -25,7 +25,7 @@
 - Клонировать проект
 
 ```bash
-https://github.com/armhaina/slipnote.git
+git clone https://github.com/armhaina/slipnote.git
 ```
 
 - Перейти в проект
