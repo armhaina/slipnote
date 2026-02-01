@@ -2,7 +2,7 @@ nelmio_api_doc:
   documentation:
     info:
       title: Slipnote
-      description: Сервис быстрых заметок!
+      description: 🔥 Сервис быстрых заметок
       version: 1.0.0
     servers:
       - url: 'http://%env(SERVER_NAME)%'
