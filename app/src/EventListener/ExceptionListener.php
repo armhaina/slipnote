@@ -9,15 +9,13 @@ use App\Entity\User;
 use App\Message\HttpStatusMessage;
 use App\Model\Response\Exception\ContextResponseModelException;
 use App\Model\Response\Exception\DefaultResponseModelException;
-use App\Model\Response\Exception\ForbiddenResponseModelException;
-use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Model\Response\Exception\ViolationResponseModelException;
 use App\Service\Entity\UserService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -50,9 +48,14 @@ readonly class ExceptionListener
 
         $groups = UserService::getGroupsByUserRoles(user: $user);
 
-        $data = $this->serializer->serialize(data: $data, format: 'json', context: array_merge([
-            'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
-        ], ['groups' => $groups]));
+        $data = $this->serializer->serialize(
+            data: $data,
+            format: 'json',
+            context: array_merge(
+                ['json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS],
+                ['groups' => $groups]
+            )
+        );
 
         $event->setResponse(
             response: new JsonResponse(
@@ -65,21 +68,17 @@ readonly class ExceptionListener
 
     private function exceptionFactory(\Throwable $exception, int $status): ExceptionResponseInterface
     {
-        $previous = $exception->getPrevious();
+        $violations = [];
 
-        // TODO: переделать на $previous
-        if ($exception instanceof AccessDeniedHttpException) {
-            return $this->forbiddenExceptionHandler(exception: $exception, status: $status);
-        }
-
-        if ($previous instanceof ValidationFailedException) {
-            return $this->validationExceptionHandler(exception: $exception, status: $status);
+        if ($exception instanceof UnprocessableEntityHttpException) {
+            $violations = $this->violationsExceptionHandler(exception: $exception);
         }
 
         return new DefaultResponseModelException(
             success: false,
-            message: $this->isUserException(exception: $exception) ? $exception->getMessage(
-            ) : HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
+            code: $exception->getCode(),
+            message: $this->getMessage(exception: $exception, status: $status),
+            violations: $violations,
             context: new ContextResponseModelException(
                 file: $exception->getFile(),
                 line: $exception->getLine(),
@@ -88,20 +87,14 @@ readonly class ExceptionListener
         );
     }
 
-    private function forbiddenExceptionHandler(\Throwable $exception, int $status): ExceptionResponseInterface
+    /**
+     * @return array<ViolationResponseModelException>
+     */
+    private function violationsExceptionHandler(\Throwable $exception): array
     {
-        return new ForbiddenResponseModelException(
-            success: false,
-            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
-            code: $exception->getCode(),
-        );
-    }
+        $violations = [];
 
-    private function validationExceptionHandler(\Throwable $exception, int $status): ExceptionResponseInterface
-    {
-        $errors = [];
-
-        $previous = $exception->getPrevious() ?? null;
+        $previous = $exception->getPrevious();
 
         if ($previous instanceof ValidationFailedException) {
             foreach ($previous->getViolations() as $violation) {
@@ -110,7 +103,7 @@ readonly class ExceptionListener
 
                 // Убрать квадратные скобки с цифрами внутри: userIds[0] => userIds
                 $propertyPath = preg_replace(
-                    pattern: '/\[\d+\]$/',
+                    pattern: '/\[\d+]$/',
                     replacement: '',
                     subject: $violation->getPropertyPath()
                 );
@@ -119,7 +112,7 @@ readonly class ExceptionListener
                 ) ?? $violation->getPropertyPath();
                 // endregion
 
-                $errors[] = new ViolationResponseModelException(
+                $violations[] = new ViolationResponseModelException(
                     property: $serializedName,
                     message: $violation->getMessage(),
                     code: $violation->getCode()
@@ -127,20 +120,15 @@ readonly class ExceptionListener
             }
         }
 
-        return new ValidationResponseModelException(
-            success: false,
-            message: HttpStatusMessage::HTTP_STATUS_MESSAGE[$status],
-            code: $exception->getCode(),
-            errors: $errors,
-        );
+        return $violations;
     }
 
-    private function isUserException(\Throwable $exception): bool
+    private function getMessage(\Throwable $exception, int $status): string
     {
         if ($exception instanceof \App\Contract\Exception\ExceptionInterface) {
-            return true;
+            return $exception->getMessage();
         }
 
-        return false;
+        return HttpStatusMessage::HTTP_STATUS_MESSAGE[$status];
     }
 }
