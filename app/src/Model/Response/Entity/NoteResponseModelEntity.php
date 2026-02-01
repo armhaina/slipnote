@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Entity;
 
-use App\Enum\Group;
+use App\Enum\Entity\User\GroupUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedName;
@@ -12,32 +12,32 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
 readonly class NoteResponseModelEntity
 {
     public function __construct(
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Уникальный идентификатор заметки',
             type: 'integer',
         )]
         private int $id,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Наименование',
             type: 'string',
         )]
         private string $name,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Описание',
             type: 'string',
         )]
         private string $description,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Корзина',
             type: 'boolean',
         )]
         #[SerializedName(serializedName: 'is_trashed')]
         private bool $isTrashed,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Пользователь (владелец заметки)',
         )]

@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\NoteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 #[ORM\Table(name: '`notes`')]
@@ -32,12 +31,12 @@ class Note
     #[ORM\Column(
         name: 'description',
         type: Types::TEXT,
-        nullable: false,
+        nullable: true,
         options: [
             'comment' => 'Текст',
         ],
     )]
-    private string $description;
+    private ?string $description = null;
 
     #[ORM\Column(
         name: 'is_trashed',
@@ -74,7 +73,7 @@ class Note
             'comment' => 'ID пользователя',
         ]
     )]
-    private UserInterface $user;
+    private User $user;
 
     #[ORM\Column(
         name: 'created_at',
@@ -114,12 +113,12 @@ class Note
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
@@ -138,12 +137,12 @@ class Note
         return $this;
     }
 
-    public function getUser(): User|UserInterface
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(User|UserInterface $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 

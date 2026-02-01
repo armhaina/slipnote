@@ -4,308 +4,83 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\Tests\_data\fixtures\NoteFixtures;
-use App\Tests\_data\fixtures\UserFixtures;
+use App\Entity\Note;
 use App\Tests\Functional\AbstractCest;
+use App\Tests\Support\Data\Fixture\NoteFixture;
+use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
+use Symfony\Component\HttpFoundation\Request;
 
 final class NoteListCest extends AbstractCest
 {
+    use TestSuccessTrait;
+    use TestFailedAuthorizationTrait;
+    use TestFailedValidationTrait;
+
     private const string URL = '/api/v1/notes';
 
-    #[DataProvider('mainProvider')]
-    public function main(FunctionalTester $I, Example $example): void
+    protected static function getMethod(): string
     {
-        $I->wantTo('GET/200: Получить список заметок');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
-        }
-
-        $I->sendGet(url: self::URL);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return Request::METHOD_GET;
     }
 
-    #[DataProvider('searchProvider')]
-    public function paramSearch(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('GET/200: Получить список заметок с параметром [search]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
-        }
-
-        $I->sendGet(url: self::URL, params: ['search' => 'мА']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL;
     }
 
-    #[DataProvider('isTrashedProvider')]
-    public function paramIsTrashed(FunctionalTester $I, Example $example): void
+    protected static function contextHandle(FunctionalTester $I, array &$context): void
     {
-        $I->wantTo('GET/200: Получить список заметок с параметром [is_trashed]');
+        $entities = [];
 
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
+        if (!empty($context['fixtures']['minor'])) {
+            foreach ($context['fixtures']['minor'] as $fixture) {
+                $entities[] = self::getEntity(I: $I, fixture: $fixture);
+            }
         }
 
-        $I->sendGet(url: self::URL, params: ['is_trashed' => true]);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
+        if (!empty($context['params']['user_ids'])) {
+            $userIds = array_map(
+                fn (Note $entity) => $entity->getUser()->getId(),
+                $entities
+            );
 
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('idsProvider')]
-    public function paramIds(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [ids]');
-
-        $this->authorized(I: $I);
-
-        $noteIds = [];
-
-        foreach ($example['fixtures'] as $fixture) {
-            $noteIds[] = NoteFixtures::load(I: $I, data: $fixture)->getId();
+            $context['params']['user_ids'] = $userIds;
         }
 
-        $I->sendGet(url: self::URL, params: ['ids' => $noteIds]);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
+        if (!empty($context['params']['ids'])) {
+            $ids = array_map(
+                fn (Note $entity) => $entity->getId(),
+                $entities
+            );
 
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('userIdsProvider')]
-    public function paramUserIds(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [user_ids]');
-
-        $this->authorized(I: $I);
-
-        $users = [];
-
-        foreach ($example['fixtures'] as $fixture) {
-            $note = NoteFixtures::load(I: $I, data: $fixture);
-            $users[] = $note->getUser()->getId();
+            $context['params']['ids'] = $ids;
         }
-
-        $I->sendGet(url: self::URL, params: ['user_ids' => $users]);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
     }
 
-    #[DataProvider('updatedAtLessProvider')]
-    public function paramUpdatedAtLess(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [updated_at_less]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
-        }
-
-        $I->sendGet(url: self::URL, params: ['updated_at_less' => $example['query']['updated_at_less']]);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('orderByNameAscProvider')]
-    public function paramOrderByNameAsc(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[name]=asc]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
-        }
-
-        $I->sendGet(url: self::URL, params: ['order_by[name]' => 'asc']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('orderByNameDescProvider')]
-    public function paramOrderByNameDesc(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[name]=desc]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
-        }
-
-        $I->sendGet(url: self::URL, params: ['order_by[name]' => 'desc']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('orderByCreatedAtAscProvider')]
-    public function paramOrderByCreatedAtAsc(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[created_at]=asc]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
-        }
-
-        $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'asc']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('orderByCreatedAtDescProvider')]
-    public function paramOrderByCreatedAtDesc(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[created_at]=desc]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
-        }
-
-        $I->sendGet(url: self::URL, params: ['order_by[created_at]' => 'desc']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('orderByUpdatedAtAscProvider')]
-    public function paramOrderByUpdatedAtAsc(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[updated_at]=asc]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
-        }
-
-        $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'asc']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('orderByUpdatedAtDescProvider')]
-    public function paramOrderByUpdatedAtDesc(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/200: Получить список заметок с параметром [order_by[updated_at]=desc]');
-
-        $this->authorized(I: $I);
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture)->getId();
-        }
-
-        $I->sendGet(url: self::URL, params: ['order_by[updated_at]' => 'desc']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('GET/401: Ошибка авторизации');
-
-        foreach ($example['fixtures'] as $fixture) {
-            NoteFixtures::load(I: $I, data: $fixture);
-        }
-
-        $I->sendGet(url: self::URL);
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    protected function mainProvider(): array
+    protected function successProvider(): array
     {
         return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок',
+                'is_authorize' => true,
+                'context' => [
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => 'test_0@mail.ru'],
+                            ],
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -318,53 +93,30 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function failedAuthorizationProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                ],
-                'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
-                ],
-            ],
-        ];
-    }
-
-    protected function isTrashedProvider(): array
-    {
-        return [
-            [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'is_trashed' => true,
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [is_trashed]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['is_trashed' => true],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'is_trashed' => true,
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -377,48 +129,49 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => true,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function searchProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Родитель',
-                        'description' => 'Описание: мама',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Мат',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Машина',
-                        'description' => 'Описание_10',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                    [
-                        'name' => 'Лодка',
-                        'description' => 'Описание: марка',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                    [
-                        'name' => 'Комар',
-                        'description' => 'Описание_100',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                    [
-                        'name' => 'Смерть',
-                        'description' => 'Описание_1000',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [search]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['search' => 'мА'],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Родитель',
+                                'description' => 'Описание: мама',
+                                'user' => ['email' => 'test_0@mail.ru'],
+                            ],
+                            [
+                                'name' => 'Мат',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => 'test_0@mail.ru'],
+                            ],
+                            [
+                                'name' => 'Машина',
+                                'description' => 'Описание_10',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Лодка',
+                                'description' => 'Описание: марка',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Комар',
+                                'description' => 'Описание_100',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Смерть',
+                                'description' => 'Описание_1000',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -431,40 +184,41 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Машина',
                             'description' => 'Описание_10',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Лодка',
                             'description' => 'Описание: марка',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Комар',
                             'description' => 'Описание_100',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function userIdsProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [user_ids]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['user_ids' => true],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => 'test_0@mail.ru'],
+                            ],
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -477,33 +231,33 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function updatedAtLessProvider(): array
-    {
-        return [
             [
-                'query' => [
-                    'updated_at_less' => new \DateTimeImmutable('01.02.2025')->format(format: DATE_ATOM),
-                ],
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new \DateTimeImmutable('01.03.2025'),
+                'want_to' => 'Получить список заметок с параметром [updated_at_less]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'updated_at_less' => new \DateTimeImmutable('01.02.2025')->format(format: DATE_ATOM),
                     ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new \DateTimeImmutable('01.01.2025'),
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                                'updated_at' => new \DateTimeImmutable('01.03.2025'),
+                            ],
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                                'updated_at' => new \DateTimeImmutable('01.01.2025'),
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -516,28 +270,29 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function idsProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => 'test_0@mail.ru'],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [ids]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['ids' => true],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => 'test_0@mail.ru'],
+                            ],
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -550,28 +305,29 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function orderByNameAscProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [order_by[name]=asc]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['order_by[name]' => 'asc'],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -584,34 +340,35 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function orderByNameDescProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [order_by[name]=desc]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['order_by[name]' => 'desc'],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -624,34 +381,35 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function orderByCreatedAtAscProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                    ],
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [order_by[created_at]=asc]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['order_by[created_at]' => 'asc'],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -664,34 +422,79 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function orderByCreatedAtDescProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                'want_to' => 'Получить список заметок с параметром [order_by[created_at]=desc]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['order_by[created_at]' => 'desc'],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                            ],
+                        ],
                     ],
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                ],
+
+                'response' => [
+                    'count' => 2,
+                    'page' => 1,
+                    'total' => 2,
+                    'pages' => 1,
+                    'items' => [
+                        [
+                            'name' => 'Заметка_1',
+                            'description' => 'Описание заметки_1',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                        ],
+                        [
+                            'name' => 'Заметка_0',
+                            'description' => 'Описание заметки_0',
+                            'is_trashed' => false,
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'want_to' => 'Получить список заметок с параметром [order_by[updated_at]=asc]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['order_by[updated_at]' => 'asc'],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                                'updated_at' => new \DateTimeImmutable('01.01.2025'),
+                            ],
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                                'updated_at' => new \DateTimeImmutable('01.01.2030'),
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -704,36 +507,37 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function orderByUpdatedAtAscProvider(): array
-    {
-        return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new \DateTimeImmutable('01.01.2025'),
-                    ],
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new \DateTimeImmutable('01.01.2030'),
+                'want_to' => 'Получить список заметок с параметром [order_by[updated_at]=desc]',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['order_by[updated_at]' => 'desc'],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'name' => 'Заметка_1',
+                                'description' => 'Описание заметки_1',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                                'updated_at' => new \DateTimeImmutable('01.01.2030'),
+                            ],
+                            [
+                                'name' => 'Заметка_0',
+                                'description' => 'Описание заметки_0',
+                                'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                                'updated_at' => new \DateTimeImmutable('01.01.2025'),
+                            ],
+                        ],
                     ],
                 ],
                 'response' => [
@@ -746,13 +550,13 @@ final class NoteListCest extends AbstractCest
                             'name' => 'Заметка_1',
                             'description' => 'Описание заметки_1',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                         [
                             'name' => 'Заметка_0',
                             'description' => 'Описание заметки_0',
                             'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                         ],
                     ],
                 ],
@@ -760,45 +564,36 @@ final class NoteListCest extends AbstractCest
         ];
     }
 
-    protected function orderByUpdatedAtDescProvider(): array
+    protected function failedValidationProvider(): array
     {
         return [
             [
-                'fixtures' => [
-                    [
-                        'name' => 'Заметка_1',
-                        'description' => 'Описание заметки_1',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new \DateTimeImmutable('01.01.2030'),
-                    ],
-                    [
-                        'name' => 'Заметка_0',
-                        'description' => 'Описание заметки_0',
-                        'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                        'updated_at' => new \DateTimeImmutable('01.01.2025'),
-                    ],
+                'want_to' => 'Доступные поля/направления для сортировки',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => ['order_by[rand]' => 'test'],
                 ],
                 'response' => [
-                    'count' => 2,
-                    'page' => 1,
-                    'total' => 2,
-                    'pages' => 1,
-                    'items' => [
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Ошибка валидации',
+                    'violations' => [
                         [
-                            'name' => 'Заметка_1',
-                            'description' => 'Описание заметки_1',
-                            'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'property' => 'order_by',
+                            'message' => 'Поле rand не разрешено для сортировки. Разрешены поля: name, created_at, updated_at',
                         ],
                         [
-                            'name' => 'Заметка_0',
-                            'description' => 'Описание заметки_0',
-                            'is_trashed' => false,
-                            'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                            'property' => 'order_by',
+                            'message' => 'Направление test недопустимо. Используйте: asc или desc',
                         ],
                     ],
                 ],
             ],
         ];
+    }
+
+    private static function getEntity(FunctionalTester $I, array $fixture = []): Note
+    {
+        return NoteFixture::load(I: $I, data: $fixture);
     }
 }

@@ -4,18 +4,27 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class UserQueryModel
 {
+    #[Assert\Positive]
+    #[Assert\Range(min: 0, max: 100)]
     private int $limit = 20;
+    #[Assert\PositiveOrZero]
+    #[Assert\Range(min: 0)]
     private int $offset = 0;
+    #[Assert\Type(type: 'string')]
+    #[Assert\Email]
     private ?string $email = null;
     /** @var array<int> */
+    #[Assert\All([new Assert\Type(type: 'numeric'), new Assert\Positive()])]
     private ?array $ids = null;
     /** @var array<int> */
+    #[Assert\All([new Assert\Type(type: 'numeric'), new Assert\Positive()])]
     private ?array $excludeIds = null;
     /** @var array<string> */
-    private ?array $roles = null;
-    /** @var array<string> */
+    #[Assert\All([new Assert\Type(type: 'string')])]
     private array $orderBy = [];
 
     public function getLimit(): int
@@ -104,24 +113,6 @@ class UserQueryModel
     public function setExcludeIds(array $excludeIds): self
     {
         $this->excludeIds = $excludeIds;
-
-        return $this;
-    }
-
-    /**
-     * @return null|array<string>
-     */
-    public function getRoles(): ?array
-    {
-        return $this->roles;
-    }
-
-    /**
-     * @param array<string> $roles
-     */
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
 
         return $this;
     }

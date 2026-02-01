@@ -4,112 +4,84 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\User;
 
-use App\Tests\_data\fixtures\UserFixtures;
+use App\Entity\User;
 use App\Tests\Functional\AbstractCest;
+use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedConflictTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
+use Symfony\Component\HttpFoundation\Request;
 
 final class UserUpdateCest extends AbstractCest
 {
+    use TestSuccessTrait;
+    use TestFailedAuthorizationTrait;
+    use TestFailedForbiddenTrait;
+    use TestFailedConflictTrait;
+    use TestFailedValidationTrait;
+
     private const string URL = '/api/v1/users';
 
-    #[DataProvider('mainProvider')]
-    public function main(FunctionalTester $I, Example $example): void
+    protected static function getMethod(): string
     {
-        $I->wantTo('PUT/200: Изменить пользователя');
-
-        $user = $this->authorized(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return Request::METHOD_PUT;
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('PUT/401: Ошибка авторизации');
-        $user = UserFixtures::load(I: $I);
+        $id = self::getEntity(I: $I, fixtures: $context['fixtures']['major'] ?? [])->getId();
 
-        $I->sendPut(url: self::URL.'/'.$user->getId());
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL.'/'.$id;
     }
 
-    #[DataProvider('forbiddenProvider')]
-    public function forbidden(FunctionalTester $I, Example $example): void
+    protected static function contextHandle(FunctionalTester $I, array &$context): void
     {
-        $I->wantTo('PUT/403: Доступ запрещен');
-
-        $this->authorized(I: $I);
-        $user = UserFixtures::load(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        if (!empty($context['fixtures']['minor'])) {
+            foreach ($context['fixtures']['minor'] as $fixture) {
+                UserFixture::load(I: $I, data: $fixture);
+            }
+        }
     }
 
-    #[DataProvider('failedEmailAlreadyExistsProvider')]
-    public function failedEmailAlreadyExists(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/409: Почта уже существует');
-
-        $user = $this->authorized(I: $I);
-        UserFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::CONFLICT);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/422: Ошибка валидации');
-
-        $user = $this->authorized(I: $I);
-
-        $I->sendPut(url: self::URL.'/'.$user->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    protected function mainProvider(): array
+    protected function successProvider(): array
     {
         return [
             [
-                'request' => [
-                    'email' => 'update@mail.ru',
+                'want_to' => 'Изменить пользователя (только текущий пользователь)',
+                'is_authorize' => true,
+                'context' => [
+                    'fixtures' => [
+                        'major' => [
+                            'email' => UserFixture::USER_AUTHORIZED_EMAIL,
+                        ],
+                    ],
+                    'params' => [
+                        'email' => 'update@mail.ru',
+                    ],
                 ],
                 'response' => [
                     'email' => 'update@mail.ru',
+                ],
+            ],
+        ];
+    }
+
+    protected function failedForbiddenProvider(): array
+    {
+        return [
+            [
+                'context' => [
+                    'fixtures' => [
+                        'major' => [
+                            'email' => 'launch@mail.ru',
+                        ],
+                    ],
+                    'params' => [
+                        'email' => 'update@mail.ru',
+                    ],
                 ],
             ],
         ];
@@ -119,13 +91,18 @@ final class UserUpdateCest extends AbstractCest
     {
         return [
             [
-                'request' => [
-                    'email' => 'test',
+                'want_to' => 'Неверный формат Email',
+                'context' => [
+                    'params' => [
+                        'email' => 'test',
+                        'password' => 'Password123',
+                    ],
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'email',
                             'message' => 'Email не соответствует формату электронной почты',
@@ -136,48 +113,39 @@ final class UserUpdateCest extends AbstractCest
         ];
     }
 
-    protected function failedAuthorizationProvider(): array
+    protected function failedConflictProvider(): array
     {
         return [
             [
+                'want_to' => 'Дублирование Email',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'email' => 'create@mail.ru',
+                    ],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'email' => 'create@mail.ru',
+                            ],
+                        ],
+                        'major' => [
+                            'email' => UserFixture::USER_AUTHORIZED_EMAIL,
+                        ],
+                    ],
+                ],
                 'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Пользователь с почтой create@mail.ru уже существует',
+                    'violations' => [],
                 ],
             ],
         ];
     }
 
-    protected function forbiddenProvider(): array
+    private static function getEntity(FunctionalTester $I, array $fixtures = []): User
     {
-        return [
-            [
-                'request' => [
-                    'email' => 'update@mail.ru',
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Доступ запрещен',
-                ],
-            ],
-        ];
-    }
-
-    protected function failedEmailAlreadyExistsProvider(): array
-    {
-        return [
-            [
-                'fixtures' => [
-                    'email' => 'update@mail.ru',
-                ],
-                'request' => [
-                    'email' => 'update@mail.ru',
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Пользователь с почтой update@mail.ru уже существует',
-                ],
-            ],
-        ];
+        return UserFixture::load(I: $I, data: $fixtures);
     }
 }

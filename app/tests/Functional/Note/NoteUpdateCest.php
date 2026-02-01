@@ -4,108 +4,77 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\Tests\_data\fixtures\NoteFixtures;
-use App\Tests\_data\fixtures\UserFixtures;
+use App\Entity\Note;
 use App\Tests\Functional\AbstractCest;
+use App\Tests\Support\Data\Fixture\NoteFixture;
+use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
 use Faker\Factory;
+use Symfony\Component\HttpFoundation\Request;
 
 final class NoteUpdateCest extends AbstractCest
 {
+    use TestSuccessTrait;
+    use TestFailedAuthorizationTrait;
+    use TestFailedForbiddenTrait;
+    use TestFailedValidationTrait;
+
     private const string URL = '/api/v1/notes';
 
-    #[DataProvider('mainProvider')]
-    public function main(FunctionalTester $I, Example $example): void
+    protected static function getMethod(): string
     {
-        $I->wantTo('PUT/200: Изменить заметку');
-
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return Request::METHOD_PUT;
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('PUT/401: Ошибка авторизации');
+        $id = self::getEntity(I: $I, fixtures: $context['fixtures']['major'] ?? [])->getId();
 
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL.'/'.$id;
     }
 
-    #[DataProvider('forbiddenProvider')]
-    public function forbidden(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/403: Доступ запрещен');
-
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::FORBIDDEN);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('PUT/422: Ошибка валидации');
-
-        $this->authorized(I: $I);
-        $note = NoteFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPut(url: self::URL.'/'.$note->getId(), params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    protected function mainProvider(): array
+    protected function successProvider(): array
     {
         return [
             [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
-                'request' => [
-                    'name' => 'Заметка_1',
-                    'description' => 'Описание заметки_1',
+                'want_to' => 'Изменить заметку',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                    ],
+                    'fixtures' => [
+                        'major' => [
+                            'name' => 'Заметка_0',
+                            'description' => 'Описание_0',
+                            'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                        ],
+                    ],
                 ],
                 'response' => [
                     'name' => 'Заметка_1',
                     'description' => 'Описание заметки_1',
                     'is_trashed' => false,
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
+                ],
+            ],
+        ];
+    }
+
+    protected function failedForbiddenProvider(): array
+    {
+        return [
+            [
+                'context' => [
+                    'params' => [
+                        'name' => 'Заметка_1',
+                        'description' => 'Описание заметки_1',
+                    ],
                 ],
             ],
         ];
@@ -117,26 +86,67 @@ final class NoteUpdateCest extends AbstractCest
 
         return [
             [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
-                'request' => [
-                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
-                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
+                'want_to' => 'Название мин.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(0, 0).'}'),
+                    ],
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'name',
-                            'message' => 'Название должно содержать максимум 100 символов',
+                            'message' => 'Поле не может быть пустым',
                         ],
                         [
+                            'property' => 'name',
+                            'message' => 'Минимально допустимое кол-во символов: 1. Ваше кол-во символов: 0',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'want_to' => 'Название макс.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
+                    ],
+                ],
+
+                'response' => [
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Ошибка валидации',
+                    'violations' => [
+                        [
+                            'property' => 'name',
+                            'message' => 'Максимально допустимое кол-во символов: 100. Ваше кол-во символов: 101',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'want_to' => 'Описание макс.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => 'Название',
+                        'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
+                    ],
+                ],
+                'response' => [
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Ошибка валидации',
+                    'violations' => [
+                        [
                             'property' => 'description',
-                            'message' => 'Описание должно содержать максимум 10000 символов',
+                            'message' => 'Максимально допустимое кол-во символов: 10000. Ваше кол-во символов: 10001',
                         ],
                     ],
                 ],
@@ -144,45 +154,8 @@ final class NoteUpdateCest extends AbstractCest
         ];
     }
 
-    protected function failedAuthorizationProvider(): array
+    private static function getEntity(FunctionalTester $I, array $fixtures = []): Note
     {
-        return [
-            [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
-                ],
-                'request' => [
-                    'name' => 'Заметка_1',
-                    'description' => 'Описание заметки_1',
-                ],
-                'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
-                ],
-            ],
-        ];
-    }
-
-    protected function forbiddenProvider(): array
-    {
-        return [
-            [
-                'fixtures' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание_0',
-                    'user' => ['email' => 'test_0@mail.ru'],
-                ],
-                'request' => [
-                    'name' => 'Заметка_1',
-                    'description' => 'Описание заметки_1',
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Доступ запрещен',
-                ],
-            ],
-        ];
+        return NoteFixture::load(I: $I, data: $fixtures);
     }
 }

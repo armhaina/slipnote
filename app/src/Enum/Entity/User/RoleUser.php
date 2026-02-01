@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Enum;
+namespace App\Enum\Entity\User;
 
-enum Role: string
+enum RoleUser: string
 {
     case ROLE_USER = 'ROLE_USER';
     case ROLE_ADMIN = 'ROLE_ADMIN';

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Entity;
 
-use App\Enum\Group;
+use App\Enum\Entity\User\GroupUser;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -15,31 +15,31 @@ readonly class UserPaginationResponseModelEntity
      * @param array<int, UserResponseModelEntity> $items
      */
     public function __construct(
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Количество записей на странице',
             type: 'integer',
         )]
         private int $count,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Номер страницы',
             type: 'integer',
         )]
         private int $page,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Количество записей',
             type: 'integer',
         )]
         private int $total,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Количество страниц',
             type: 'integer',
         )]
         private int $pages,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Пользователи',
             type: 'array',

@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Entity;
 
-use App\Enum\Group;
+use App\Enum\Entity\User\GroupUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class UserResponseModelEntity
 {
     public function __construct(
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Уникальный идентификатор пользователя',
             type: 'integer',
         )]
         private int $id,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Email пользователя',
             type: 'string',

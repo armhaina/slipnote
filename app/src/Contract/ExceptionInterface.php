@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-namespace App\Contract\Exception;
+namespace App\Contract;
 
 interface ExceptionInterface {}

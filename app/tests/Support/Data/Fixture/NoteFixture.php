@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Tests\_data\fixtures;
+namespace App\Tests\Support\Data\Fixture;
 
 use App\Entity\Note;
 use App\Tests\Support\FunctionalTester;
 use Faker\Factory;
 
-class NoteFixtures
+class NoteFixture
 {
     public static function load(FunctionalTester $I, array $data = []): Note
     {
@@ -17,7 +17,7 @@ class NoteFixtures
         $name = $data['name'] ?? $faker->name;
         $description = $data['description'] ?? $faker->text();
         $isTrashed = $data['is_trashed'] ?? false;
-        $user = UserFixtures::load(I: $I, data: $data['user'] ?? []);
+        $user = UserFixture::load(I: $I, data: $data['user'] ?? []);
         $deletedAt = $data['deleted_at'] ?? null;
         $createdAt = $data['created_at'] ?? $dateTimeImmutable;
         $updatedAt = $data['updated_at'] ?? $dateTimeImmutable;

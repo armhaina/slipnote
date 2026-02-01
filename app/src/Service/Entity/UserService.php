@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Service\Entity;
 
 use App\Entity\User;
+use App\Enum\Entity\User\GroupUser;
+use App\Enum\Entity\User\RoleUser;
 use App\Exception\Entity\EntityNotFoundException;
-use App\Exception\Entity\EntityNotFoundWhenDeleteException;
-use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Model\Query\UserQueryModel;
 use App\Repository\UserRepository;
 use Ds\Sequence;
@@ -62,25 +62,19 @@ readonly class UserService
         return $this->userRepository->save(entity: $entity);
     }
 
-    /**
-     * @throws EntityNotFoundWhenUpdateException
-     */
     public function update(User $entity): User
     {
         if (!$entity->getId()) {
-            throw new EntityNotFoundWhenUpdateException(entity: $entity::class);
+            throw new EntityNotFoundException(entity: $entity::class);
         }
 
         return $this->userRepository->save(entity: $entity);
     }
 
-    /**
-     * @throws EntityNotFoundWhenDeleteException
-     */
     public function delete(User $entity): void
     {
         if (!$entity->getId()) {
-            throw new EntityNotFoundWhenDeleteException(entity: $entity::class);
+            throw new EntityNotFoundException(entity: $entity::class);
         }
 
         $this->userRepository->delete(entity: $entity);
@@ -89,5 +83,23 @@ readonly class UserService
     public function checkExistsEmail(string $email): bool
     {
         return (bool) $this->one(queryModel: new UserQueryModel()->setEmail(email: $email));
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getGroupsByUserRoles(?User $user): array
+    {
+        $groups = [GroupUser::PUBLIC->value];
+
+        if (!$user) {
+            return $groups;
+        }
+
+        if (in_array(needle: RoleUser::ROLE_ADMIN->value, haystack: $user->getRoles())) {
+            $groups[] = GroupUser::ADMIN->value;
+        }
+
+        return $groups;
     }
 }

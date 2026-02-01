@@ -6,23 +6,19 @@ namespace App\Controller;
 
 use App\Entity\Note;
 use App\Entity\User;
-use App\Enum\Group;
-use App\Enum\Role;
-use App\Exception\Entity\EntityNotFoundWhenDeleteException;
-use App\Exception\Entity\EntityNotFoundWhenUpdateException;
-use App\Exception\Entity\User\ForbiddenException;
+use App\Enum\Entity\User\GroupUser;
+use App\Enum\Entity\User\RoleUser;
+use App\Enum\Message\HttpStatusMessage;
+use App\Exception\Auth\ForbiddenException;
+use App\Exception\Entity\EntityNotFoundException;
 use App\Mapper\Entity\NoteMapper;
-use App\Message\HttpStatusMessage;
 use App\Model\Payload\NoteCreatePayloadModel;
 use App\Model\Payload\NoteUpdatePayloadModel;
 use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
-use App\Model\Response\Exception\DefaultResponseModelException;
-use App\Model\Response\Exception\ExpiredJWTTokenModelException;
-use App\Model\Response\Exception\ForbiddenResponseModelException;
-use App\Model\Response\Exception\ValidationResponseModelException;
+use App\Model\Response\Exception\AllResponseModelException;
 use App\Service\Entity\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -39,7 +35,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/v1/notes')]
 #[OA\Tag(name: 'notes', description: 'Операции с заметками')]
 #[IsGranted(
-    attribute: Role::ROLE_USER->value,
+    attribute: RoleUser::ROLE_USER->value,
     statusCode: Response::HTTP_FORBIDDEN
 )]
 #[Security(name: 'Bearer')]
@@ -58,38 +54,38 @@ class NoteController extends AbstractController
     #[OA\Get(operationId: 'getNote', summary: 'Получить заметку по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessage::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -101,7 +97,7 @@ class NoteController extends AbstractController
 
         $responseModel = $this->noteMapper->one(note: $note);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     #[Route(methods: [Request::METHOD_GET])]
@@ -111,41 +107,41 @@ class NoteController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessage::HTTP_OK->value,
         content: new OA\JsonContent(
             type: 'array',
             items: new OA\Items(
                 ref: new Model(
                     type: NotePaginationResponseModelEntity::class,
-                    groups: [Group::PUBLIC->value]
+                    groups: [GroupUser::PUBLIC->value]
                 )
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ValidationResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -271,13 +267,12 @@ class NoteController extends AbstractController
         schema: new OA\Schema(type: 'string', enum: ['asc', 'desc']),
         example: 'desc',
     )]
-    public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
-    {
+    public function list(
+        #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)]
+        NoteQueryModel $model
+    ): JsonResponse {
+        /** @var User $user */
         $user = $this->getUser();
-
-        if (!$user instanceof User) {
-            throw new ForbiddenException();
-        }
 
         if (!is_bool($model->getIsTrashed())) {
             $model->setIsTrashed(isTrashed: false);
@@ -288,7 +283,7 @@ class NoteController extends AbstractController
 
         $responseModel = $this->noteMapper->pagination(pagination: $pagination);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     #[Route(methods: [Request::METHOD_POST])]
@@ -296,49 +291,52 @@ class NoteController extends AbstractController
     #[OA\RequestBody(content: new Model(type: NoteCreatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessage::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ValidationResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     public function create(#[MapRequestPayload] NoteCreatePayloadModel $model): JsonResponse
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         $dateTimeImmutable = new \DateTimeImmutable();
 
         $note = new Note()
             ->setName(name: $model->getName())
             ->setDescription(description: $model->getDescription())
-            ->setUser(user: $this->getUser())
+            ->setUser(user: $user)
             ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setIsTrashed(isTrashed: false)
@@ -348,11 +346,11 @@ class NoteController extends AbstractController
 
         $responseModel = $this->noteMapper->one(note: $note);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     /**
-     * @throws EntityNotFoundWhenUpdateException
+     * @throws EntityNotFoundException
      */
     #[Route(
         path: '/{id}',
@@ -363,47 +361,47 @@ class NoteController extends AbstractController
     #[OA\RequestBody(content: new Model(type: NoteUpdatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessage::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ValidationResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -428,11 +426,11 @@ class NoteController extends AbstractController
 
         $responseModel = $this->noteMapper->one(note: $note);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     /**
-     * @throws EntityNotFoundWhenDeleteException
+     * @throws EntityNotFoundException
      */
     #[Route(
         path: '/{id}',
@@ -442,35 +440,35 @@ class NoteController extends AbstractController
     #[OA\Delete(operationId: 'deleteNote', summary: 'Удалить заметку по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessage::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(type: DeleteResponseModelAction::class)
         )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -485,9 +483,6 @@ class NoteController extends AbstractController
         return $this->json(data: new DeleteResponseModelAction());
     }
 
-    /**
-     * @throws EntityNotFoundWhenUpdateException
-     */
     #[Route(
         path: '/{id}/trash',
         requirements: ['id' => '\d+'],
@@ -496,38 +491,38 @@ class NoteController extends AbstractController
     #[OA\Delete(operationId: 'deleteInTrashNote', summary: 'Удалить заметку в корзину по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessage::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -548,11 +543,11 @@ class NoteController extends AbstractController
 
         $responseModel = $this->noteMapper->one(note: $note);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     /**
-     * @throws EntityNotFoundWhenUpdateException
+     * @throws EntityNotFoundException
      */
     #[Route(
         path: '/{id}/trash/restore',
@@ -562,38 +557,38 @@ class NoteController extends AbstractController
     #[OA\Put(operationId: 'restoreFromTrashNote', summary: 'Восстановить заметку из корзины по ID')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessage::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: NoteResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ExpiredJWTTokenModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -614,6 +609,6 @@ class NoteController extends AbstractController
 
         $responseModel = $this->noteMapper->one(note: $note);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 }

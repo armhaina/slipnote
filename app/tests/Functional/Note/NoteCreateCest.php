@@ -4,80 +4,50 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Note;
 
-use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
+use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Test\TestFailedAuthorizationTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Util\HttpCode;
 use Faker\Factory;
+use Symfony\Component\HttpFoundation\Request;
 
 final class NoteCreateCest extends AbstractCest
 {
+    use TestSuccessTrait;
+    use TestFailedAuthorizationTrait;
+    use TestFailedValidationTrait;
+
     private const string URL = '/api/v1/notes';
 
-    #[DataProvider('mainProvider')]
-    public function main(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('POST/200: Создать заметку');
-
-        $this->authorized(I: $I);
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL;
     }
 
-    #[DataProvider('failedAuthorizationProvider')]
-    public function failedAuthorization(FunctionalTester $I, Example $example): void
+    protected static function getMethod(): string
     {
-        $I->wantTo('POST/401: Ошибка авторизации');
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNAUTHORIZED);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return Request::METHOD_POST;
     }
 
-    #[DataProvider('failedValidationProvider')]
-    public function failedValidation(FunctionalTester $I, Example $example): void
-    {
-        $I->wantTo('POST/422: Ошибка валидации');
-
-        $this->authorized(I: $I);
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    protected function mainProvider(): array
+    protected function successProvider(): array
     {
         return [
             [
-                'request' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
+                'want_to' => 'Создать заметку',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => 'Заметка_0',
+                        'description' => 'Описание заметки_0',
+                    ],
                 ],
                 'response' => [
                     'name' => 'Заметка_0',
                     'description' => 'Описание заметки_0',
                     'is_trashed' => false,
-                    'user' => ['email' => UserFixtures::USER_AUTHORIZED_EMAIL],
+                    'user' => ['email' => UserFixture::USER_AUTHORIZED_EMAIL],
                 ],
             ],
         ];
@@ -89,39 +59,69 @@ final class NoteCreateCest extends AbstractCest
 
         return [
             [
-                'request' => [
-                    'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
-                    'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
+                'want_to' => 'Название мин.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(0, 0).'}'),
+                    ],
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'name',
-                            'message' => 'Название должно содержать максимум 100 символов',
+                            'message' => 'Поле не может быть пустым',
                         ],
                         [
-                            'property' => 'description',
-                            'message' => 'Описание должно содержать максимум 10000 символов',
+                            'property' => 'name',
+                            'message' => 'Минимально допустимое кол-во символов: 1. Ваше кол-во символов: 0',
                         ],
                     ],
                 ],
             ],
-        ];
-    }
-
-    protected function failedAuthorizationProvider(): array
-    {
-        return [
             [
-                'request' => [
-                    'name' => 'Заметка_0',
-                    'description' => 'Описание заметки_0',
+                'want_to' => 'Название макс.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(101, 101).'}'),
+                    ],
+                ],
+
+                'response' => [
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Ошибка валидации',
+                    'violations' => [
+                        [
+                            'property' => 'name',
+                            'message' => 'Максимально допустимое кол-во символов: 100. Ваше кол-во символов: 101',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'want_to' => 'Описание макс.',
+                'is_authorize' => true,
+                'context' => [
+                    'params' => [
+                        'name' => 'Название',
+                        'description' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(10001, 10001).'}'),
+                    ],
                 ],
                 'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Ошибка валидации',
+                    'violations' => [
+                        [
+                            'property' => 'description',
+                            'message' => 'Максимально допустимое кол-во символов: 10000. Ваше кол-во символов: 10001',
+                        ],
+                    ],
                 ],
             ],
         ];

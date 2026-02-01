@@ -6,8 +6,6 @@ namespace App\Service\Entity;
 
 use App\Entity\Note;
 use App\Exception\Entity\EntityNotFoundException;
-use App\Exception\Entity\EntityNotFoundWhenDeleteException;
-use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Model\Query\NoteQueryModel;
 use App\Repository\NoteRepository;
 use Ds\Sequence;
@@ -51,6 +49,8 @@ readonly class NoteService
     }
 
     /**
+     * @throws \DateMalformedStringException
+     *
      * @return PaginationInterface<int, Note>
      */
     public function pagination(NoteQueryModel $queryModel): PaginationInterface
@@ -59,6 +59,8 @@ readonly class NoteService
     }
 
     /**
+     * @throws \DateMalformedStringException
+     *
      * @return Sequence<Note>
      */
     public function list(NoteQueryModel $queryModel): Sequence
@@ -72,24 +74,24 @@ readonly class NoteService
     }
 
     /**
-     * @throws EntityNotFoundWhenUpdateException
+     * @throws EntityNotFoundException
      */
     public function update(Note $entity): Note
     {
         if (!$entity->getId()) {
-            throw new EntityNotFoundWhenUpdateException(entity: $entity::class);
+            throw new EntityNotFoundException(entity: $entity::class);
         }
 
         return $this->noteRepository->save(entity: $entity);
     }
 
     /**
-     * @throws EntityNotFoundWhenDeleteException
+     * @throws EntityNotFoundException
      */
     public function delete(Note $entity): void
     {
         if (!$entity->getId()) {
-            throw new EntityNotFoundWhenDeleteException(entity: $entity::class);
+            throw new EntityNotFoundException(entity: $entity::class);
         }
 
         $this->noteRepository->delete(entity: $entity);

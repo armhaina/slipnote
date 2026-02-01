@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace App\Exception\Entity;
 
-use App\Contract\Exception\ExceptionInterface;
+use App\Contract\ExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class EntityNotFoundException extends \Exception implements ExceptionInterface
+class EntityNotFoundException extends NotFoundHttpException implements ExceptionInterface
 {
-    public function __construct(string $entity, int $id)
+    public function __construct(string $entity, ?int $id = null)
     {
-        parent::__construct("Entity {$entity} with id = {$id} not found");
+        if ($id) {
+            $message = 'Сущность '.$entity.' с id '.$id.' не найдена';
+        } else {
+            $message = 'Сущность '.$entity.' не найдена';
+        }
+
+        parent::__construct(message: $message);
     }
 }

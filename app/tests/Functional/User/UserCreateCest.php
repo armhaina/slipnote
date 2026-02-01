@@ -4,88 +4,54 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\User;
 
-use App\Tests\_data\fixtures\UserFixtures;
 use App\Tests\Functional\AbstractCest;
+use App\Tests\Support\Data\Fixture\UserFixture;
+use App\Tests\Support\Data\Trait\Test\TestFailedConflictTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedForbiddenTrait;
+use App\Tests\Support\Data\Trait\Test\TestFailedValidationTrait;
+use App\Tests\Support\Data\Trait\Test\TestSuccessTrait;
 use App\Tests\Support\FunctionalTester;
-use Codeception\Attribute\DataProvider;
-use Codeception\Example;
-use Codeception\Scenario;
-use Codeception\Util\HttpCode;
 use Faker\Factory;
+use Symfony\Component\HttpFoundation\Request;
 
 final class UserCreateCest extends AbstractCest
 {
+    use TestSuccessTrait;
+    use TestFailedForbiddenTrait;
+    use TestFailedConflictTrait;
+    use TestFailedValidationTrait;
+
     private const string URL = '/api/v1/users';
 
-    #[DataProvider('mainProvider')]
-    public function main(FunctionalTester $I, Example $example): void
+    protected static function getMethod(): string
     {
-        $I->wantTo('POST/200: Создать пользователя');
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::OK);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return Request::METHOD_POST;
     }
 
-    #[DataProvider('failedEmailAlreadyExistsProvider')]
-    public function failedEmailAlreadyExists(FunctionalTester $I, Example $example): void
+    protected static function getUrl(FunctionalTester $I, array $context = []): string
     {
-        $I->wantTo('POST/409: Почта уже существует');
-
-        UserFixtures::load(I: $I, data: $example['fixtures']);
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::CONFLICT);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        return self::URL;
     }
 
-    #[DataProvider('failedValidationPasswordMinProvider')]
-    public function failedValidationPasswordMin(FunctionalTester $I, Example $example, Scenario $scenario): void
+    protected static function contextHandle(FunctionalTester $I, array &$context): void
     {
-        $I->wantTo('POST/422: Ошибка валидации (пароль минимум)');
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
+        if (!empty($context['fixtures']['minor'])) {
+            foreach ($context['fixtures']['minor'] as $fixture) {
+                UserFixture::load(I: $I, data: $fixture);
+            }
+        }
     }
 
-    #[DataProvider('failedValidationPasswordMaxProvider')]
-    public function failedValidationPasswordMax(FunctionalTester $I, Example $example, Scenario $scenario): void
-    {
-        $I->wantTo('POST/422: Ошибка валидации (пароль максимум)');
-
-        $I->sendPost(url: self::URL, params: $example['request']);
-        $I->seeResponseCodeIs(code: HttpCode::UNPROCESSABLE_ENTITY);
-        $I->seeResponseIsJson();
-
-        $data = json_decode($I->grabResponse(), true);
-        $data = self::except(data: $data, excludeKeys: ['id']);
-
-        $I->assertEquals(expected: $example['response'], actual: $data);
-    }
-
-    protected function mainProvider(): array
+    protected function successProvider(): array
     {
         return [
             [
-                'request' => [
-                    'email' => 'create@mail.ru',
-                    'password' => 'createPassword',
+                'want_to' => 'Создать пользователя',
+                'context' => [
+                    'params' => [
+                        'email' => 'create@mail.ru',
+                        'password' => 'createPassword',
+                    ],
                 ],
                 'response' => [
                     'email' => 'create@mail.ru',
@@ -94,27 +60,85 @@ final class UserCreateCest extends AbstractCest
         ];
     }
 
-    protected function failedValidationPasswordMinProvider(): array
+    protected function failedForbiddenProvider(): array
+    {
+        return [
+            [
+                'want_to' => 'Создать пользователя',
+                'context' => [
+                    'params' => [
+                        'email' => 'create@mail.ru',
+                        'password' => 'createPassword',
+                    ],
+                ],
+                'response' => [
+                    'email' => 'create@mail.ru',
+                ],
+            ],
+        ];
+    }
+
+    protected function failedValidationProvider(): array
     {
         $faker = Factory::create();
 
         return [
             [
-                'request' => [
-                    'email' => 'test',
-                    'password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(5, 5).'}'),
+                'want_to' => 'Неверный формат Email',
+                'context' => [
+                    'params' => [
+                        'email' => 'test',
+                        'password' => 'Password123',
+                    ],
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'email',
                             'message' => 'Email не соответствует формату электронной почты',
                         ],
+                    ],
+                ],
+            ],
+            [
+                'want_to' => 'Пароль мин.',
+                'context' => [
+                    'params' => [
+                        'email' => 'test@mail.ru',
+                        'password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(5, 5).'}'),
+                    ],
+                ],
+                'response' => [
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Ошибка валидации',
+                    'violations' => [
                         [
                             'property' => 'password',
-                            'message' => 'Пароль должен содержать минимум 6 символов',
+                            'message' => 'Минимально допустимое кол-во символов: 6. Ваше кол-во символов: 5',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'want_to' => 'Пароль макс.',
+                'context' => [
+                    'params' => [
+                        'email' => 'test@mail.ru',
+                        'password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(19, 19).'}'),
+                    ],
+                ],
+                'response' => [
+                    'success' => false,
+                    'code' => 0,
+                    'message' => 'Ошибка валидации',
+                    'violations' => [
+                        [
+                            'property' => 'password',
+                            'message' => 'Максимально допустимое кол-во символов: 18. Ваше кол-во символов: 19',
                         ],
                     ],
                 ],
@@ -122,75 +146,29 @@ final class UserCreateCest extends AbstractCest
         ];
     }
 
-    protected function failedValidationPasswordMaxProvider(): array
+    protected function failedConflictProvider(): array
     {
-        $faker = Factory::create();
-
         return [
             [
-                'request' => [
-                    'email' => 'test',
-                    'password' => $faker->regexify('[A-Za-z0-9]{'.mt_rand(19, 19).'}'),
-                ],
-                'response' => [
-                    'success' => false,
-                    'message' => 'Ошибка валидации',
-                    'errors' => [
-                        [
-                            'property' => 'email',
-                            'message' => 'Email не соответствует формату электронной почты',
-                        ],
-                        [
-                            'property' => 'password',
-                            'message' => 'Пароль должен содержать максимум 18 символов',
+                'want_to' => 'Дублирование Email',
+                'context' => [
+                    'params' => [
+                        'email' => 'create@mail.ru',
+                        'password' => 'createPassword',
+                    ],
+                    'fixtures' => [
+                        'minor' => [
+                            [
+                                'email' => 'create@mail.ru',
+                            ],
                         ],
                     ],
                 ],
-            ],
-        ];
-    }
-
-    protected function failedAuthorizationProvider(): array
-    {
-        return [
-            [
-                'response' => [
-                    'code' => 401,
-                    'message' => 'JWT Token not found',
-                ],
-            ],
-        ];
-    }
-
-    protected function forbiddenProvider(): array
-    {
-        return [
-            [
-                'request' => [
-                    'email' => 'update@mail.ru',
-                ],
                 'response' => [
                     'success' => false,
-                    'message' => 'Доступ запрещен',
-                ],
-            ],
-        ];
-    }
-
-    protected function failedEmailAlreadyExistsProvider(): array
-    {
-        return [
-            [
-                'fixtures' => [
-                    'email' => 'create@mail.ru',
-                ],
-                'request' => [
-                    'email' => 'create@mail.ru',
-                    'password' => 'createPassword',
-                ],
-                'response' => [
-                    'success' => false,
+                    'code' => 0,
                     'message' => 'Пользователь с почтой create@mail.ru уже существует',
+                    'violations' => [],
                 ],
             ],
         ];

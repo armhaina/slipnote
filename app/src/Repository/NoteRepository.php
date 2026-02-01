@@ -36,6 +36,8 @@ class NoteRepository extends AbstractRepository
     }
 
     /**
+     * @throws \DateMalformedStringException
+     *
      * @return Vector<Note>
      */
     public function list(NoteQueryModel $queryModel): Vector
@@ -46,6 +48,8 @@ class NoteRepository extends AbstractRepository
     }
 
     /**
+     * @throws \DateMalformedStringException
+     *
      * @return PaginationInterface<int, Note>
      */
     public function pagination(NoteQueryModel $queryModel): PaginationInterface
@@ -73,6 +77,9 @@ class NoteRepository extends AbstractRepository
         $this->em->flush();
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     private function queryBuilder(NoteQueryModel $queryModel): QueryBuilder
     {
         $query = $this->createQueryBuilder(Note::shortName());

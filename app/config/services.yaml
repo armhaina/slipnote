@@ -19,9 +19,12 @@ services:
   App\:
     resource: '../src/'
 
-  App\EventListener\ExceptionListener:
+  App\EventListener\Exception\AllExceptionListener:
     tags:
       - { name: kernel.event_listener, event: kernel.exception }
 
-  # add more service definitions when explicit configuration is needed
-  # please note that last definitions always *replace* previous ones
+  App\EventListener\Exception\JWTExceptionListener:
+    tags:
+      - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
+      - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired }
+      - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_invalid, method: onJWTInvalid }
