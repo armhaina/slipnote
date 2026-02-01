@@ -10,8 +10,7 @@ use App\Enum\Entity\User\GroupUser;
 use App\Enum\Entity\User\RoleUser;
 use App\Enum\Message\HttpStatusMessage;
 use App\Exception\Auth\ForbiddenException;
-use App\Exception\Entity\EntityNotFoundWhenDeleteException;
-use App\Exception\Entity\EntityNotFoundWhenUpdateException;
+use App\Exception\Entity\EntityNotFoundException;
 use App\Mapper\Entity\NoteMapper;
 use App\Model\Payload\NoteCreatePayloadModel;
 use App\Model\Payload\NoteUpdatePayloadModel;
@@ -351,7 +350,7 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @throws EntityNotFoundWhenUpdateException
+     * @throws EntityNotFoundException
      */
     #[Route(
         path: '/{id}',
@@ -431,7 +430,7 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @throws EntityNotFoundWhenDeleteException
+     * @throws EntityNotFoundException
      */
     #[Route(
         path: '/{id}',
@@ -484,9 +483,6 @@ class NoteController extends AbstractController
         return $this->json(data: new DeleteResponseModelAction());
     }
 
-    /**
-     * @throws EntityNotFoundWhenUpdateException
-     */
     #[Route(
         path: '/{id}/trash',
         requirements: ['id' => '\d+'],
@@ -551,7 +547,7 @@ class NoteController extends AbstractController
     }
 
     /**
-     * @throws EntityNotFoundWhenUpdateException
+     * @throws EntityNotFoundException
      */
     #[Route(
         path: '/{id}/trash/restore',

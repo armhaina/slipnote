@@ -8,8 +8,14 @@ use App\Contract\ExceptionInterface;
 
 class EntityNotFoundException extends \Exception implements ExceptionInterface
 {
-    public function __construct(string $entity, int $id)
+    public function __construct(string $entity, ?int $id = null)
     {
-        parent::__construct("Entity {$entity} with id = {$id} not found");
+        if ($id) {
+            $message = 'Сущность '.$entity.' с id '.$id.' не найдена';
+        } else {
+            $message = 'Сущность '.$entity.' не найдена';
+        }
+
+        parent::__construct(message: $message);
     }
 }
