@@ -73,6 +73,9 @@ class NoteRepository extends AbstractRepository
         $this->em->flush();
     }
 
+    /**
+     * @throws \DateMalformedStringException
+     */
     private function queryBuilder(NoteQueryModel $queryModel): QueryBuilder
     {
         $query = $this->createQueryBuilder(Note::shortName());
