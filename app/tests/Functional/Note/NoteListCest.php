@@ -568,10 +568,10 @@ final class NoteListCest extends AbstractCest
     {
         return [
             [
-                'want_to' => 'Доступные поля для сортировки',
+                'want_to' => 'Доступные поля/направления для сортировки',
                 'is_authorize' => true,
                 'context' => [
-                    'params' => ['order_by[rand]' => 'asc'],
+                    'params' => ['order_by[rand]' => 'test'],
                 ],
                 'response' => [
                     'success' => false,
@@ -580,6 +580,10 @@ final class NoteListCest extends AbstractCest
                         [
                             'property' => 'order_by',
                             'message' => 'Поле "rand" не разрешено для сортировки. Разрешены поля: name, created_at, updated_at',
+                        ],
+                        [
+                            'property' => 'order_by',
+                            'message' => 'Направление "test" недопустимо. Используйте: asc или desc',
                         ],
                     ],
                 ],
