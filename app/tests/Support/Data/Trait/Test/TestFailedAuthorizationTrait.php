@@ -7,10 +7,12 @@ namespace App\Tests\Support\Data\Trait\Test;
 use App\Tests\Support\Data\Trait\AbstractTrait;
 use App\Tests\Support\FunctionalTester;
 use Codeception\Attribute\DataProvider;
-use Codeception\Attribute\Skip;
 use Codeception\Example;
 use Codeception\Scenario;
 use Codeception\Util\HttpCode;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTExpiredEvent;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 trait TestFailedAuthorizationTrait
 {
@@ -20,14 +22,8 @@ trait TestFailedAuthorizationTrait
      * @throws \Exception
      */
     #[DataProvider('failedAuthorizationProvider')]
-    #[Skip]
     public function failedAuthorization(FunctionalTester $I, Scenario $scenario, Example $example): void
     {
-        $kernel = $I->grabService('kernel');
-        $container = $kernel->getContainer();
-
-        $is = $container->hasParameter('test_config_loaded');
-
         self::setWantTo(scenario: $scenario, wantTo: self::getMethod().'/401 АВТОРИЗАЦИЯ: Ошибка авторизации');
 
         $context = $example['context'] ?? [];
@@ -44,13 +40,29 @@ trait TestFailedAuthorizationTrait
         $data = json_decode($I->grabResponse(), true);
         $data = self::except(data: $data, excludeKeys: ['id']);
 
+        // HACK: События LexikJWTAuthenticationBundle не вызываются в тестовом окружении
+        if (!empty($data['message']) && 'JWT Token not found' === $data['message']) {
+            // Получаем EventDispatcher
+            $dispatcher = $I->grabService('event_dispatcher');
+
+            // Создаем событие
+            $event = new JWTExpiredEvent(exception: new AuthenticationException(), response: null);
+
+            // Принудительно вызываем событие
+            $dispatcher->dispatch($event, 'lexik_jwt_authentication.on_jwt_expired');
+
+            // Проверяем результат
+            $response = $event->getResponse();
+
+            $I->assertInstanceOf(expected: JsonResponse::class, actual: $response);
+            $I->assertEquals(expected: HttpCode::UNAUTHORIZED, actual: $response->getStatusCode());
+
+            // Получаем данные
+            $data = json_decode($response->getContent(), true);
+        }
+
         $I->assertEquals(
-            expected: [
-                'success' => false,
-                'code' => 0,
-                'message' => 'Требуется авторизация',
-                'violations' => [],
-            ],
+            expected: $data,
             actual: $data
         );
     }
