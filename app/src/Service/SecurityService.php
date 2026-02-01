@@ -30,7 +30,7 @@ readonly class SecurityService
             $this->jwtManager->parse(token: $token);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
     }

@@ -32,7 +32,7 @@ class NotesDeleteCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->noteService->transaction(func: function () {
+        $this->noteService->transaction(func: function (): void {
             do {
                 $pagination = $this->getNotes();
 

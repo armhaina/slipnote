@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: '`notes`')]
 #[ORM\Index(name: 'idx_notes_name', columns: ['name'])]
 #[ORM\Index(name: 'idx_notes_description', columns: ['description'])]
-class Note
+class Note implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
@@ -91,7 +91,7 @@ class Note
     )]
     private \DateTimeImmutable $updatedAt;
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->getId();
     }

@@ -11,20 +11,14 @@ class OrderBy extends Constraint
     /**
      * @var array<string>
      */
-    public array $allowedFields;
-    /**
-     * @var array<string>
-     */
     public array $allowedDirections = ['asc', 'desc'];
 
     /**
-     * @param string[] $fields
+     * @param string[] $allowedFields
      */
     #[HasNamedArguments]
-    public function __construct(array $fields)
+    public function __construct(public array $allowedFields)
     {
-        $this->allowedFields = $fields;
-
         parent::__construct();
     }
 }
