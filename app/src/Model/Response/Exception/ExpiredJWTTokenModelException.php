@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Exception;
 
-use App\Contract\Exception\ExceptionResponseInterface;
 use App\Enum\Entity\User\GroupUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class ExpiredJWTTokenModelException implements ExceptionResponseInterface
+readonly class ExpiredJWTTokenModelException
 {
     public function __construct(
         #[Groups([GroupUser::PUBLIC->value])]

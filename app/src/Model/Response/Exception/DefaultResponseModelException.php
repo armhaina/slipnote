@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Exception;
 
-use App\Contract\Exception\ExceptionResponseInterface;
 use App\Enum\Entity\User\GroupUser;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class DefaultResponseModelException implements ExceptionResponseInterface
+readonly class DefaultResponseModelException
 {
     /**
      * @param ViolationResponseModelException[] $violations

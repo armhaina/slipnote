@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
-use App\Contract\Exception\ExceptionResponseInterface;
 use App\Entity\User;
 use App\Enum\Message\HttpStatusMessage;
 use App\Model\Response\Exception\ContextResponseModelException;
@@ -66,7 +65,7 @@ readonly class ExceptionListener
         );
     }
 
-    private function exceptionFactory(\Throwable $exception, int $status): ExceptionResponseInterface
+    private function exceptionFactory(\Throwable $exception, int $status): DefaultResponseModelException
     {
         $violations = [];
 

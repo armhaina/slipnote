@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Model\Response\Exception;
 
-use App\Contract\Exception\ExceptionResponseInterface;
 use App\Enum\Entity\User\GroupUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class ContextResponseModelException implements ExceptionResponseInterface
+readonly class ContextResponseModelException
 {
     public function __construct(
         #[Groups([GroupUser::ADMIN->value])]
