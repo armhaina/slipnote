@@ -28,7 +28,7 @@
 - Клонировать проект
 
 ```bash
-git clone https://github.com/yourname/slipnote.git
+https://github.com/armhaina/slipnote.git
 ```
 
 - Перейти в проект
@@ -62,7 +62,10 @@ make test-run
 
 ## 📄 Лицензия
 
-Распространяется под лицензией MIT. См. файл `LICENSE` для подробностей.
+Распространяется под лицензией MIT.
+
+[![Лицензия MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 
 ---
 
