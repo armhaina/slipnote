@@ -1,4 +1,5 @@
 <img src="logo.png" alt="Slipnote Logo">
+<img src="logo-2.png" alt="Slipnote Logo">
 
 # Slipnote
 
