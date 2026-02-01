@@ -3,5 +3,8 @@ pre-commit:
     phpcs:
       run: make phpcs && git add {staged_files}
 
+    rector:
+      run: make rector && git add {staged_files}
+
     phpstan:
       run: make phpstan
