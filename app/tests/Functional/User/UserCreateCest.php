@@ -93,8 +93,9 @@ final class UserCreateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'email',
                             'message' => 'Email не соответствует формату электронной почты',
@@ -112,11 +113,12 @@ final class UserCreateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'password',
-                            'message' => 'Минимально допустимое значение символов: 6. Ваше кол-во символов: 5',
+                            'message' => 'Минимально допустимое кол-во символов: 6. Ваше кол-во символов: 5',
                         ],
                     ],
                 ],
@@ -131,11 +133,12 @@ final class UserCreateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'password',
-                            'message' => 'Максимально допустимое значение символов: 18. Ваше кол-во символов: 19',
+                            'message' => 'Максимально допустимое кол-во символов: 18. Ваше кол-во символов: 19',
                         ],
                     ],
                 ],
@@ -163,7 +166,9 @@ final class UserCreateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Пользователь с почтой create@mail.ru уже существует',
+                    'violations' => [],
                 ],
             ],
         ];

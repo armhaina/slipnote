@@ -44,7 +44,9 @@ trait TestFailedForbiddenTrait
         $I->assertEquals(
             expected: [
                 'success' => false,
+                'code' => 0,
                 'message' => 'Доступ запрещен',
+                'violations' => [],
             ],
             actual: $data
         );

@@ -100,8 +100,9 @@ final class UserUpdateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'email',
                             'message' => 'Email не соответствует формату электронной почты',
@@ -135,7 +136,9 @@ final class UserUpdateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Пользователь с почтой create@mail.ru уже существует',
+                    'violations' => [],
                 ],
             ],
         ];

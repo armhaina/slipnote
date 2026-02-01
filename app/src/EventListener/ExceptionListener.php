@@ -6,7 +6,7 @@ namespace App\EventListener;
 
 use App\Contract\Exception\ExceptionResponseInterface;
 use App\Entity\User;
-use App\Enum\Message\HttpStatusMessageNew;
+use App\Enum\Message\HttpStatusMessage;
 use App\Model\Response\Exception\ContextResponseModelException;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ViolationResponseModelException;
@@ -129,6 +129,6 @@ readonly class ExceptionListener
             return $exception->getMessage();
         }
 
-        return HttpStatusMessageNew::getValue(code: $status);
+        return HttpStatusMessage::getValue(code: $status);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enum\Message;
 
-enum HttpStatusMessageNew: string
+enum HttpStatusMessage: string
 {
     case HTTP_OK = 'Успех';
     case HTTP_BAD_REQUEST = 'Некорректный запрос';

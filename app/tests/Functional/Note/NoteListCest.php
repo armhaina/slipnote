@@ -575,15 +575,16 @@ final class NoteListCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'order_by',
-                            'message' => 'Поле "rand" не разрешено для сортировки. Разрешены поля: name, created_at, updated_at',
+                            'message' => 'Поле rand не разрешено для сортировки. Разрешены поля: name, created_at, updated_at',
                         ],
                         [
                             'property' => 'order_by',
-                            'message' => 'Направление "test" недопустимо. Используйте: asc или desc',
+                            'message' => 'Направление test недопустимо. Используйте: asc или desc',
                         ],
                     ],
                 ],

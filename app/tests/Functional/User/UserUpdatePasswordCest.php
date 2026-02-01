@@ -97,11 +97,12 @@ final class UserUpdatePasswordCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'new_password',
-                            'message' => 'Минимально допустимое значение символов: 6. Ваше кол-во символов: 5',
+                            'message' => 'Минимально допустимое кол-во символов: 6. Ваше кол-во символов: 5',
                         ],
                     ],
                 ],
@@ -117,11 +118,12 @@ final class UserUpdatePasswordCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'new_password',
-                            'message' => 'Максимально допустимое значение символов: 18. Ваше кол-во символов: 19',
+                            'message' => 'Максимально допустимое кол-во символов: 18. Ваше кол-во символов: 19',
                         ],
                     ],
                 ],
@@ -148,7 +150,9 @@ final class UserUpdatePasswordCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Неверный текущий пароль пользователя',
+                    'violations' => [],
                 ],
             ],
         ];

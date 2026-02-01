@@ -95,15 +95,16 @@ final class NoteUpdateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'name',
                             'message' => 'Поле не может быть пустым',
                         ],
                         [
                             'property' => 'name',
-                            'message' => 'Минимально допустимое значение символов: 1. Ваше кол-во символов: 0',
+                            'message' => 'Минимально допустимое кол-во символов: 1. Ваше кол-во символов: 0',
                         ],
                     ],
                 ],
@@ -119,11 +120,12 @@ final class NoteUpdateCest extends AbstractCest
 
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'name',
-                            'message' => 'Максимально допустимое значение символов: 100. Ваше кол-во символов: 101',
+                            'message' => 'Максимально допустимое кол-во символов: 100. Ваше кол-во символов: 101',
                         ],
                     ],
                 ],
@@ -139,11 +141,12 @@ final class NoteUpdateCest extends AbstractCest
                 ],
                 'response' => [
                     'success' => false,
+                    'code' => 0,
                     'message' => 'Ошибка валидации',
-                    'errors' => [
+                    'violations' => [
                         [
                             'property' => 'description',
-                            'message' => 'Максимально допустимое значение символов: 10000. Ваше кол-во символов: 10001',
+                            'message' => 'Максимально допустимое кол-во символов: 10000. Ваше кол-во символов: 10001',
                         ],
                     ],
                 ],
