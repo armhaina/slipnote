@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Contract\Exception\ExceptionResponseInterface;
-use App\Enum\Group;
-use App\Enum\Role;
+use App\Entity\User;
 use App\Message\HttpStatusMessage;
 use App\Model\Response\Exception\ContextResponseModelException;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ForbiddenResponseModelException;
 use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Model\Response\Exception\ViolationResponseModelException;
+use App\Service\Entity\UserService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +44,11 @@ readonly class ExceptionListener
         ) ? $exception->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
 
         $data = $this->exceptionFactory(exception: $exception, status: $status);
-        $groups = $this->getGroupsByUserRoles();
+
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        $groups = UserService::getGroupsByUserRoles(user: $user);
 
         $data = $this->serializer->serialize(data: $data, format: 'json', context: array_merge([
             'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
@@ -129,26 +133,6 @@ readonly class ExceptionListener
             code: $exception->getCode(),
             errors: $errors,
         );
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getGroupsByUserRoles(): array
-    {
-        $user = $this->security->getUser() ?? null;
-
-        $groups = [Group::PUBLIC->value];
-
-        if (!$user) {
-            return $groups;
-        }
-
-        if (in_array(needle: Role::ROLE_ADMIN->value, haystack: $user->getRoles())) {
-            $groups[] = Group::ADMIN->value;
-        }
-
-        return $groups;
     }
 
     private function isUserException(\Throwable $exception): bool

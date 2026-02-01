@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Service\Entity;
 
 use App\Entity\User;
+use App\Enum\Group;
+use App\Enum\Role;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
@@ -89,5 +91,23 @@ readonly class UserService
     public function checkExistsEmail(string $email): bool
     {
         return (bool) $this->one(queryModel: new UserQueryModel()->setEmail(email: $email));
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getGroupsByUserRoles(?User $user): array
+    {
+        $groups = [Group::PUBLIC->value];
+
+        if (!$user) {
+            return $groups;
+        }
+
+        if (in_array(needle: Role::ROLE_ADMIN->value, haystack: $user->getRoles())) {
+            $groups[] = Group::ADMIN->value;
+        }
+
+        return $groups;
     }
 }
