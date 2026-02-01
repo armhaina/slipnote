@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\Entity\User;
 
-use App\Contract\Exception\ExceptionInterface;
+use App\Contract\ExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class EmailAlreadyExistsException extends ConflictHttpException implements ExceptionInterface

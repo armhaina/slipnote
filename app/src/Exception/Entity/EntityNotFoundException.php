@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exception\Entity;
 
-use App\Contract\Exception\ExceptionInterface;
+use App\Contract\ExceptionInterface;
 
 class EntityNotFoundException extends \Exception implements ExceptionInterface
 {

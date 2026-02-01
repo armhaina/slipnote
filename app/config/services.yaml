@@ -19,15 +19,16 @@ services:
   App\:
     resource: '../src/'
 
-  App\EventListener\ExceptionListener:
+  App\EventListener\Exception\ExceptionListener:
     tags:
       - { name: kernel.event_listener, event: kernel.exception }
 
-#  acme_api.event.authentication_failure_listener:
-#    class: App\EventListener\AuthenticationFailureListener
-#    tags:
-#      - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
-#
+  App\EventListener\Exception\JwtExceptionListener:
+    tags:
+      - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
+      - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired }
+      - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_invalid, method: onJWTInvalid }
+
 #  acme_api.event.jwt_expired_listener:
 #    class: App\EventListener\JWTExpiredListener
 #    tags:

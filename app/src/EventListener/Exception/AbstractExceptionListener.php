@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace App\EventListener\Exception;
 
 use App\Entity\User;
 use App\Enum\Message\HttpStatusMessage;
@@ -12,60 +12,41 @@ use App\Model\Response\Exception\ViolationResponseModelException;
 use App\Service\Entity\UserService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-readonly class ExceptionListener
+abstract readonly class AbstractExceptionListener
 {
     public function __construct(
-        private SerializerInterface $serializer,
-        private Security $security,
-        private ClassMetadataFactoryInterface $classMetadataFactory
+        protected SerializerInterface $serializer,
+        protected Security $security,
+        protected ClassMetadataFactoryInterface $classMetadataFactory
     ) {}
 
     /**
      * @throws ExceptionInterface
      */
-    public function onKernelException(ExceptionEvent $event): void
+    protected function serialize(DefaultResponseModelException $model): string
     {
-        $exception = $event->getThrowable();
-
-        $status = method_exists(
-            object_or_class: $exception,
-            method: 'getStatusCode'
-        ) ? $exception->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
-
-        $data = $this->exceptionFactory(exception: $exception, status: $status);
-
         /** @var User $user */
         $user = $this->security->getUser();
 
         $groups = UserService::getGroupsByUserRoles(user: $user);
 
-        $data = $this->serializer->serialize(
-            data: $data,
+        return $this->serializer->serialize(
+            data: $model,
             format: 'json',
             context: array_merge(
                 ['json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS],
                 ['groups' => $groups]
             )
         );
-
-        $event->setResponse(
-            response: new JsonResponse(
-                data: $data,
-                status: $status,
-                json: true
-            )
-        );
     }
 
-    private function exceptionFactory(\Throwable $exception, int $status): DefaultResponseModelException
+    protected function exceptionFactory(\Throwable $exception, int $status): DefaultResponseModelException
     {
         $violations = [];
 
@@ -124,7 +105,7 @@ readonly class ExceptionListener
 
     private function getMessage(\Throwable $exception, int $status): string
     {
-        if ($exception instanceof \App\Contract\Exception\ExceptionInterface) {
+        if ($exception instanceof \App\Contract\ExceptionInterface) {
             return $exception->getMessage();
         }
 

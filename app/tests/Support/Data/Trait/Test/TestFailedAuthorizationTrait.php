@@ -39,8 +39,10 @@ trait TestFailedAuthorizationTrait
 
         $I->assertEquals(
             expected: [
-                'code' => 401,
-                'message' => 'JWT Token not found',
+                'success' => false,
+                'code' => 0,
+                'message' => 'Требуется авторизация',
+                'violations' => [],
             ],
             actual: $data
         );
