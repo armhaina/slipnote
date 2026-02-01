@@ -1,7 +1,15 @@
 # Slipnote
 
+<style>
+.logo-rounded {
+    border-radius: 12px;
+    max-width: 200px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+</style>
+
 <p align="center">
-    <img src="logo.png" alt="Slipnote Logo" style="border-radius: 15px;">
+    <img src="logo.png" alt="Slipnote Logo" class="logo-rounded">
 </p>
 
 **Slipnote** — это небольшой PET-проект для работы с заметками, который позволяет создавать, редактировать и организовывать
