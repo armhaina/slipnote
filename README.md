@@ -1,7 +1,7 @@
 # Slipnote
 
 <p align="center">
-    <img src="logo.png" alt="Slipnote Logo">
+    <img src="logo.png" alt="Slipnote Logo" style="border-radius: 15px;">
 </p>
 
 **Slipnote** — это небольшой PET-проект для работы с заметками, который позволяет создавать, редактировать и организовывать
