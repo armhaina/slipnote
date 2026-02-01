@@ -1,8 +1,8 @@
 # Slipnote
 
-<p align="center"><a href="https://symfony.com" target="_blank">
-    <img src="https://symfony.com/logos/symfony_dynamic_01.svg" alt="Symfony Logo">
-</a></p>
+<p align="center">
+    <img src="logo.png" alt="Slipnote Logo">
+</p>
 
 **Slipnote** — это небольшой PET-проект для работы с заметками, который позволяет создавать, редактировать и организовывать
 заметки с возможностью полнотекстового поиска. Проект включает REST API на Symfony с JWT-аутентификацией.
