@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
-readonly class JwtExceptionListener extends AbstractExceptionListener
+readonly class JWTExceptionListener extends AbstractExceptionListener
 {
     /**
      * @throws ExceptionInterface

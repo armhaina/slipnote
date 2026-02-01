@@ -19,7 +19,7 @@ use App\Model\Query\NoteQueryModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\NotePaginationResponseModelEntity;
 use App\Model\Response\Entity\NoteResponseModelEntity;
-use App\Model\Response\Exception\DefaultResponseModelException;
+use App\Model\Response\Exception\AllResponseModelException;
 use App\Service\Entity\NoteService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -68,7 +68,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -77,7 +77,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -86,7 +86,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -124,7 +124,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -133,7 +133,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -142,7 +142,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -305,7 +305,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -314,7 +314,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -323,7 +323,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -375,7 +375,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -384,7 +384,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -393,7 +393,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -402,7 +402,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -451,7 +451,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -460,7 +460,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -469,7 +469,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -508,7 +508,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -517,7 +517,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -526,7 +526,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -574,7 +574,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -583,7 +583,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -592,7 +592,7 @@ class NoteController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]

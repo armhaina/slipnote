@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
-readonly class ExceptionListener extends AbstractExceptionListener
+readonly class AllExceptionListener extends AbstractExceptionListener
 {
     /**
      * @throws ExceptionInterface

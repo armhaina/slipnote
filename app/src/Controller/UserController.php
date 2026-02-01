@@ -19,7 +19,7 @@ use App\Model\Payload\UserUpdatePasswordPayloadModel;
 use App\Model\Payload\UserUpdatePayloadModel;
 use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
-use App\Model\Response\Exception\DefaultResponseModelException;
+use App\Model\Response\Exception\AllResponseModelException;
 use App\Service\Entity\UserService;
 use App\Service\SecurityService;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -68,7 +68,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -77,7 +77,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -86,7 +86,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -123,7 +123,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -132,7 +132,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_CONFLICT->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -141,7 +141,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -207,7 +207,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -216,7 +216,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_CONFLICT->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -225,7 +225,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -234,7 +234,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -243,7 +243,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -299,7 +299,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -308,7 +308,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -317,7 +317,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -326,7 +326,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -335,7 +335,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_BAD_REQUEST->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -389,7 +389,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -398,7 +398,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]
@@ -407,7 +407,7 @@ class UserController extends AbstractController
         description: HttpStatusMessage::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: DefaultResponseModelException::class
+                type: AllResponseModelException::class
             )
         )
     )]

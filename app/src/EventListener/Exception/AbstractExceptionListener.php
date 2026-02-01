@@ -6,8 +6,8 @@ namespace App\EventListener\Exception;
 
 use App\Entity\User;
 use App\Enum\Message\HttpStatusMessage;
+use App\Model\Response\Exception\AllResponseModelException;
 use App\Model\Response\Exception\ContextResponseModelException;
-use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ViolationResponseModelException;
 use App\Service\Entity\UserService;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -29,7 +29,7 @@ abstract readonly class AbstractExceptionListener
     /**
      * @throws ExceptionInterface
      */
-    protected function serialize(DefaultResponseModelException $model): string
+    protected function serialize(AllResponseModelException $model): string
     {
         /** @var User $user */
         $user = $this->security->getUser();
@@ -46,7 +46,7 @@ abstract readonly class AbstractExceptionListener
         );
     }
 
-    protected function exceptionFactory(\Throwable $exception, int $status): DefaultResponseModelException
+    protected function exceptionFactory(\Throwable $exception, int $status): AllResponseModelException
     {
         $violations = [];
 
@@ -54,7 +54,7 @@ abstract readonly class AbstractExceptionListener
             $violations = $this->violationsExceptionHandler(exception: $exception);
         }
 
-        return new DefaultResponseModelException(
+        return new AllResponseModelException(
             success: false,
             code: $exception->getCode(),
             message: $this->getMessage(exception: $exception, status: $status),

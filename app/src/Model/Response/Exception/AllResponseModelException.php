@@ -9,7 +9,7 @@ use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class DefaultResponseModelException
+readonly class AllResponseModelException
 {
     /**
      * @param ViolationResponseModelException[] $violations
