@@ -14,9 +14,11 @@
 
 ## 🛠️ Технологический стек
 
+- PHP 8.5
 - Symfony 8.0
 - PostgreSQL + Doctrine
 - JWT-аутентификация (LexikJWTAuthenticationBundle)
+- Codeception
 - Rector + PHPStan + PHP-CS-Fixer
 - Docker
 
