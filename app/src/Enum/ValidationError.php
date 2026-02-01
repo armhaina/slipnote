@@ -14,4 +14,5 @@ enum ValidationError: string
     case LENGTH_MAX = 'Максимально допустимое значение символов: {{ limit }}. Ваше кол-во символов: {{ value_length }}';
     case TYPE_NUMERIC = 'Переданное значение должно содержать число. Вы передали: {{ value }}';
     case NOT_BLANK = 'Поле не может быть пустым';
+    case EMAIL = 'Email не соответствует формату электронной почты';
 }

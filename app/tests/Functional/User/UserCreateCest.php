@@ -116,7 +116,7 @@ final class UserCreateCest extends AbstractCest
                     'errors' => [
                         [
                             'property' => 'password',
-                            'message' => 'Пароль должен содержать минимум 6 символов',
+                            'message' => 'Минимально допустимое значение символов: 6. Ваше кол-во символов: 5',
                         ],
                     ],
                 ],
@@ -135,7 +135,7 @@ final class UserCreateCest extends AbstractCest
                     'errors' => [
                         [
                             'property' => 'password',
-                            'message' => 'Пароль должен содержать максимум 18 символов',
+                            'message' => 'Максимально допустимое значение символов: 18. Ваше кол-во символов: 19',
                         ],
                     ],
                 ],
