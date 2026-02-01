@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model\Response\Exception;
 
 use App\Contract\Exception\ExceptionResponseInterface;
-use App\Enum\Entity\User\Group;
+use App\Enum\Entity\User\GroupUser;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -16,25 +16,25 @@ readonly class DefaultResponseModelException implements ExceptionResponseInterfa
      * @param ViolationResponseModelException[] $violations
      */
     public function __construct(
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Статус',
             type: 'boolean',
         )]
         private bool $success,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Код ошибки',
             type: 'integer',
         )]
         private int $code,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
         )]
         private string $message,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Нарушения',
             type: 'array',
@@ -42,15 +42,16 @@ readonly class DefaultResponseModelException implements ExceptionResponseInterfa
                 ref: new Model(
                     type: ViolationResponseModelException::class,
                 )
-            )
+            ),
+            nullable: true
         )]
         private array $violations,
-        #[Groups([Group::ADMIN->value])]
+        #[Groups([GroupUser::ADMIN->value])]
         #[OA\Property(
             ref: new Model(
                 type: ContextResponseModelException::class,
             ),
-            description: 'Контекст ('.Group::ADMIN->value.')',
+            description: 'Контекст ('.GroupUser::ADMIN->value.')',
             type: 'object',
             nullable: true
         )]

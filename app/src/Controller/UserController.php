@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Enum\Entity\User\Group;
-use App\Enum\Entity\User\Role;
+use App\Enum\Entity\User\GroupUser;
+use App\Enum\Entity\User\RoleUser;
+use App\Enum\Message\HttpStatusMessageNew;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
 use App\Exception\Entity\User\EmailAlreadyExistsException;
 use App\Exception\Entity\User\ForbiddenException;
 use App\Exception\Entity\User\InvalidCurrentPasswordException;
 use App\Mapper\Entity\UserMapper;
-use App\Message\HttpStatusMessage;
 use App\Model\Payload\UserCreatePayloadModel;
 use App\Model\Payload\UserUpdatePasswordPayloadModel;
 use App\Model\Payload\UserUpdatePayloadModel;
@@ -21,8 +21,6 @@ use App\Model\Response\Action\DeleteResponseModelAction;
 use App\Model\Response\Entity\UserResponseModelEntity;
 use App\Model\Response\Exception\DefaultResponseModelException;
 use App\Model\Response\Exception\ExpiredJWTTokenModelException;
-use App\Model\Response\Exception\ForbiddenResponseModelException;
-use App\Model\Response\Exception\ValidationResponseModelException;
 use App\Service\Entity\UserService;
 use App\Service\SecurityService;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -53,22 +51,22 @@ class UserController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_GET]
     )]
-    #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
+    #[IsGranted(attribute: RoleUser::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[DocSecurity(name: 'Bearer')]
     #[OA\Get(operationId: 'getUser', summary: 'Получить пользователя (только текущий пользователь)')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessageNew::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: UserResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessageNew::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -77,16 +75,16 @@ class UserController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessageNew::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessageNew::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: ExpiredJWTTokenModelException::class
@@ -101,7 +99,7 @@ class UserController extends AbstractController
 
         $responseModel = $this->userMapper->one(user: $user);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     /**
@@ -113,26 +111,26 @@ class UserController extends AbstractController
     #[OA\RequestBody(content: new Model(type: UserCreatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessageNew::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: UserResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        description: HttpStatusMessageNew::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ValidationResponseModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_CONFLICT,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_CONFLICT],
+        description: HttpStatusMessageNew::HTTP_CONFLICT->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -141,7 +139,7 @@ class UserController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessageNew::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -171,7 +169,7 @@ class UserController extends AbstractController
         $entity
             ->setEmail(email: $model->getEmail())
             ->setPassword(password: $hashedPassword)
-            ->setRoles(roles: [Role::ROLE_USER->value])
+            ->setRoles(roles: [RoleUser::ROLE_USER->value])
             ->setCreatedAt(dateTimeImmutable: $dateTimeImmutable)
             ->setUpdatedAt(dateTimeImmutable: $dateTimeImmutable)
         ;
@@ -180,7 +178,7 @@ class UserController extends AbstractController
 
         $responseModel = $this->userMapper->one(user: $entity);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     /**
@@ -191,32 +189,32 @@ class UserController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
-    #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
+    #[IsGranted(attribute: RoleUser::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[DocSecurity(name: 'Bearer')]
     #[OA\Put(operationId: 'updateUser', summary: 'Изменить пользователя (только текущий пользователь)')]
     #[OA\RequestBody(content: new Model(type: UserUpdatePayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessageNew::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: UserResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        description: HttpStatusMessageNew::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ValidationResponseModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_CONFLICT,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_CONFLICT],
+        description: HttpStatusMessageNew::HTTP_CONFLICT->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -225,7 +223,7 @@ class UserController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessageNew::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -234,16 +232,16 @@ class UserController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessageNew::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessageNew::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: ExpiredJWTTokenModelException::class
@@ -272,7 +270,7 @@ class UserController extends AbstractController
 
         $responseModel = $this->userMapper->one(user: $entity);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     /**
@@ -283,32 +281,32 @@ class UserController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_PUT]
     )]
-    #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
+    #[IsGranted(attribute: RoleUser::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[DocSecurity(name: 'Bearer')]
     #[OA\Put(operationId: 'updatePasswordUser', summary: 'Изменить пароль пользователя (только текущий пользователь)')]
     #[OA\RequestBody(content: new Model(type: UserUpdatePasswordPayloadModel::class))]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessageNew::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: UserResponseModelEntity::class,
-                groups: [Group::PUBLIC->value]
+                groups: [GroupUser::PUBLIC->value]
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNPROCESSABLE_ENTITY,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNPROCESSABLE_ENTITY],
+        description: HttpStatusMessageNew::HTTP_UNPROCESSABLE_ENTITY->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ValidationResponseModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessageNew::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -317,16 +315,16 @@ class UserController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessageNew::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessageNew::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: ExpiredJWTTokenModelException::class
@@ -335,7 +333,7 @@ class UserController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_BAD_REQUEST,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_BAD_REQUEST],
+        description: HttpStatusMessageNew::HTTP_BAD_REQUEST->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -366,7 +364,7 @@ class UserController extends AbstractController
 
         $responseModel = $this->userMapper->one(user: $entity);
 
-        return $this->json(data: $responseModel, context: ['groups' => [Group::PUBLIC->value]]);
+        return $this->json(data: $responseModel, context: ['groups' => [GroupUser::PUBLIC->value]]);
     }
 
     /**
@@ -377,28 +375,28 @@ class UserController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: [Request::METHOD_DELETE]
     )]
-    #[IsGranted(attribute: Role::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
+    #[IsGranted(attribute: RoleUser::ROLE_USER->value, statusCode: Response::HTTP_FORBIDDEN)]
     #[DocSecurity(name: 'Bearer')]
     #[OA\Delete(operationId: 'deleteUser', summary: 'Удалить пользователя по ID (только текущий пользователь)')]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_OK],
+        description: HttpStatusMessageNew::HTTP_OK->value,
         content: new OA\JsonContent(
             ref: new Model(type: DeleteResponseModelAction::class)
         )
     )]
     #[OA\Response(
         response: Response::HTTP_FORBIDDEN,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_FORBIDDEN],
+        description: HttpStatusMessageNew::HTTP_FORBIDDEN->value,
         content: new OA\JsonContent(
             ref: new Model(
-                type: ForbiddenResponseModelException::class
+                type: DefaultResponseModelException::class
             )
         )
     )]
     #[OA\Response(
         response: Response::HTTP_INTERNAL_SERVER_ERROR,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_INTERNAL_SERVER_ERROR],
+        description: HttpStatusMessageNew::HTTP_INTERNAL_SERVER_ERROR->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: DefaultResponseModelException::class
@@ -407,7 +405,7 @@ class UserController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_UNAUTHORIZED,
-        description: HttpStatusMessage::HTTP_STATUS_MESSAGE[Response::HTTP_UNAUTHORIZED],
+        description: HttpStatusMessageNew::HTTP_UNAUTHORIZED->value,
         content: new OA\JsonContent(
             ref: new Model(
                 type: ExpiredJWTTokenModelException::class

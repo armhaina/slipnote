@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Query;
 
-use App\Enum\Message\ValidationError;
+use App\Enum\Message\ValidationViolationMessage;
 use App\Validator\OrderBy;
 use Nelmio\ApiDocBundle\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\SerializedName;
@@ -13,10 +13,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class NoteQueryModel
 {
     #[Assert\Type(type: 'numeric')]
-    #[Assert\Range(notInRangeMessage: ValidationError::RANGE->value, min: 1, max: 100)]
+    #[Assert\Range(notInRangeMessage: ValidationViolationMessage::RANGE->value, min: 1, max: 100)]
     private int $limit = 20;
     #[Assert\Type(type: 'numeric')]
-    #[Assert\Range(minMessage: ValidationError::RANGE_MIN->value, min: 0)]
+    #[Assert\Range(minMessage: ValidationViolationMessage::RANGE_MIN->value, min: 0)]
     private int $offset = 0;
     #[Assert\Type(type: 'boolean')]
     #[SerializedName(serializedName: 'is_trashed')]
@@ -24,22 +24,22 @@ class NoteQueryModel
     #[Assert\Type(type: 'string')]
     #[Assert\Length(
         max: 100,
-        maxMessage: ValidationError::LENGTH_MAX->value
+        maxMessage: ValidationViolationMessage::LENGTH_MAX->value
     )]
     private ?string $search = null;
     /** @var array<int> */
     #[Ignore]
     #[Assert\All([
-        new Assert\Type(type: 'numeric', message: ValidationError::TYPE_NUMERIC->value),
-        new Assert\Positive(message: ValidationError::POSITIVE->value),
+        new Assert\Type(type: 'numeric', message: ValidationViolationMessage::TYPE_NUMERIC->value),
+        new Assert\Positive(message: ValidationViolationMessage::POSITIVE->value),
     ])]
     private ?array $ids = null;
     /** @var array<int> */
     #[Ignore]
     #[SerializedName(serializedName: 'user_ids')]
     #[Assert\All([
-        new Assert\Type(type: 'numeric', message: ValidationError::TYPE_NUMERIC->value),
-        new Assert\Positive(message: ValidationError::POSITIVE->value),
+        new Assert\Type(type: 'numeric', message: ValidationViolationMessage::TYPE_NUMERIC->value),
+        new Assert\Positive(message: ValidationViolationMessage::POSITIVE->value),
     ])]
     private ?array $userIds = null;
     /** @var array<string> */

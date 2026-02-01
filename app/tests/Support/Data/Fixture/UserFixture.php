@@ -3,7 +3,7 @@
 namespace App\Tests\Support\Data\Fixture;
 
 use App\Entity\User;
-use App\Enum\Entity\User\Role;
+use App\Enum\Entity\User\RoleUser;
 use App\Tests\Support\FunctionalTester;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -21,7 +21,7 @@ class UserFixture
 
         $passwordHasher = $I->grabService(serviceId: UserPasswordHasherInterface::class);
 
-        $roles = $data['roles'] ?? [Role::ROLE_USER->value];
+        $roles = $data['roles'] ?? [RoleUser::ROLE_USER->value];
         $email = $data['email'] ?? $faker->email();
         $createdAt = $data['created_at'] ?? $dateTimeImmutable;
         $updatedAt = $data['updated_at'] ?? $dateTimeImmutable;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enum\Message;
 
-enum ValidationError: string
+enum ValidationViolationMessage: string
 {
     case POSITIVE = 'Число должно быть положительным. Ваше число: {{ value }}';
     case RANGE = 'Значение {{ value }} должно быть в диапазоне от {{ min }} до {{ max }}';

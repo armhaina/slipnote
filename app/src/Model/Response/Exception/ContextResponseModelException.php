@@ -5,26 +5,26 @@ declare(strict_types=1);
 namespace App\Model\Response\Exception;
 
 use App\Contract\Exception\ExceptionResponseInterface;
-use App\Enum\Entity\User\Group;
+use App\Enum\Entity\User\GroupUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class ContextResponseModelException implements ExceptionResponseInterface
 {
     public function __construct(
-        #[Groups([Group::ADMIN->value])]
+        #[Groups([GroupUser::ADMIN->value])]
         #[OA\Property(
             description: 'Файл',
             type: 'string',
         )]
         private string $file,
-        #[Groups([Group::ADMIN->value])]
+        #[Groups([GroupUser::ADMIN->value])]
         #[OA\Property(
             description: 'Строка',
             type: 'integer',
         )]
         private int $line,
-        #[Groups([Group::ADMIN->value])]
+        #[Groups([GroupUser::ADMIN->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',

@@ -5,28 +5,28 @@ declare(strict_types=1);
 namespace App\Model\Response\Exception;
 
 use App\Contract\Exception\ExceptionResponseInterface;
-use App\Enum\Entity\User\Group;
+use App\Enum\Entity\User\GroupUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class ForbiddenResponseModelException implements ExceptionResponseInterface
 {
     public function __construct(
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Статус',
             type: 'boolean',
         )]
         private bool $success,
-        #[Groups([Group::PUBLIC->value])]
+        #[Groups([GroupUser::PUBLIC->value])]
         #[OA\Property(
             description: 'Сообщение',
             type: 'string',
         )]
         private string $message,
-        #[Groups([Group::ADMIN->value])]
+        #[Groups([GroupUser::ADMIN->value])]
         #[OA\Property(
-            description: 'Код ошибки ('.Group::ADMIN->value.')',
+            description: 'Код ошибки ('.GroupUser::ADMIN->value.')',
             type: 'integer',
             nullable: true,
         )]

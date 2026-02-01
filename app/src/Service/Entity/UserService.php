@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Service\Entity;
 
 use App\Entity\User;
-use App\Enum\Entity\User\Group;
-use App\Enum\Entity\User\Role;
+use App\Enum\Entity\User\GroupUser;
+use App\Enum\Entity\User\RoleUser;
 use App\Exception\Entity\EntityNotFoundException;
 use App\Exception\Entity\EntityNotFoundWhenDeleteException;
 use App\Exception\Entity\EntityNotFoundWhenUpdateException;
@@ -98,14 +98,14 @@ readonly class UserService
      */
     public static function getGroupsByUserRoles(?User $user): array
     {
-        $groups = [Group::PUBLIC->value];
+        $groups = [GroupUser::PUBLIC->value];
 
         if (!$user) {
             return $groups;
         }
 
-        if (in_array(needle: Role::ROLE_ADMIN->value, haystack: $user->getRoles())) {
-            $groups[] = Group::ADMIN->value;
+        if (in_array(needle: RoleUser::ROLE_ADMIN->value, haystack: $user->getRoles())) {
+            $groups[] = GroupUser::ADMIN->value;
         }
 
         return $groups;
