@@ -16,7 +16,7 @@ class OrderBy extends Constraint
      * @var array<string>
      */
     public array $allowedDirections = ['asc', 'desc'];
-    public string $invalidFieldMessage = 'Поле "{{ field }}" не разрешено для сортировки. Разрешены: {{ allowed }}';
+    public string $invalidFieldMessage = 'Поле "{{ field }}" не разрешено для сортировки. Разрешены поля: {{ allowed }}';
     public string $invalidDirectionMessage = 'Направление "{{ direction }}" недопустимо. Используйте: asc или desc';
 
     /**

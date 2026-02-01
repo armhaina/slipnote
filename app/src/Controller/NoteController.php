@@ -271,8 +271,10 @@ class NoteController extends AbstractController
         schema: new OA\Schema(type: 'string', enum: ['asc', 'desc']),
         example: 'desc',
     )]
-    public function list(#[MapQueryString] NoteQueryModel $model): JsonResponse
-    {
+    public function list(
+        #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)]
+        NoteQueryModel $model
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
