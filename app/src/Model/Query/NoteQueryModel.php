@@ -45,7 +45,7 @@ class NoteQueryModel
     /** @var array<string> */
     #[Ignore]
     #[SerializedName(serializedName: 'order_by')]
-    #[OrderBy(fields: ['name', 'created_at', 'updated_at'])]
+    #[OrderBy(allowedFields: ['name', 'created_at', 'updated_at'])]
     #[Assert\All([new Assert\Type(type: 'string')])]
     private array $orderBy = [];
     #[SerializedName(serializedName: 'updated_at_less')]

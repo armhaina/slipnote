@@ -36,7 +36,7 @@ class UserFixture
 
         try {
             $entity = $I->grabEntityFromRepository(entity: User::class, params: ['email' => $email]);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $id = $I->haveInRepository(classNameOrInstance: User::class, data: [
                 'email' => $email,
                 'password' => $password,
