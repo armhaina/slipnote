@@ -47,6 +47,12 @@ cd slipnote
 make up
 ```
 
+- Сгенерировать [JWT-ключи][2]
+
+```bash
+docker compose exec -it application php bin/console lexik:jwt:generate-keypair
+```
+
 ## 📚 Документация
 
 - API документация доступна после запуска проекта по адресу: http://localhost/api/doc
@@ -102,3 +108,4 @@ node_modules/.bin/lefthook install
 Полный текст лицензии доступен в файле [LICENSE](LICENSE)
 
 [1]: https://nodejs.org/en/download
+[2]: https://symfony.com/bundles/LexikJWTAuthenticationBundle/current/index.html#generate-the-ssl-keys
