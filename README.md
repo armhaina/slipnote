@@ -31,6 +31,8 @@ git clone https://github.com/armhaina/slipnote.git
 cd slipnote
 ```
 
+- Скопировать файл `.env.example` в `.env`
+
 - Запустить проект
 
 ```bash
