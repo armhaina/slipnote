@@ -33,6 +33,10 @@ cd slipnote
 
 - Скопировать файл `.env.example` в `.env`
 
+```bash
+cp .env.example .env
+```
+
 - Запустить проект
 
 ```bash
