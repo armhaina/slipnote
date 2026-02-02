@@ -4,8 +4,8 @@
 
 [![PHP 8.5](https://img.shields.io/badge/php-8.5-%23777BB4?style=for-the-badge&logo=php&logoColor=black">)](https://www.php.net/releases/8.5/ru.php)
 [![Symfony 8.0](https://img.shields.io/badge/symfony-8.0-%23000000.svg?style=for-the-badge&logo=symfony&logoColor=white)](https://symfony.com/releases/8.0)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.1-396a94?style=for-the-badge&logo=postgresql&logoColor=blue)](https://www.postgresql.org/docs/release/18.1)
-[![Codeception](https://img.shields.io/badge/codeception-5.0-%2344C242?style=for-the-badge&logo=codeception&logoColor=white)](https://codeception.com/)
+[![PostgreSQL 18.1](https://img.shields.io/badge/PostgreSQL-18.1-396a94?style=for-the-badge&logo=postgresql&logoColor=blue)](https://www.postgresql.org/docs/release/18.1)
+[![Codeception 5.3](https://img.shields.io/badge/codeception-5.3-%2344C242?style=for-the-badge&logo=codeception&logoColor=white)](https://codeception.com/)
 
 **Slipnote** — это небольшой PET-проект для работы с заметками, который позволяет создавать, редактировать и организовывать
 заметки с возможностью полнотекстового поиска. Проект включает REST API на Symfony с JWT-аутентификацией.
